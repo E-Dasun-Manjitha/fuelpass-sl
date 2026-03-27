@@ -8,12 +8,15 @@ const PORT = process.env.PORT || 4000;
 
 // ---- Middleware ----
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    process.env.FRONTEND_URL || '*',        // Vercel URL set in env
-  ],
+  origin: function(origin, callback) {
+    if (!origin || /localhost:\d+|127\.0\.0\.1:\d+|fuelpass-sl.*\.vercel\.app$/.test(origin)) {
+      callback(null, true);
+    } else if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());
