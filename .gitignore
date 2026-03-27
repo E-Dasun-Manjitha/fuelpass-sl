@@ -1,0 +1,34 @@
+# ── Node.js ──────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Environment variables (NEVER commit these) ────────────
+.env
+.env.local
+.env.production
+backend/.env
+
+# ── OS files ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor files ──────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+
+# ── Logs ─────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Build output ─────────────────────────────────────────
+dist/
+build/
+.cache/
+
+# ── Keep .env.example (safe template, no real secrets) ───
+!backend/.env.example
