@@ -121,6 +121,7 @@
       <div class="sb-section-label">Overview</div>
       <a class="active" onclick="showPanel('dashboard')">📊 Dashboard</a>
       <div class="sb-section-label">Owner Management</div>
+      <a onclick="showPanel('pending')">⏳ Pending Registrations</a>
       <a onclick="showPanel('addowner')">➕ Add New Owner</a>
       <a onclick="showPanel('approved')">🏪 All Station Owners</a>
       <div class="sb-section-label">Data Management</div>
@@ -134,6 +135,15 @@
 
   <!-- Main Content -->
   <main class="admin-main">
+
+    <!-- ── PENDING REGISTRATIONS ── -->
+    <div id="panel-pending" class="admin-panel animate-fade-in">
+      <div class="panel-header">
+        <h2>⏳ Pending Registrations</h2>
+        <p>Review and approve new fuel stations submitted via the public portal's Register page.</p>
+      </div>
+      <div id="pendingList"></div>
+    </div>
 
     <!-- ── DASHBOARD ── -->
     <div id="panel-dashboard" class="admin-panel active">
