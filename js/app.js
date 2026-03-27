@@ -1,0 +1,158 @@
+// ============================================================
+// app.js – Main application controller, SPA routing, init
+// ============================================================
+
+// ---- SPA NAVIGATION ----
+function navigateTo(page) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Show target
+  const target = document.getElementById(`page-${page}`);
+  if (target) {
+    target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  // Update nav links
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.page === page);
+  });
+  // Close mobile menu
+  document.getElementById('navLinks')?.classList.remove('open');
+
+  // Page-specific init
+  if (page === 'dashboard') setTimeout(() => { if (map) map.invalidateSize(); }, 100);
+  if (page === 'stations')   try { searchStations(); }         catch(e) {}
+  if (page === 'gas')        try { renderGasPage(); }          catch(e) {}
+  if (page === 'prices')     try { renderPricesPage(); }       catch(e) {}
+  if (page === 'eligibility')try { initOddEvenFromToday(); }   catch(e) {}
+  if (page === 'report')     try { renderRecentReports(); }    catch(e) {}
+}
+
+// ---- NAVBAR ----
+function initNavbar() {
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // Nav link click
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => { e.preventDefault(); navigateTo(link.dataset.page); });
+  });
+
+  // Mobile toggle
+  document.getElementById('navToggle')?.addEventListener('click', () => {
+    document.getElementById('navLinks')?.classList.toggle('open');
+  });
+}
+
+// ---- REAL-TIME SIMULATION ----
+const statusCycle = ['available', 'limited', 'out'];
+function simulateRealTimeUpdates() {
+  setInterval(() => {
+    try {
+      // Randomly update 1–2 stations
+      const count = Math.floor(Math.random() * 2) + 1;
+      for (let i = 0; i < count; i++) {
+        const idx = Math.floor(Math.random() * DB.stations.length);
+        const station = DB.stations[idx];
+        const fuelKeys = Object.keys(station.fuels);
+        const fuelKey  = fuelKeys[Math.floor(Math.random() * fuelKeys.length)];
+        const newStatus = statusCycle[Math.floor(Math.random() * statusCycle.length)];
+        station.fuels[fuelKey] = newStatus;
+        station.lastUpdated    = 'Just now';
+      }
+
+      // Update stats
+      DB.stats.availableStations = DB.stations.filter(s => Object.values(s.fuels).some(v => v === 'available')).length;
+      DB.stats.lastUpdated = 'Just now';
+      document.getElementById('statAvail').textContent = DB.stats.availableStations;
+      document.getElementById('statUpdated').textContent = 'Just now';
+
+      // Refresh visible lists
+      const activePage = document.querySelector('.page.active')?.id;
+      if (activePage === 'page-dashboard') try { filterStations(); }  catch(e) {}
+      if (activePage === 'page-stations')  try { searchStations(); }  catch(e) {}
+
+      // Refresh map markers
+      if (map) try { renderMapMarkers(); } catch(e) {}
+
+      // Update last updated display
+      document.getElementById('overviewUpdated').textContent = 'Updated just now';
+    } catch(e) { console.warn('Realtime update error:', e); }
+  }, 30000); // every 30s
+}
+
+// ---- SPLASH ----
+function hideSplash() {
+  // Always hide after 2s regardless of anything else
+  setTimeout(() => {
+    const el = document.getElementById('splash-loader');
+    if (el) el.classList.add('hidden');
+  }, 2000);
+}
+
+// ---- MAIN INIT ----
+window.addEventListener('DOMContentLoaded', () => {
+  // ⚠️ ALWAYS hide splash first — nothing should block this
+  hideSplash();
+
+  try { initNavbar(); }           catch(e) { console.warn(e); }
+
+  // Ticker
+  try { buildTicker(); }          catch(e) { console.warn(e); }
+
+  // Stats
+  try { updateStats(); }          catch(e) { console.warn(e); }
+
+  // Sparklines
+  try { drawSparkline('chart92', '#10B981'); } catch(e) {}
+  try { drawSparkline('chartDsl','#F59E0B'); } catch(e) {}
+  try { drawSparkline('chartGas','#EF4444'); } catch(e) {}
+
+  // Dashboard station list
+  try { filterStations(); }       catch(e) { console.warn(e); }
+
+  // Render recent reports (for report page pre-load)
+  try { renderRecentReports(); }  catch(e) { console.warn(e); }
+
+  // Map (dashboard) – Leaflet may not load on file:// without internet
+  setTimeout(() => {
+    try {
+      if (typeof L !== 'undefined') {
+        initMap();
+      } else {
+        const el = document.getElementById('mainMap');
+        if (el) el.innerHTML = `
+          <div style="height:100%;display:flex;align-items:center;justify-content:center;
+                      flex-direction:column;gap:12px;color:#64748B;font-family:Inter,sans-serif;">
+            <span style="font-size:3rem">🗺️</span>
+            <p>Map requires an internet connection to load tiles.</p>
+          </div>`;
+      }
+    } catch(e) { console.warn('Map init failed:', e); }
+  }, 400);
+
+  // Eligibility
+  try { initOddEvenFromToday(); } catch(e) { console.warn(e); }
+
+  // Simulate real-time updates
+  try { simulateRealTimeUpdates(); } catch(e) {}
+
+  // Hash navigation
+  try {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(`page-${hash}`)) {
+      navigateTo(hash);
+    }
+  } catch(e) {}
+});
+
+// Handle browser back/forward
+window.addEventListener('hashchange', () => {
+  try {
+    const page = window.location.hash.replace('#', '');
+    if (page && document.getElementById(`page-${page}`)) {
+      navigateTo(page);
+    }
+  } catch(e) {}
+});
