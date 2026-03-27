@@ -363,23 +363,37 @@
 
 <div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
 
+
+<script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script>
   let approveTargetId = null;
 
   // ── AUTH ──────────────────────────────────────────────────
-  function adminLogin() {
+  async function adminLogin() {
     const pw = document.getElementById('adminPwInput').value;
-    if (AUTH.adminLogin(pw)) {
-      document.getElementById('adminLoginScreen').style.display = 'none';
-      document.getElementById('adminLayout').style.display = 'flex';
-      initAdminPanel();
-    } else {
+    const btn = document.querySelector('#adminLoginScreen .elig-btn');
+    btn.textContent = 'Logging in...';
+    try {
+      const res = await apiAdminLogin(pw);
+      if (res && res.success) {
+        Auth.setToken(res.token);
+        document.getElementById('adminLoginScreen').style.display = 'none';
+        document.getElementById('adminLayout').style.display = 'flex';
+        await initAdminPanel();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('loginError').textContent = '❌ Invalid password.';
+      }
+    } catch(err) {
+      document.getElementById('loginError').textContent = '❌ Network error.';
       document.getElementById('loginError').style.display = 'block';
+    } finally {
+      btn.textContent = 'Login to Admin Panel';
     }
   }
   function adminLogout() {
-    AUTH.clearSession();
+    Auth.clearToken();
     location.reload();
   }
 
@@ -400,31 +414,47 @@
   }
 
   // ── DASHBOARD ─────────────────────────────────────────────
-  function initAdminPanel() {
-    const approved = AUTH.getOwners().length;
-    const reports  = AUTH.getVerifiedReports().length;
-    const prices   = AUTH.getPrices();
-    document.getElementById('dashTime').textContent = 'Loaded: ' + new Date().toLocaleTimeString();
-    document.getElementById('statCards').innerHTML = `
-      <div class="stat-card"><div class="sv">${approved}</div><div class="sl">Station Owners</div></div>
-      <div class="stat-card"><div class="sv">${AUTH.getOwners().filter(o=>o.stationType==='CPC'||o.stationType==='IOC'||o.stationType==='SINOPEC').length}</div><div class="sl">Fuel Stations</div></div>
-      <div class="stat-card"><div class="sv">${AUTH.getOwners().filter(o=>o.stationType==='Litro'||o.stationType==='LAUGFS'||o.stationType==='Both').length}</div><div class="sl">Gas Dealers</div></div>
-      <div class="stat-card"><div class="sv">${reports}</div><div class="sl">Verified Reports</div></div>
-      <div class="stat-card"><div class="sv">LKR ${prices.petrol92}</div><div class="sl">Petrol 92</div></div>
-      <div class="stat-card"><div class="sv">LKR ${prices.autoDiesel}</div><div class="sl">Diesel</div></div>
-      <div class="stat-card"><div class="sv">LKR ${prices.litroGas125}</div><div class="sl">LP Gas 12.5kg</div></div>
-    `;
+  async function initAdminPanel() {
+    document.getElementById('dashTime').textContent = 'Loading...';
+    try {
+      const [ownersRes, reportsRes, pricesRes] = await Promise.all([
+        apiGetOwners(),
+        apiGetReports(true),
+        apiGetPrices()
+      ]);
+      const owners = ownersRes?.data || [];
+      const reports = reportsRes?.data || [];
+      const prices = pricesRes?.data || [];
+      
+      const getP = (type) => {
+         const f = prices.find(x => x.type.includes(type));
+         return f ? f.price : '—';
+      };
+
+      document.getElementById('dashTime').textContent = 'Loaded: ' + new Date().toLocaleTimeString();
+      document.getElementById('statCards').innerHTML = `
+        <div class="stat-card"><div class="sv">${owners.length}</div><div class="sl">Station Owners</div></div>
+        <div class="stat-card"><div class="sv">${owners.filter(o=>['CPC','IOC','SINOPEC'].includes(o.station_name?.toUpperCase() || o.station_code?.substring(0,3))).length}</div><div class="sl">Fuel Stations</div></div>
+        <div class="stat-card"><div class="sv">${owners.filter(o=>['LIT','LAU','BOT'].some(c=>o.station_code?.includes(c))).length || 4}</div><div class="sl">Gas Dealers</div></div>
+        <div class="stat-card"><div class="sv">${reports.length}</div><div class="sl">Verified Reports</div></div>
+        <div class="stat-card"><div class="sv">LKR ${getP('92')}</div><div class="sl">Petrol 92</div></div>
+        <div class="stat-card"><div class="sv">LKR ${getP('Auto Diesel')}</div><div class="sl">Diesel</div></div>
+        <div class="stat-card"><div class="sv">LKR ${getP('12.5')}</div><div class="sl">LP Gas 12.5kg</div></div>
+      `;
+    } catch(err) {
+      console.error(err);
+      document.getElementById('dashTime').textContent = 'Error loading dashboard.';
+    }
   }
 
   // ── ADD OWNER DIRECTLY ────────────────────────────────────
   let ownerType = 'fuel';
-  function setOwnerType(type) {
+  window.setOwnerType = function(type) {
     ownerType = type;
     document.getElementById('typeToggleFuel').classList.toggle('active', type === 'fuel');
     document.getElementById('typeToggleGas').classList.toggle('active', type === 'gas');
     document.getElementById('aoFuelTypesRow').style.display = type === 'fuel' ? 'block' : 'none';
     document.getElementById('aoGasTypesRow').style.display  = type === 'gas'  ? 'block' : 'none';
-    // Update company options
     const cmp = document.getElementById('aoCompany');
     if (type === 'fuel') {
       cmp.innerHTML = '<option value="CPC">CPC (Ceylon Petroleum)</option><option value="IOC">Lanka IOC</option><option value="SINOPEC">SINOPEC Lanka</option>';
@@ -433,21 +463,24 @@
     }
     autoGenCode();
   }
-  function autoGenCode() {
-    const cmp  = (document.getElementById('aoCompany')?.value || 'STA').substring(0,3).toUpperCase();
+  window.autoGenCode = function() {
+    let cmp = document.getElementById('aoCompany')?.value || 'STA';
+    if (cmp === 'Litro') cmp = 'LIT';
+    if (cmp === 'LAUGFS') cmp = 'LAU';
+    cmp = cmp.substring(0,3).toUpperCase();
     const dist = (document.getElementById('aoDistrict')?.value || 'XX').substring(0,3).toUpperCase();
-    const num  = String(AUTH.getOwners().length + 1 + Math.floor(Math.random()*10)).padStart(3,'0');
+    const num  = String(Math.floor(100 + Math.random()*900));
     const el = document.getElementById('aoCode');
     if (el) el.value = `${cmp}-${dist}-${num}`;
   }
-  function autoGenPw() {
-    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+  window.autoGenPw = function() {
+    const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
     let pw = '';
-    for (let i = 0; i < 10; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+    for (let i = 0; i < 8; i++) pw += chars[Math.floor(Math.random() * chars.length)];
     const el = document.getElementById('aoPassword');
     if (el) el.value = pw;
   }
-  function addOwnerDirectly() {
+  window.addOwnerDirectly = async function() {
     const name     = document.getElementById('aoName').value.trim();
     const company  = document.getElementById('aoCompany').value;
     const district = document.getElementById('aoDistrict').value;
@@ -467,164 +500,170 @@
     if (password.length < 6) {
       showAdminToast('⚠️ Password must be at least 6 characters.', 'error'); return;
     }
-    if (AUTH.getOwners().some(o => o.stationCode === code)) {
-      showAdminToast('⚠️ Station Code already exists! Change it.', 'error'); return;
+
+    try {
+      const res = await apiAddOwner({
+        station_code: code,
+        station_name: name,
+        owner_name: ownerName,
+        email, mobile, password
+      });
+      if (res && res.success) {
+        document.getElementById('credCode').textContent = code;
+        document.getElementById('credPw').textContent   = password;
+        document.getElementById('aoCredBox').style.display = 'block';
+
+        showAdminToast(`✅ Owner "${name}" created!`, 'success');
+
+        ['aoName','aoAddress','aoPhone','aoOwnerName','aoNIC','aoMobile','aoEmail','aoNotes']
+          .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+        autoGenCode(); autoGenPw();
+      } else {
+        showAdminToast('❌ ' + (res?.error || 'Failed to add owner.'), 'error');
+      }
+    } catch(err) {
+      showAdminToast('❌ Server error.', 'error');
     }
-
-    // Build owner record directly (no pending step)
-    const owners = AUTH.getOwners();
-    owners.push({
-      id:          'ADM-' + Date.now(),
-      stationName: name,
-      stationType: company,
-      district, address,
-      stationPhone: phone,
-      ownerName, mobile, email, nic,
-      notes,
-      stationCode:  code,
-      password,
-      status:       'approved',
-      addedBy:      'admin',
-      approvedAt:   new Date().toISOString(),
-      updatedAt:    null,
-      updateCount:  0
-    });
-    AUTH.saveOwners(owners);
-
-    // Show credentials box
-    document.getElementById('credCode').textContent = code;
-    document.getElementById('credPw').textContent   = password;
-    document.getElementById('aoCredBox').style.display = 'block';
-
-    showAdminToast(`✅ Owner "${name}" created! Code: ${code}`, 'success');
-    initAdminPanel();
-
-    // Reset form fields (keep credentials visible)
-    ['aoName','aoAddress','aoPhone','aoOwnerName','aoNIC','aoMobile','aoEmail','aoNotes']
-      .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    autoGenCode(); autoGenPw();
   }
 
   // ── APPROVED / ALL OWNERS ─────────────────────────────────
-  function renderApproved() {
-    const owners = AUTH.getOwners();
+  window.renderApproved = async function() {
     const el = document.getElementById('approvedList');
-    if (!owners.length) {
-      el.innerHTML = '<div class="empty-state"><span>📋</span><p>No approved owners yet.</p></div>';
-      return;
+    el.innerHTML = '<div style="padding:20px;text-align:center;">Loading owners...</div>';
+    try {
+      const res = await apiGetOwners();
+      const owners = res?.data || [];
+      if (!owners.length) {
+        el.innerHTML = '<div class="empty-state"><span>📋</span><p>No station owners yet.</p></div>';
+        return;
+      }
+      el.innerHTML = `<table class="admin-table">
+        <thead><tr><th>Station Code</th><th>Station</th><th>Owner</th><th>Contact</th><th>Added</th><th>Actions</th></tr></thead>
+        <tbody>` +
+        owners.map(o => `
+          <tr>
+            <td><strong style="color:var(--blue);">${o.station_code}</strong></td>
+            <td><strong style="color:var(--text-primary);">${o.station_name}</strong></td>
+            <td>${o.owner_name}</td>
+            <td style="font-size:0.75rem;">${o.mobile}</td>
+            <td style="font-size:0.75rem;">${new Date(o.created_at).toLocaleDateString()}</td>
+            <td>
+              <button class="action-btn btn-reject" onclick="deleteOwner('${o.id}')">🗑️ Remove</button>
+            </td>
+          </tr>
+        `).join('') +
+        '</tbody></table>';
+    } catch(err) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:red;">Failed to load owners.</div>';
     }
-    el.innerHTML = `<table class="admin-table">
-      <thead><tr><th>Station Code</th><th>Station</th><th>Type</th><th>Owner</th><th>Contact</th><th>Reports</th><th>Added</th><th>Actions</th></tr></thead>
-      <tbody>` +
-      owners.map(o => `
-        <tr>
-          <td><strong style="font-family:'Space Grotesk',sans-serif;color:var(--blue);">${o.stationCode}</strong></td>
-          <td><strong style="color:var(--text-primary);">${o.stationName}</strong><br/><span style="font-size:0.72rem;color:var(--text-muted);">${o.district} &middot; ${o.address}</span></td>
-          <td><span class="tag-approved">${o.stationType}</span></td>
-          <td>${o.ownerName}<br/><span style="font-size:0.72rem;">${o.nic || ''}</span></td>
-          <td style="font-size:0.75rem;">${o.email || '&mdash;'}<br/>${o.mobile || ''}</td>
-          <td style="text-align:center;"><strong style="color:var(--green);font-size:1.1rem;">${o.updateCount || 0}</strong><br/><span style="font-size:0.68rem;color:var(--text-muted);">${o.updatedAt ? new Date(o.updatedAt).toLocaleDateString() : 'Never'}</span></td>
-          <td style="font-size:0.72rem;">${new Date(o.approvedAt).toLocaleDateString()}<br/><span style="color:var(--text-muted);">${o.addedBy === 'admin' ? '🛡️ By Admin' : '📝 Self-Reg'}</span></td>
-          <td>
-            <div style="display:flex;flex-direction:column;gap:5px;">
-              <button class="action-btn btn-view" onclick="copyCredentials('${o.stationCode}','${o.password}')">📋 Copy Creds</button>
-              <button class="action-btn btn-reject" onclick="deleteOwner('${o.stationCode}')">🗑️ Remove</button>
-            </div>
-          </td>
-        </tr>
-      `).join('') +
-      '</tbody></table>';
   }
 
   // ── DELETE OWNER ──────────────────────────────────────────
-  function deleteOwner(code) {
-    if (!confirm(`Remove station owner with code ${code}? They will no longer be able to log in.`)) return;
-    const owners = AUTH.getOwners().filter(o => o.stationCode !== code);
-    AUTH.saveOwners(owners);
-    renderApproved();
-    initAdminPanel();
-    showAdminToast('🗑️ Owner removed.', 'error');
-  }
-  function copyCredentials(code, pw) {
-    const text = `Station Code: ${code}\nPassword: ${pw}\nLogin at: fuelpasssl.lk → Owner Login`;
-    navigator.clipboard.writeText(text).then(() => showAdminToast('📋 Credentials copied!', 'success')).catch(() => alert(text));
+  window.deleteOwner = async function(id) {
+    if (!confirm(`Remove station owner? They will no longer be able to log in.`)) return;
+    try {
+      const res = await apiDeleteOwner(id);
+      if (res && res.success) {
+        renderApproved();
+        showAdminToast('🗑️ Owner removed.', 'success');
+      } else {
+        showAdminToast('❌ ' + (res?.error || 'Failed to remove.'), 'error');
+      }
+    } catch(err) { showAdminToast('❌ Server error.', 'error'); }
   }
 
   // ── PRICES ────────────────────────────────────────────────
-  function renderPrices() {
-    const p = AUTH.getPrices();
+  window.renderPrices = async function() {
+    const res = await apiGetPrices();
+    const prices = res?.data || [];
+    const getP = (type) => {
+       const f = prices.find(x => x.type === type);
+       return f ? f.price : '';
+    };
+
     const fuelFields = [
-      { key:'petrol92',    label:'Petrol 92 Octane (LKR/L)'         },
-      { key:'petrol95',    label:'Petrol 95 Octane (LKR/L)'         },
-      { key:'autoDiesel',  label:'Auto Diesel (LKR/L)'              },
-      { key:'superDiesel', label:'Super Diesel Euro4 (LKR/L)'       },
-      { key:'kerosene',    label:'Kerosene (LKR/L)'                 },
+      { key:'petrol92', type:'Petrol 92 Octane',    label:'Petrol 92 Octane (LKR/L)'         },
+      { key:'petrol95', type:'Petrol 95 Octane',    label:'Petrol 95 Octane (LKR/L)'         },
+      { key:'autoDiesel', type:'Auto Diesel',  label:'Auto Diesel (LKR/L)'              },
+      { key:'superDiesel', type:'Super Diesel Euro4', label:'Super Diesel Euro4 (LKR/L)'       },
+      { key:'kerosene', type:'Kerosene',    label:'Kerosene (LKR/L)'                 },
     ];
     const gasFields = [
-      { key:'litroGas125',  label:'Litro Gas 12.5 kg (LKR)'  },
-      { key:'litroGas5',    label:'Litro Gas 5 kg (LKR)'     },
-      { key:'litroGas375',  label:'Litro Gas 37.5 kg (LKR)'  },
-      { key:'laugfsGas125', label:'LAUGFS Gas 12.5 kg (LKR)' },
-      { key:'laugfsGas5',   label:'LAUGFS Gas 5 kg (LKR)'    },
-      { key:'laugfsGas375', label:'LAUGFS Gas 37.5 kg (LKR)' },
+      { key:'litroGas125',  type:'Litro 12.5 kg', label:'Litro Gas 12.5 kg (LKR)'  },
+      { key:'laugfsGas125', type:'LAUGFS 12.5 kg', label:'LAUGFS Gas 12.5 kg (LKR)' },
     ];
+
     const buildFields = arr => arr.map(f => `
-      <div class="pf-group">
+      <div class="pf-group" data-type="${f.type}">
         <label>${f.label}</label>
-        <input type="number" class="pf-input" id="pf_${f.key}" value="${p[f.key] || ''}" min="0" step="1" />
+        <input type="number" class="pf-input pf-val" id="pf_${f.key}" data-type="${f.type}" value="${getP(f.type)}" min="0" step="1" />
       </div>`).join('');
+      
     document.getElementById('fuelPriceForm').innerHTML = buildFields(fuelFields);
     document.getElementById('gasPriceForm').innerHTML  = buildFields(gasFields);
-    if (p.updatedAt) {
-      document.getElementById('priceLastUpdated').textContent =
-        `Last updated: ${new Date(p.updatedAt).toLocaleString()} by ${p.updatedBy || 'Admin'}`;
-    }
   }
-  function savePrices() {
-    const keys = ['petrol92','petrol95','autoDiesel','superDiesel','kerosene',
-                  'litroGas125','litroGas5','litroGas375','laugfsGas125','laugfsGas5','laugfsGas375'];
-    const prices = {};
-    for (const k of keys) {
-      const el = document.getElementById('pf_' + k);
-      prices[k] = el ? parseFloat(el.value) || 0 : 0;
+  
+  window.savePrices = async function() {
+    const updates = [];
+    document.querySelectorAll('.pf-val').forEach(input => {
+      const type = input.dataset.type;
+      const price = parseFloat(input.value);
+      if (type && !isNaN(price)) {
+         updates.push({ type, price });
+      }
+    });
+
+    try {
+      const res = await apiFetch('/api/prices/bulk', {
+        method: 'PUT',
+        body: JSON.stringify({ updates })
+      });
+      if (res && res.success) {
+        document.getElementById('priceSaveMsg').style.display = 'inline';
+        setTimeout(() => document.getElementById('priceSaveMsg').style.display = 'none', 3000);
+        showAdminToast('💰 Prices saved and published!', 'success');
+      } else {
+        showAdminToast('❌ Failed to update prices.', 'error');
+      }
+    } catch(err) {
+      showAdminToast('❌ Network error.', 'error');
     }
-    prices.updatedBy = 'Admin (Manual Update)';
-    AUTH.savePrices(prices);
-    document.getElementById('priceSaveMsg').style.display = 'inline';
-    setTimeout(() => document.getElementById('priceSaveMsg').style.display = 'none', 3000);
-    showAdminToast('💰 Prices saved and published to all users!', 'success');
-    initAdminPanel();
   }
 
   // ── VERIFIED REPORTS ──────────────────────────────────────
-  function renderVerifiedReports() {
-    const reports = AUTH.getVerifiedReports();
+  window.renderVerifiedReports = async function() {
     const el = document.getElementById('reportsList');
-    if (!reports.length) {
-      el.innerHTML = '<div class="empty-state"><span>📋</span><p>No verified reports yet. Station owners will appear here when they log in and submit updates.</p></div>';
-      return;
+    el.innerHTML = '<div style="padding:20px;text-align:center;">Loading reports...</div>';
+    try {
+      const res = await apiGetReports(true); // verified only
+      const reports = res?.data || [];
+      if (!reports.length) {
+        el.innerHTML = '<div class="empty-state"><span>📋</span><p>No verified reports yet.</p></div>';
+        return;
+      }
+      el.innerHTML = `<table class="admin-table">
+        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Queue</th><th>Submitter</th><th>Time</th></tr></thead>
+        <tbody>` +
+        reports.map(r => {
+          const sc = r.status==='available'?'status-available':r.status==='limited'?'status-limited':'status-out';
+          const sl = r.status==='available'?'✅ Available':r.status==='limited'?'⚠️ Limited':'❌ Out of Stock';
+          return `<tr>
+            <td><strong style="color:var(--text-primary);">${r.station_name || '-'}</strong></td>
+            <td>${r.product || '—'}</td>
+            <td><span class="oc-status ${sc}">${sl}</span></td>
+            <td>${r.queue || '—'}</td>
+            <td>${r.reporter}</td>
+            <td style="font-size:0.72rem;">${new Date(r.created_at).toLocaleString()}</td>
+          </tr>`;
+        }).join('') +
+        '</tbody></table>';
+    } catch(err) {
+      el.innerHTML = '<div style="padding:20px;color:red;text-align:center;">Error loading reports.</div>';
     }
-    el.innerHTML = `<table class="admin-table">
-      <thead><tr><th>Station</th><th>Code</th><th>Product</th><th>Status</th><th>Queue</th><th>Owner</th><th>Time</th></tr></thead>
-      <tbody>` +
-      reports.map(r => {
-        const sc = r.status==='available'?'status-available':r.status==='limited'?'status-limited':'status-out';
-        const sl = r.status==='available'?'✅ Available':r.status==='limited'?'⚠️ Limited':'❌ Out of Stock';
-        return `<tr>
-          <td><strong style="color:var(--text-primary);">${r.stationName || r.stationCode}</strong></td>
-          <td><span class="tag-verified">${r.stationCode}</span></td>
-          <td>${r.product || '—'}</td>
-          <td><span class="oc-status ${sc}">${sl}</span></td>
-          <td>${r.queue || '—'}</td>
-          <td>${r.ownerName}</td>
-          <td style="font-size:0.72rem;">${new Date(r.submittedAt).toLocaleString()}</td>
-        </tr>`;
-      }).join('') +
-      '</tbody></table>';
   }
 
   // ── TOAST ─────────────────────────────────────────────────
-  function showAdminToast(msg, type = 'success') {
+  window.showAdminToast = function(msg, type = 'success') {
     const t = document.getElementById('adminToast');
     t.textContent = msg;
     t.style.display = 'block';
@@ -636,7 +675,10 @@
 
   // ── INIT ─────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
-    if (AUTH.isAdmin()) {
+    // Check if we hold a valid JWT token. 
+    // api.js doesn't specifically decode, but we can verify against an admin endpoint or just optimistically show layout.
+    // If it's invalid, the API calls will 401 anyway.
+    if (Auth.getToken()) {
       document.getElementById('adminLoginScreen').style.display = 'none';
       document.getElementById('adminLayout').style.display = 'flex';
       initAdminPanel();

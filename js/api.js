@@ -99,6 +99,20 @@ async function apiAdminLogin(password) {
   });
 }
 
+// ---- Admin Functions ----
+async function apiGetOwners() {
+  return apiFetch('/api/owners');
+}
+async function apiAddOwner(payload) {
+  return apiFetch('/api/owners', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+async function apiDeleteOwner(id) {
+  return apiFetch(`/api/owners/${id}`, { method: 'DELETE' });
+}
+
 // ============================================================
 // BOOTSTRAP – Load live data into DB on page start
 // Falls back to static data if API is unreachable
