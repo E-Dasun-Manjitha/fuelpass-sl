@@ -44,4 +44,28 @@ router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
+// PUT /api/prices/bulk (admin only)
+router.put('/bulk', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { updates } = req.body;
+    for (const u of updates) {
+      // Look up and update fuel_prices or gas_prices depending on the request criteria
+      // Our frontend bulk updates pass `type` and `price`.
+      // We can update fuel and gas based on type matching.
+      await db.query(
+        "UPDATE fuel_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE type = $2",
+        [u.price, u.type]
+      );
+      await db.query(
+        "UPDATE gas_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE provider || ' ' || size = $2",
+        [u.price, u.type]
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
 module.exports = router;

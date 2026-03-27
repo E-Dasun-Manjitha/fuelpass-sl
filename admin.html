@@ -424,7 +424,8 @@
       ]);
       const owners = ownersRes?.data || [];
       const reports = reportsRes?.data || [];
-      const prices = pricesRes?.data || [];
+      const d = pricesRes?.data;
+      const prices = d ? [ ...(d.fuelPrices?.cpc||[]), ...(d.gasPrices?.litro||[]) ] : [];
       
       const getP = (type) => {
          const f = prices.find(x => x.type.includes(type));
@@ -575,7 +576,8 @@
   // ── PRICES ────────────────────────────────────────────────
   window.renderPrices = async function() {
     const res = await apiGetPrices();
-    const prices = res?.data || [];
+    const d = res?.data;
+    const prices = d ? [ ...(d.fuelPrices?.cpc||[]), ...(d.gasPrices?.litro||[]), ...(d.gasPrices?.laugfs||[]) ] : [];
     const getP = (type) => {
        const f = prices.find(x => x.type === type);
        return f ? f.price : '';
@@ -615,6 +617,7 @@
 
     try {
       const res = await apiFetch('/api/prices/bulk', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getToken() },
         method: 'PUT',
         body: JSON.stringify({ updates })
       });
