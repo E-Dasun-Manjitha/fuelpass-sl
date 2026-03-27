@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Your Station – FuelPass SL</title>
+  <meta name="description" content="Register your fuel station or LPG gas shop on FuelPass SL to submit verified real-time availability updates." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .reg-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 24px; position: relative; }
+    .reg-page::before { content:''; position:fixed; inset:0; background: radial-gradient(ellipse at 20% 30%, rgba(59,130,246,0.12), transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(124,58,237,0.1), transparent 60%); pointer-events:none; }
+    .reg-box { width: 100%; max-width: 720px; position: relative; z-index: 1; }
+    .reg-header { text-align: center; margin-bottom: 36px; }
+    .reg-header .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--text-muted); font-size:0.85rem; margin-bottom:20px; transition:var(--transition); }
+    .reg-header .back-link:hover { color:var(--blue); }
+    .reg-header h1 { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:800; background:linear-gradient(135deg,#fff 30%,var(--blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px; }
+    .reg-header p { color:var(--text-secondary); font-size:0.95rem; }
+    .reg-form-card { padding: 40px; }
+    .reg-steps { display:flex; gap:0; margin-bottom:32px; }
+    .reg-step { flex:1; text-align:center; position:relative; }
+    .reg-step:not(:last-child)::after { content:''; position:absolute; top:16px; left:60%; width:80%; height:2px; background:var(--glass-border); }
+    .reg-step.active::after, .reg-step.done::after { background:var(--blue); }
+    .rs-circle { width:32px; height:32px; border-radius:50%; border:2px solid var(--glass-border); background:var(--bg-card); display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; color:var(--text-muted); margin-bottom:6px; transition:var(--transition); }
+    .reg-step.active .rs-circle { border-color:var(--blue); background:rgba(59,130,246,0.2); color:var(--blue); }
+    .reg-step.done .rs-circle { border-color:var(--green); background:rgba(16,185,129,0.2); color:var(--green); }
+    .rs-label { font-size:0.72rem; color:var(--text-muted); display:block; }
+    .reg-step.active .rs-label { color:var(--blue); font-weight:600; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .form-grid .full { grid-column:1 / -1; }
+    .form-group label { display:block; font-size:0.8rem; font-weight:600; color:var(--text-secondary); margin-bottom:6px; }
+    .form-group label .req { color:var(--red); margin-left:2px; }
+    .form-input, .reg-select { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:var(--radius-xs); color:var(--text-primary); padding:12px 14px; font-size:0.9rem; font-family:inherit; outline:none; transition:var(--transition); }
+    .form-input:focus, .reg-select:focus { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-glow); }
+    .reg-select option { background:#0f1629; }
+    .form-hint { font-size:0.72rem; color:var(--text-muted); margin-top:4px; }
+    .reg-btn { width:100%; padding:14px; background:linear-gradient(135deg,var(--blue),var(--violet)); border:none; border-radius:var(--radius-xs); color:white; font-size:1rem; font-weight:700; font-family:inherit; cursor:pointer; transition:var(--transition); margin-top:8px; }
+    .reg-btn:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 8px 32px var(--blue-glow); }
+    .reg-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .notice-box { padding:14px 18px; border-radius:var(--radius-xs); font-size:0.82rem; line-height:1.6; margin-bottom:20px; }
+    .notice-info { background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); color:#93C5FD; }
+    .notice-warn { background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); color:#FCD34D; }
+    .notice-success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:#6EE7B7; }
+    .checkbox-row { display:flex; align-items:flex-start; gap:10px; }
+    .checkbox-row input[type=checkbox] { margin-top:3px; accent-color:var(--blue); width:16px; height:16px; flex-shrink:0; }
+    .checkbox-row label { font-size:0.82rem; color:var(--text-secondary); font-weight:400; cursor:pointer; }
+    .success-screen { text-align:center; padding:20px 0; }
+    .success-screen .big-icon { font-size:5rem; margin-bottom:20px; animation:splashPulse 2s ease-in-out infinite; }
+    .success-screen h2 { font-size:1.6rem; font-weight:800; color:var(--green); margin-bottom:12px; }
+    .success-screen p { color:var(--text-secondary); line-height:1.7; margin-bottom:8px; }
+    .reg-id-box { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:var(--radius-xs); padding:12px 20px; font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:700; color:var(--green); letter-spacing:0.1em; margin:16px 0; }
+    @media(max-width:600px) { .form-grid{grid-template-columns:1fr;} .reg-form-card{padding:24px;} }
+  </style>
+</head>
+<body>
+  <div class="reg-page">
+    <div class="reg-box">
+      <div class="reg-header">
+        <a href="index.html" class="back-link">← Back to FuelPass SL</a>
+        <div style="margin-bottom:16px;">
+          <img src="logo.png" alt="FuelPass SL" style="width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));" />
+        </div>
+        <h1>🏪 Register Your Station</h1>
+        <p>Get verified access to submit real-time fuel &amp; gas availability updates</p>
+      </div>
+
+      <div class="reg-form-card glassmorphic">
+        <!-- Progress Steps -->
+        <div class="reg-steps" id="regSteps">
+          <div class="reg-step active" id="step1Indicator">
+            <div class="rs-circle">1</div>
+            <span class="rs-label">Station Info</span>
+          </div>
+          <div class="reg-step" id="step2Indicator">
+            <div class="rs-circle">2</div>
+            <span class="rs-label">Owner Details</span>
+          </div>
+          <div class="reg-step" id="step3Indicator">
+            <div class="rs-circle">3</div>
+            <span class="rs-label">Confirmation</span>
+          </div>
+        </div>
+
+        <!-- STEP 1: Station Info -->
+        <div id="step1">
+          <div class="notice-box notice-info">
+            ℹ️ After submitting, a <strong>FuelPass SL admin</strong> will review and approve your application within 24–48 hours. You will receive a unique Station Code and Password to log in.
+          </div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Station / Shop Name <span class="req">*</span></label>
+              <input type="text" id="stationName" class="form-input" placeholder="e.g. CPC Filling Station – Nugegoda" />
+            </div>
+            <div class="form-group">
+              <label>Station Type <span class="req">*</span></label>
+              <select id="stationType" class="reg-select">
+                <option value="">Select type</option>
+                <option value="CPC">⛽ CPC Fuel Station</option>
+                <option value="IOC">⛽ Lanka IOC Station</option>
+                <option value="SINOPEC">⛽ SINOPEC Station</option>
+                <option value="Litro">🔥 Litro Gas Dealer</option>
+                <option value="LAUGFS">🔥 LAUGFS Gas Dealer</option>
+                <option value="Both">🔥 Litro + LAUGFS Dealer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>District <span class="req">*</span></label>
+              <select id="district" class="reg-select">
+                <option value="">Select district</option>
+                <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+                <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+                <option>Galle</option><option>Matara</option><option>Hambantota</option>
+                <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+                <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
+                <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
+                <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
+                <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
+                <option>Kegalle</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Full Address <span class="req">*</span></label>
+              <input type="text" id="address" class="form-input" placeholder="No. 15, Main Street, Nugegoda, Colombo" />
+            </div>
+            <div class="form-group">
+              <label>Google Maps Link (optional)</label>
+              <input type="url" id="mapsLink" class="form-input" placeholder="https://maps.google.com/..." />
+              <span class="form-hint">Share your location from Google Maps</span>
+            </div>
+            <div class="form-group">
+              <label>Station Phone Number <span class="req">*</span></label>
+              <input type="tel" id="stationPhone" class="form-input" placeholder="011-XXXXXXX" />
+            </div>
+          </div>
+          <button class="reg-btn" onclick="goStep2()">Continue → Owner Details</button>
+        </div>
+
+        <!-- STEP 2: Owner Details -->
+        <div id="step2" style="display:none">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Owner / Manager Full Name <span class="req">*</span></label>
+              <input type="text" id="ownerName" class="form-input" placeholder="Perera, D.M.S." />
+            </div>
+            <div class="form-group">
+              <label>NIC Number <span class="req">*</span></label>
+              <input type="text" id="nic" class="form-input" placeholder="XXXXXXXXV or XXXXXXXXXXXX" maxlength="12" />
+              <span class="form-hint">Used for identity verification by admin</span>
+            </div>
+            <div class="form-group">
+              <label>Email Address <span class="req">*</span></label>
+              <input type="email" id="email" class="form-input" placeholder="owner@example.com" />
+            </div>
+            <div class="form-group">
+              <label>Mobile Number <span class="req">*</span></label>
+              <input type="tel" id="mobile" class="form-input" placeholder="07X-XXXXXXX" />
+            </div>
+            <div class="form-group full">
+              <label>Business Registration No. (optional)</label>
+              <input type="text" id="bizReg" class="form-input" placeholder="PV XXXXXXX / XX XXXXX" />
+              <span class="form-hint">Speeds up admin verification</span>
+            </div>
+            <div class="form-group full">
+              <label>Why do you want to join FuelPass SL?</label>
+              <textarea id="reason" class="form-input" rows="3" style="resize:vertical"
+                placeholder="Help customers find fuel availability at my station in real time..."></textarea>
+            </div>
+            <div class="form-group full">
+              <div class="checkbox-row">
+                <input type="checkbox" id="agreeTerms" />
+                <label for="agreeTerms">I confirm that the information provided is accurate and I agree to submit only truthful, real-time stock updates. I understand that false reports will result in immediate suspension.</label>
+              </div>
+            </div>
+            <div class="form-group full">
+              <div class="checkbox-row">
+                <input type="checkbox" id="agreeData" />
+                <label for="agreeData">I consent to FuelPass SL storing and displaying my station's availability data to the public.</label>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <button class="reg-btn" style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);" onclick="goStep1()">← Back</button>
+            <button class="reg-btn" onclick="submitRegistration()">✅ Submit Application</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Success -->
+        <div id="step3" style="display:none">
+          <div class="success-screen">
+            <div class="big-icon">🎉</div>
+            <h2>Application Submitted!</h2>
+            <p>Your registration has been submitted to the <strong>FuelPass SL admin team</strong> for review.</p>
+            <p>Your unique Application ID is:</p>
+            <div class="reg-id-box" id="appIdDisplay">—</div>
+            <div class="notice-box notice-warn" style="text-align:left;">
+              📌 <strong>What happens next?</strong><br/>
+              1. Admin reviews your application (24–48 hours)<br/>
+              2. Admin verifies your NIC and station details<br/>
+              3. Admin approves and sends you your <strong>Station Code + Password</strong><br/>
+              4. You log in on the FuelPass SL homepage to submit updates<br/>
+            </div>
+            <div class="notice-box notice-info" style="text-align:left;">
+              📞 Contact: <strong>admin@fuelpasssl.lk</strong> or call us if you need faster approval.
+            </div>
+            <a href="index.html">
+              <button class="reg-btn" style="width:auto;padding:12px 32px;">← Back to FuelPass SL</button>
+            </a>
+          </div>
+        </div>
+
+      </div><!-- /reg-form-card -->
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    function goStep2() {
+      const sName   = document.getElementById('stationName').value.trim();
+      const sType   = document.getElementById('stationType').value;
+      const dist    = document.getElementById('district').value;
+      const addr    = document.getElementById('address').value.trim();
+      const phone   = document.getElementById('stationPhone').value.trim();
+      if (!sName || !sType || !dist || !addr || !phone) {
+        alert('⚠️ Please fill all required fields in Step 1.');
+        return;
+      }
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
+      document.getElementById('step1Indicator').className = 'reg-step done';
+      document.getElementById('step2Indicator').className = 'reg-step active';
+    }
+    function goStep1() {
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step1').style.display = 'block';
+      document.getElementById('step1Indicator').className = 'reg-step active';
+      document.getElementById('step2Indicator').className = 'reg-step';
+    }
+    function submitRegistration() {
+      const ownerName = document.getElementById('ownerName').value.trim();
+      const nic       = document.getElementById('nic').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const mobile    = document.getElementById('mobile').value.trim();
+      const agreeT    = document.getElementById('agreeTerms').checked;
+      const agreeD    = document.getElementById('agreeData').checked;
+
+      if (!ownerName || !nic || !email || !mobile) {
+        alert('⚠️ Please fill all required fields.'); return;
+      }
+      if (!agreeT || !agreeD) {
+        alert('⚠️ You must agree to both checkboxes to proceed.'); return;
+      }
+
+      const regId = AUTH.submitRegistration({
+        stationName:  document.getElementById('stationName').value.trim(),
+        stationType:  document.getElementById('stationType').value,
+        district:     document.getElementById('district').value,
+        address:      document.getElementById('address').value.trim(),
+        mapsLink:     document.getElementById('mapsLink').value.trim(),
+        stationPhone: document.getElementById('stationPhone').value.trim(),
+        ownerName, nic, email, mobile,
+        bizReg:  document.getElementById('bizReg').value.trim(),
+        reason:  document.getElementById('reason').value.trim(),
+      });
+
+      document.getElementById('appIdDisplay').textContent = regId;
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'block';
+      document.getElementById('step2Indicator').className = 'reg-step done';
+      document.getElementById('step3Indicator').className = 'reg-step done';
+    }
+  </script>
+</body>
+</html>
