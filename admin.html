@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – FuelPass SL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Admin-specific overrides */
+    body { background: var(--bg-base); }
+    .admin-login { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .login-box { width:100%; max-width:420px; padding:40px; }
+    .login-box h1 { font-family:'Space Grotesk',sans-serif; font-size:1.8rem; font-weight:800; text-align:center; margin-bottom:8px; background:linear-gradient(135deg,#fff,var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .login-box p { text-align:center; color:var(--text-muted); font-size:0.875rem; margin-bottom:28px; }
+    .admin-layout { display:flex; min-height:100vh; }
+    .admin-sidebar { width:240px; background:var(--bg-surface); border-right:1px solid var(--glass-border); padding:24px 0; flex-shrink:0; position:fixed; top:0; left:0; bottom:0; overflow-y:auto; z-index:100; }
+    .sb-brand { padding:0 20px 24px; border-bottom:1px solid var(--glass-border); margin-bottom:12px; }
+    .sb-brand h2 { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; color:var(--text-primary); }
+    .sb-brand span { font-size:0.72rem; color:var(--amber); font-weight:600; letter-spacing:0.08em; }
+    .sb-nav a { display:flex; align-items:center; gap:10px; padding:11px 20px; color:var(--text-secondary); font-size:0.875rem; font-weight:500; transition:var(--transition); cursor:pointer; }
+    .sb-nav a:hover, .sb-nav a.active { background:rgba(59,130,246,0.1); color:var(--blue); border-right:3px solid var(--blue); }
+    .sb-section-label { padding:16px 20px 6px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); }
+    .sb-logout { margin-top:auto; padding:12px 20px; color:var(--red); font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:8px; }
+    .sb-logout:hover { background:rgba(239,68,68,0.08); }
+    .admin-main { margin-left:240px; flex:1; padding:32px; }
+    .admin-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:16px; }
+    .admin-topbar h1 { font-family:'Space Grotesk',sans-serif; font-size:1.6rem; font-weight:800; color:var(--text-primary); }
+    .badge-count { display:inline-flex; align-items:center; justify-content:center; background:var(--red); color:white; border-radius:50%; width:20px; height:20px; font-size:0.7rem; font-weight:700; margin-left:6px; }
+    .admin-panel { display:none; }
+    .admin-panel.active { display:block; }
+    .admin-card { background:var(--bg-card); border:1px solid var(--glass-border); border-radius:var(--radius); padding:24px; margin-bottom:20px; }
+    .admin-card h3 { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+    .admin-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    .admin-table th { text-align:left; padding:10px 14px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); border-bottom:1px solid var(--glass-border); }
+    .admin-table td { padding:12px 14px; color:var(--text-secondary); border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+    .admin-table tr:last-child td { border-bottom:none; }
+    .admin-table tr:hover td { background:rgba(255,255,255,0.02); }
+    .action-btn { padding:6px 12px; border-radius:var(--radius-xs); font-size:0.72rem; font-weight:600; border:none; cursor:pointer; font-family:inherit; transition:var(--transition); }
+    .btn-approve { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
+    .btn-approve:hover { background:rgba(16,185,129,0.3); }
+    .btn-reject { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+    .btn-reject:hover { background:rgba(239,68,68,0.3); }
+    .btn-view { background:rgba(59,130,246,0.15); color:var(--blue); border:1px solid rgba(59,130,246,0.3); }
+    .btn-view:hover { background:rgba(59,130,246,0.3); }
+    .stat-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
+    .stat-card { background:var(--bg-card); border:1px solid var(--glass-border); border-radius:var(--radius-sm); padding:20px; text-align:center; }
+    .stat-card .sv { font-family:'Space Grotesk',sans-serif; font-size:2.4rem; font-weight:800; color:var(--text-primary); }
+    .stat-card .sl { font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+    .price-form { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+    .pf-group label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-secondary); margin-bottom:6px; }
+    .pf-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:var(--radius-xs); color:var(--text-primary); padding:10px 14px; font-family:inherit; font-size:0.9rem; outline:none; transition:var(--transition); }
+    .pf-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-glow); }
+    .save-price-btn { padding:12px 32px; background:linear-gradient(135deg,var(--blue),var(--violet)); border:none; border-radius:var(--radius-xs); color:white; font-size:0.9rem; font-weight:700; font-family:inherit; cursor:pointer; transition:var(--transition); }
+    .save-price-btn:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 6px 24px var(--blue-glow); }
+    .tag-pending { background:rgba(245,158,11,0.15); color:var(--amber); padding:2px 8px; border-radius:99px; font-size:0.7rem; font-weight:600; }
+    .tag-approved { background:rgba(16,185,129,0.15); color:var(--green); padding:2px 8px; border-radius:99px; font-size:0.7rem; font-weight:600; }
+    .tag-verified { background:rgba(59,130,246,0.15); color:var(--blue); padding:2px 8px; border-radius:99px; font-size:0.7rem; font-weight:600; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:500; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .approve-modal { width:100%; max-width:480px; padding:32px; border-radius:var(--radius); background:var(--bg-surface); border:1px solid var(--glass-border); }
+    .approve-modal h3 { font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--text-primary); }
+    .am-row { margin-bottom:14px; }
+    .am-row label { display:block; font-size:0.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:5px; }
+    .am-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid var(--glass-border); border-radius:var(--radius-xs); color:var(--text-primary); padding:10px 14px; font-family:inherit; font-size:0.9rem; outline:none; }
+    .am-input:focus { border-color:var(--green); }
+    .empty-state { text-align:center; padding:48px 24px; color:var(--text-muted); }
+    .empty-state span { font-size:3rem; display:block; margin-bottom:12px; }
+    .updated-info { font-size:0.75rem; color:var(--text-muted); margin-top:12px; font-style:italic; }
+    /* Add Owner specific */
+    .type-toggle-btn { padding:10px 20px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:var(--radius-xs); color:var(--text-secondary); font-size:0.9rem; font-weight:600; font-family:inherit; cursor:pointer; transition:var(--transition); }
+    .type-toggle-btn.active { background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.4); color:var(--blue); }
+    .type-toggle-btn:hover { background:rgba(255,255,255,0.08); }
+    .ao-field { margin-bottom:14px; }
+    .ao-field label { display:block; font-size:0.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:5px; }
+    .gen-btn { padding:10px 14px; background:rgba(255,255,255,0.06); border:1px solid var(--glass-border); border-radius:var(--radius-xs); color:var(--text-secondary); font-size:0.8rem; cursor:pointer; font-family:inherit; flex-shrink:0; transition:var(--transition); }
+    .gen-btn:hover { background:rgba(255,255,255,0.12); color:var(--text-primary); }
+    .ao-check { display:flex; align-items:center; gap:5px; font-size:0.8rem; color:var(--text-secondary); cursor:pointer; padding:5px 10px; border-radius:6px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.03); }
+    .ao-check input { accent-color:var(--blue); width:14px; height:14px; }
+    @media(max-width:768px) {
+      .admin-sidebar { width:100%; position:relative; height:auto; } 
+      .admin-main { margin-left:0; padding:16px; }
+      .admin-layout { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="adminLoginScreen" class="admin-login">
+  <div class="login-box glassmorphic">
+    <div style="text-align:center;margin-bottom:20px;">
+      <img src="logo.png" alt="FuelPass SL" style="width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));" />
+    </div>
+    <h1>🔐 Admin Panel</h1>
+    <p>FuelPass SL — Restricted Access</p>
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">Admin Password</label>
+      <input type="password" id="adminPwInput" class="elig-input" placeholder="Enter admin password" style="width:100%;" onkeydown="if(event.key==='Enter')adminLogin()" />
+    </div>
+    <button class="elig-btn" style="width:100%;" onclick="adminLogin()">Login to Admin Panel</button>
+    <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">
+      <a href="index.html" style="color:var(--blue);">← Back to FuelPass SL</a>
+    </p>
+    <div id="loginError" style="display:none;" class="notice-box notice-warn" style="margin-top:12px;">❌ Invalid password.</div>
+  </div>
+</div>
+
+<!-- ── ADMIN LAYOUT ── -->
+<div id="adminLayout" style="display:none;" class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sb-brand">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <img src="logo.png" alt="FuelPass SL" style="width:36px;height:36px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />
+        <h2 style="margin:0;">FuelPass SL</h2>
+      </div>
+      <span>ADMIN PANEL</span>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section-label">Overview</div>
+      <a class="active" onclick="showPanel('dashboard')">📊 Dashboard</a>
+      <div class="sb-section-label">Owner Management</div>
+      <a onclick="showPanel('addowner')">➕ Add New Owner</a>
+      <a onclick="showPanel('approved')">🏪 All Station Owners</a>
+      <div class="sb-section-label">Data Management</div>
+      <a onclick="showPanel('prices')">💰 Update Fuel Prices</a>
+      <a onclick="showPanel('reports')">📋 Verified Reports</a>
+      <div class="sb-section-label">Site</div>
+      <a onclick="window.open('index.html','_blank')">🌐 View Live Site</a>
+    </nav>
+    <div class="sb-logout" onclick="adminLogout()">🚪 Logout</div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="panel-dashboard" class="admin-panel active">
+      <div class="admin-topbar">
+        <h1>📊 Dashboard</h1>
+        <span class="updated-tag" id="dashTime"></span>
+      </div>
+      <div class="stat-cards" id="statCards"></div>
+      <div class="admin-card">
+        <h3>⚡ Quick Actions</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="action-btn btn-approve" onclick="showPanel('addowner')" style="padding:10px 20px;font-size:0.85rem;">➕ Add New Station Owner</button>
+          <button class="action-btn btn-view" onclick="showPanel('approved')" style="padding:10px 20px;font-size:0.85rem;">🏪 View All Owners</button>
+          <button class="action-btn btn-approve" onclick="showPanel('prices')" style="padding:10px 20px;font-size:0.85rem;">💰 Update Fuel Prices</button>
+          <button class="action-btn btn-view" onclick="showPanel('reports')" style="padding:10px 20px;font-size:0.85rem;">📋 Verified Reports</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADD OWNER ── -->
+    <div id="panel-addowner" class="admin-panel">
+      <div class="admin-topbar">
+        <h1>➕ Add Station Owner</h1>
+        <span class="updated-tag">Admin-created accounts are instantly active</span>
+      </div>
+
+      <!-- Type Toggle -->
+      <div class="admin-card" style="margin-bottom:20px;">
+        <h3>Select Station Type</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="type-toggle-btn active" id="typeToggleFuel" onclick="setOwnerType('fuel')">⛽ Fuel Station (CPC / IOC / SINOPEC)</button>
+          <button class="type-toggle-btn" id="typeToggleGas" onclick="setOwnerType('gas')">🔥 LPG Gas Dealer (Litro / LAUGFS)</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+        <!-- Station Details -->
+        <div class="admin-card">
+          <h3>🏪 Station Details</h3>
+          <div class="ao-field">
+            <label>Station / Shop Name *</label>
+            <input type="text" id="aoName" class="pf-input" placeholder="e.g. CPC Filling Station – Nugegoda" />
+          </div>
+          <div class="ao-field">
+            <label>Company / Provider *</label>
+            <select id="aoCompany" class="pf-input">
+              <option value="CPC">CPC (Ceylon Petroleum)</option>
+              <option value="IOC">Lanka IOC</option>
+              <option value="SINOPEC">SINOPEC Lanka</option>
+              <option value="Litro">Litro Gas Lanka</option>
+              <option value="LAUGFS">LAUGFS Gas PLC</option>
+              <option value="Both">Litro + LAUGFS (Both)</option>
+            </select>
+          </div>
+          <div class="ao-field">
+            <label>District *</label>
+            <select id="aoDistrict" class="pf-input">
+              <option value="">Select district</option>
+              <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+              <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+              <option>Galle</option><option>Matara</option><option>Hambantota</option>
+              <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+              <option>Vavuniya</option><option>Batticaloa</option><option>Ampara</option>
+              <option>Trincomalee</option><option>Kurunegala</option><option>Puttalam</option>
+              <option>Anuradhapura</option><option>Polonnaruwa</option><option>Badulla</option>
+              <option>Monaragala</option><option>Ratnapura</option><option>Kegalle</option>
+            </select>
+          </div>
+          <div class="ao-field">
+            <label>Full Address *</label>
+            <input type="text" id="aoAddress" class="pf-input" placeholder="No. 15, Main Street, Nugegoda" />
+          </div>
+          <div class="ao-field">
+            <label>Station Phone</label>
+            <input type="text" id="aoPhone" class="pf-input" placeholder="011-XXXXXXX" />
+          </div>
+          <div class="ao-field" id="aoFuelTypesRow">
+            <label>Available Fuel Types</label>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+              <label class="ao-check"><input type="checkbox" value="petrol92" checked> Petrol 92</label>
+              <label class="ao-check"><input type="checkbox" value="petrol95"> Petrol 95</label>
+              <label class="ao-check"><input type="checkbox" value="diesel" checked> Auto Diesel</label>
+              <label class="ao-check"><input type="checkbox" value="superDiesel"> Super Diesel</label>
+            </div>
+          </div>
+          <div class="ao-field" id="aoGasTypesRow" style="display:none;">
+            <label>Cylinder Types Sold</label>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+              <label class="ao-check"><input type="checkbox" value="12.5kg" checked> 12.5 kg</label>
+              <label class="ao-check"><input type="checkbox" value="5kg"> 5 kg</label>
+              <label class="ao-check"><input type="checkbox" value="37.5kg"> 37.5 kg</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Owner + Credentials -->
+        <div class="admin-card">
+          <h3>👤 Owner Details &amp; Login Credentials</h3>
+          <div class="ao-field">
+            <label>Owner / Manager Name *</label>
+            <input type="text" id="aoOwnerName" class="pf-input" placeholder="e.g. Perera D.M.S." />
+          </div>
+          <div class="ao-field">
+            <label>NIC Number</label>
+            <input type="text" id="aoNIC" class="pf-input" placeholder="XXXXXXXXV or XXXXXXXXXXXX" maxlength="12" />
+          </div>
+          <div class="ao-field">
+            <label>Mobile Number *</label>
+            <input type="text" id="aoMobile" class="pf-input" placeholder="07X-XXXXXXX" />
+          </div>
+          <div class="ao-field">
+            <label>Email Address</label>
+            <input type="email" id="aoEmail" class="pf-input" placeholder="owner@example.com" />
+          </div>
+
+          <div style="border-top:1px solid var(--glass-border);margin:20px 0;padding-top:20px;">
+            <h3 style="margin-bottom:16px;">🔑 Login Credentials</h3>
+            <div class="ao-field">
+              <label>Station Code (unique login ID) *</label>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="aoCode" class="pf-input" placeholder="e.g. CPC-COL-001" oninput="this.value=this.value.toUpperCase()" style="flex:1;" />
+                <button onclick="autoGenCode()" class="gen-btn">🎲 Auto</button>
+              </div>
+              <span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;display:block;">Format: COMPANY-DISTRICT-NUMBER (owner uses this to log in)</span>
+            </div>
+            <div class="ao-field">
+              <label>Password *</label>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="aoPassword" class="pf-input" style="flex:1;" placeholder="Min 6 characters" />
+                <button onclick="autoGenPw()" class="gen-btn">🎲 Auto</button>
+              </div>
+            </div>
+            <div class="ao-field">
+              <label>Admin Notes (internal)</label>
+              <input type="text" id="aoNotes" class="pf-input" placeholder="e.g. Called & verified, near Nugegoda junction" />
+            </div>
+          </div>
+
+          <div id="aoCredBox" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:16px;margin-bottom:16px;">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--green);margin-bottom:8px;">✅ OWNER ADDED SUCCESSFULLY — Share these credentials:</div>
+            <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
+              Station Code: <strong id="credCode" style="color:var(--blue);">—</strong><br/>
+              Password: <strong id="credPw" style="color:var(--amber);">—</strong><br/>
+              <span style="font-size:0.75rem;color:var(--text-muted);">Give these to the owner to log in at fuelpasssl.lk</span>
+            </div>
+          </div>
+
+          <button onclick="addOwnerDirectly()" class="save-price-btn" style="width:100%;margin-top:8px;">✅ Create Owner Account</button>
+        </div>
+
+      </div><!-- /grid -->
+    </div>
+
+    <!-- ── ALL OWNERS ── -->
+    <div id="panel-approved" class="admin-panel">
+      <div class="admin-topbar">
+        <h1>🏪 All Station Owners</h1>
+        <button class="action-btn btn-approve" onclick="showPanel('addowner')" style="padding:10px 20px;">➕ Add New Owner</button>
+      </div>
+      <div class="admin-card">
+        <div id="approvedList"></div>
+      </div>
+    </div>
+
+    <!-- ── PRICES ── -->
+    <div id="panel-prices" class="admin-panel">
+      <div class="admin-topbar">
+        <h1>💰 Fuel &amp; Gas Prices</h1>
+      </div>
+      <div class="admin-card">
+        <h3>⛽ Ceypetco / Lanka IOC Prices</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:20px;">Update prices when Ceypetco / Ministry of Energy announces changes. These prices are shown to ALL users.</p>
+        <div class="price-form" id="fuelPriceForm"></div>
+      </div>
+      <div class="admin-card" style="margin-top:20px;">
+        <h3>🔥 LPG Gas Prices</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:20px;">Update Litro Gas and LAUGFS Gas cylinder prices.</p>
+        <div class="price-form" id="gasPriceForm"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:20px;flex-wrap:wrap;">
+        <button class="save-price-btn" onclick="savePrices()">💾 Save All Prices</button>
+        <span id="priceSaveMsg" style="color:var(--green);font-size:0.85rem;display:none;">✅ Prices saved and published!</span>
+      </div>
+      <p class="updated-info" id="priceLastUpdated"></p>
+    </div>
+
+    <!-- ── VERIFIED REPORTS ── -->
+    <div id="panel-reports" class="admin-panel">
+      <div class="admin-topbar">
+        <h1>📋 Verified Station Reports</h1>
+      </div>
+      <div class="admin-card">
+        <div id="reportsList"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── APPROVE MODAL ── -->
+<div id="approveModal" style="display:none;" class="modal-overlay">
+  <div class="approve-modal">
+    <h3>✅ Approve Application</h3>
+    <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:16px;">Review details and assign login credentials for this station owner.</p>
+    <div id="approveModalDetails" style="background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:8px;padding:14px;margin-bottom:16px;font-size:0.82rem;color:var(--text-secondary);"></div>
+    <div class="am-row">
+      <label>Station Code (unique ID — shown to owner) *</label>
+      <input type="text" id="amStationCode" class="am-input" placeholder="e.g. CPC-COL-001" oninput="this.value=this.value.toUpperCase()" />
+      <span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;display:block;">Format: COMPANY-DISTRICT-NUMBER</span>
+    </div>
+    <div class="am-row">
+      <label>Password for Owner *</label>
+      <input type="text" id="amPassword" class="am-input" placeholder="Min 8 characters" />
+      <button onclick="generatePw()" style="margin-top:6px;padding:5px 12px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:6px;color:var(--text-secondary);font-size:0.75rem;cursor:pointer;">🎲 Generate Password</button>
+    </div>
+    <div class="am-row">
+      <label>Admin Notes (optional)</label>
+      <input type="text" id="amNotes" class="am-input" placeholder="e.g. Verified NIC, called owner" />
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="action-btn btn-approve" style="flex:1;padding:12px;" onclick="confirmApprove()">✅ Approve & Activate</button>
+      <button class="action-btn btn-reject" style="padding:12px 20px;" onclick="closeApproveModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
+
+<script src="js/auth.js"></script>
+<script>
+  let approveTargetId = null;
+
+  // ── AUTH ──────────────────────────────────────────────────
+  function adminLogin() {
+    const pw = document.getElementById('adminPwInput').value;
+    if (AUTH.adminLogin(pw)) {
+      document.getElementById('adminLoginScreen').style.display = 'none';
+      document.getElementById('adminLayout').style.display = 'flex';
+      initAdminPanel();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+  function adminLogout() {
+    AUTH.clearSession();
+    location.reload();
+  }
+
+  // ── PANEL NAVIGATION ──────────────────────────────────────
+  function showPanel(name) {
+    document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sb-nav a').forEach(a => a.classList.remove('active'));
+    const panel = document.getElementById('panel-' + name);
+    if (panel) panel.classList.add('active');
+    const map = { dashboard:0, addowner:1, approved:2, prices:3, reports:4 };
+    const links = document.querySelectorAll('.sb-nav a');
+    if (links[map[name]] !== undefined) links[map[name]].classList.add('active');
+
+    if (name === 'approved') renderApproved();
+    if (name === 'prices')   renderPrices();
+    if (name === 'reports')  renderVerifiedReports();
+    if (name === 'addowner') { document.getElementById('aoCredBox').style.display='none'; autoGenCode(); autoGenPw(); }
+  }
+
+  // ── DASHBOARD ─────────────────────────────────────────────
+  function initAdminPanel() {
+    const approved = AUTH.getOwners().length;
+    const reports  = AUTH.getVerifiedReports().length;
+    const prices   = AUTH.getPrices();
+    document.getElementById('dashTime').textContent = 'Loaded: ' + new Date().toLocaleTimeString();
+    document.getElementById('statCards').innerHTML = `
+      <div class="stat-card"><div class="sv">${approved}</div><div class="sl">Station Owners</div></div>
+      <div class="stat-card"><div class="sv">${AUTH.getOwners().filter(o=>o.stationType==='CPC'||o.stationType==='IOC'||o.stationType==='SINOPEC').length}</div><div class="sl">Fuel Stations</div></div>
+      <div class="stat-card"><div class="sv">${AUTH.getOwners().filter(o=>o.stationType==='Litro'||o.stationType==='LAUGFS'||o.stationType==='Both').length}</div><div class="sl">Gas Dealers</div></div>
+      <div class="stat-card"><div class="sv">${reports}</div><div class="sl">Verified Reports</div></div>
+      <div class="stat-card"><div class="sv">LKR ${prices.petrol92}</div><div class="sl">Petrol 92</div></div>
+      <div class="stat-card"><div class="sv">LKR ${prices.autoDiesel}</div><div class="sl">Diesel</div></div>
+      <div class="stat-card"><div class="sv">LKR ${prices.litroGas125}</div><div class="sl">LP Gas 12.5kg</div></div>
+    `;
+  }
+
+  // ── ADD OWNER DIRECTLY ────────────────────────────────────
+  let ownerType = 'fuel';
+  function setOwnerType(type) {
+    ownerType = type;
+    document.getElementById('typeToggleFuel').classList.toggle('active', type === 'fuel');
+    document.getElementById('typeToggleGas').classList.toggle('active', type === 'gas');
+    document.getElementById('aoFuelTypesRow').style.display = type === 'fuel' ? 'block' : 'none';
+    document.getElementById('aoGasTypesRow').style.display  = type === 'gas'  ? 'block' : 'none';
+    // Update company options
+    const cmp = document.getElementById('aoCompany');
+    if (type === 'fuel') {
+      cmp.innerHTML = '<option value="CPC">CPC (Ceylon Petroleum)</option><option value="IOC">Lanka IOC</option><option value="SINOPEC">SINOPEC Lanka</option>';
+    } else {
+      cmp.innerHTML = '<option value="Litro">Litro Gas Lanka</option><option value="LAUGFS">LAUGFS Gas PLC</option><option value="Both">Litro + LAUGFS (Both)</option>';
+    }
+    autoGenCode();
+  }
+  function autoGenCode() {
+    const cmp  = (document.getElementById('aoCompany')?.value || 'STA').substring(0,3).toUpperCase();
+    const dist = (document.getElementById('aoDistrict')?.value || 'XX').substring(0,3).toUpperCase();
+    const num  = String(AUTH.getOwners().length + 1 + Math.floor(Math.random()*10)).padStart(3,'0');
+    const el = document.getElementById('aoCode');
+    if (el) el.value = `${cmp}-${dist}-${num}`;
+  }
+  function autoGenPw() {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+    let pw = '';
+    for (let i = 0; i < 10; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+    const el = document.getElementById('aoPassword');
+    if (el) el.value = pw;
+  }
+  function addOwnerDirectly() {
+    const name     = document.getElementById('aoName').value.trim();
+    const company  = document.getElementById('aoCompany').value;
+    const district = document.getElementById('aoDistrict').value;
+    const address  = document.getElementById('aoAddress').value.trim();
+    const phone    = document.getElementById('aoPhone').value.trim();
+    const ownerName= document.getElementById('aoOwnerName').value.trim();
+    const mobile   = document.getElementById('aoMobile').value.trim();
+    const email    = document.getElementById('aoEmail').value.trim();
+    const nic      = document.getElementById('aoNIC').value.trim();
+    const code     = document.getElementById('aoCode').value.trim().toUpperCase();
+    const password = document.getElementById('aoPassword').value.trim();
+    const notes    = document.getElementById('aoNotes').value.trim();
+
+    if (!name || !district || !address || !ownerName || !mobile || !code || !password) {
+      showAdminToast('⚠️ Please fill all required fields (marked with *).', 'error'); return;
+    }
+    if (password.length < 6) {
+      showAdminToast('⚠️ Password must be at least 6 characters.', 'error'); return;
+    }
+    if (AUTH.getOwners().some(o => o.stationCode === code)) {
+      showAdminToast('⚠️ Station Code already exists! Change it.', 'error'); return;
+    }
+
+    // Build owner record directly (no pending step)
+    const owners = AUTH.getOwners();
+    owners.push({
+      id:          'ADM-' + Date.now(),
+      stationName: name,
+      stationType: company,
+      district, address,
+      stationPhone: phone,
+      ownerName, mobile, email, nic,
+      notes,
+      stationCode:  code,
+      password,
+      status:       'approved',
+      addedBy:      'admin',
+      approvedAt:   new Date().toISOString(),
+      updatedAt:    null,
+      updateCount:  0
+    });
+    AUTH.saveOwners(owners);
+
+    // Show credentials box
+    document.getElementById('credCode').textContent = code;
+    document.getElementById('credPw').textContent   = password;
+    document.getElementById('aoCredBox').style.display = 'block';
+
+    showAdminToast(`✅ Owner "${name}" created! Code: ${code}`, 'success');
+    initAdminPanel();
+
+    // Reset form fields (keep credentials visible)
+    ['aoName','aoAddress','aoPhone','aoOwnerName','aoNIC','aoMobile','aoEmail','aoNotes']
+      .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    autoGenCode(); autoGenPw();
+  }
+
+  // ── APPROVED / ALL OWNERS ─────────────────────────────────
+  function renderApproved() {
+    const owners = AUTH.getOwners();
+    const el = document.getElementById('approvedList');
+    if (!owners.length) {
+      el.innerHTML = '<div class="empty-state"><span>📋</span><p>No approved owners yet.</p></div>';
+      return;
+    }
+    el.innerHTML = `<table class="admin-table">
+      <thead><tr><th>Station Code</th><th>Station</th><th>Type</th><th>Owner</th><th>Contact</th><th>Reports</th><th>Added</th><th>Actions</th></tr></thead>
+      <tbody>` +
+      owners.map(o => `
+        <tr>
+          <td><strong style="font-family:'Space Grotesk',sans-serif;color:var(--blue);">${o.stationCode}</strong></td>
+          <td><strong style="color:var(--text-primary);">${o.stationName}</strong><br/><span style="font-size:0.72rem;color:var(--text-muted);">${o.district} &middot; ${o.address}</span></td>
+          <td><span class="tag-approved">${o.stationType}</span></td>
+          <td>${o.ownerName}<br/><span style="font-size:0.72rem;">${o.nic || ''}</span></td>
+          <td style="font-size:0.75rem;">${o.email || '&mdash;'}<br/>${o.mobile || ''}</td>
+          <td style="text-align:center;"><strong style="color:var(--green);font-size:1.1rem;">${o.updateCount || 0}</strong><br/><span style="font-size:0.68rem;color:var(--text-muted);">${o.updatedAt ? new Date(o.updatedAt).toLocaleDateString() : 'Never'}</span></td>
+          <td style="font-size:0.72rem;">${new Date(o.approvedAt).toLocaleDateString()}<br/><span style="color:var(--text-muted);">${o.addedBy === 'admin' ? '🛡️ By Admin' : '📝 Self-Reg'}</span></td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <button class="action-btn btn-view" onclick="copyCredentials('${o.stationCode}','${o.password}')">📋 Copy Creds</button>
+              <button class="action-btn btn-reject" onclick="deleteOwner('${o.stationCode}')">🗑️ Remove</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') +
+      '</tbody></table>';
+  }
+
+  // ── DELETE OWNER ──────────────────────────────────────────
+  function deleteOwner(code) {
+    if (!confirm(`Remove station owner with code ${code}? They will no longer be able to log in.`)) return;
+    const owners = AUTH.getOwners().filter(o => o.stationCode !== code);
+    AUTH.saveOwners(owners);
+    renderApproved();
+    initAdminPanel();
+    showAdminToast('🗑️ Owner removed.', 'error');
+  }
+  function copyCredentials(code, pw) {
+    const text = `Station Code: ${code}\nPassword: ${pw}\nLogin at: fuelpasssl.lk → Owner Login`;
+    navigator.clipboard.writeText(text).then(() => showAdminToast('📋 Credentials copied!', 'success')).catch(() => alert(text));
+  }
+
+  // ── PRICES ────────────────────────────────────────────────
+  function renderPrices() {
+    const p = AUTH.getPrices();
+    const fuelFields = [
+      { key:'petrol92',    label:'Petrol 92 Octane (LKR/L)'         },
+      { key:'petrol95',    label:'Petrol 95 Octane (LKR/L)'         },
+      { key:'autoDiesel',  label:'Auto Diesel (LKR/L)'              },
+      { key:'superDiesel', label:'Super Diesel Euro4 (LKR/L)'       },
+      { key:'kerosene',    label:'Kerosene (LKR/L)'                 },
+    ];
+    const gasFields = [
+      { key:'litroGas125',  label:'Litro Gas 12.5 kg (LKR)'  },
+      { key:'litroGas5',    label:'Litro Gas 5 kg (LKR)'     },
+      { key:'litroGas375',  label:'Litro Gas 37.5 kg (LKR)'  },
+      { key:'laugfsGas125', label:'LAUGFS Gas 12.5 kg (LKR)' },
+      { key:'laugfsGas5',   label:'LAUGFS Gas 5 kg (LKR)'    },
+      { key:'laugfsGas375', label:'LAUGFS Gas 37.5 kg (LKR)' },
+    ];
+    const buildFields = arr => arr.map(f => `
+      <div class="pf-group">
+        <label>${f.label}</label>
+        <input type="number" class="pf-input" id="pf_${f.key}" value="${p[f.key] || ''}" min="0" step="1" />
+      </div>`).join('');
+    document.getElementById('fuelPriceForm').innerHTML = buildFields(fuelFields);
+    document.getElementById('gasPriceForm').innerHTML  = buildFields(gasFields);
+    if (p.updatedAt) {
+      document.getElementById('priceLastUpdated').textContent =
+        `Last updated: ${new Date(p.updatedAt).toLocaleString()} by ${p.updatedBy || 'Admin'}`;
+    }
+  }
+  function savePrices() {
+    const keys = ['petrol92','petrol95','autoDiesel','superDiesel','kerosene',
+                  'litroGas125','litroGas5','litroGas375','laugfsGas125','laugfsGas5','laugfsGas375'];
+    const prices = {};
+    for (const k of keys) {
+      const el = document.getElementById('pf_' + k);
+      prices[k] = el ? parseFloat(el.value) || 0 : 0;
+    }
+    prices.updatedBy = 'Admin (Manual Update)';
+    AUTH.savePrices(prices);
+    document.getElementById('priceSaveMsg').style.display = 'inline';
+    setTimeout(() => document.getElementById('priceSaveMsg').style.display = 'none', 3000);
+    showAdminToast('💰 Prices saved and published to all users!', 'success');
+    initAdminPanel();
+  }
+
+  // ── VERIFIED REPORTS ──────────────────────────────────────
+  function renderVerifiedReports() {
+    const reports = AUTH.getVerifiedReports();
+    const el = document.getElementById('reportsList');
+    if (!reports.length) {
+      el.innerHTML = '<div class="empty-state"><span>📋</span><p>No verified reports yet. Station owners will appear here when they log in and submit updates.</p></div>';
+      return;
+    }
+    el.innerHTML = `<table class="admin-table">
+      <thead><tr><th>Station</th><th>Code</th><th>Product</th><th>Status</th><th>Queue</th><th>Owner</th><th>Time</th></tr></thead>
+      <tbody>` +
+      reports.map(r => {
+        const sc = r.status==='available'?'status-available':r.status==='limited'?'status-limited':'status-out';
+        const sl = r.status==='available'?'✅ Available':r.status==='limited'?'⚠️ Limited':'❌ Out of Stock';
+        return `<tr>
+          <td><strong style="color:var(--text-primary);">${r.stationName || r.stationCode}</strong></td>
+          <td><span class="tag-verified">${r.stationCode}</span></td>
+          <td>${r.product || '—'}</td>
+          <td><span class="oc-status ${sc}">${sl}</span></td>
+          <td>${r.queue || '—'}</td>
+          <td>${r.ownerName}</td>
+          <td style="font-size:0.72rem;">${new Date(r.submittedAt).toLocaleString()}</td>
+        </tr>`;
+      }).join('') +
+      '</tbody></table>';
+  }
+
+  // ── TOAST ─────────────────────────────────────────────────
+  function showAdminToast(msg, type = 'success') {
+    const t = document.getElementById('adminToast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    t.style.background = type === 'success' ? 'rgba(16,185,129,0.9)' : 'rgba(239,68,68,0.9)';
+    t.style.color = 'white';
+    t.style.border = `1px solid ${type === 'success' ? '#10B981' : '#EF4444'}`;
+    setTimeout(() => t.style.display = 'none', 4000);
+  }
+
+  // ── INIT ─────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    if (AUTH.isAdmin()) {
+      document.getElementById('adminLoginScreen').style.display = 'none';
+      document.getElementById('adminLayout').style.display = 'flex';
+      initAdminPanel();
+    }
+  });
+</script>
+</body>
+</html>
