@@ -403,10 +403,11 @@
     document.querySelectorAll('.sb-nav a').forEach(a => a.classList.remove('active'));
     const panel = document.getElementById('panel-' + name);
     if (panel) panel.classList.add('active');
-    const map = { dashboard:0, addowner:1, approved:2, prices:3, reports:4 };
+    const map = { dashboard:0, pending:1, addowner:2, approved:3, prices:4, reports:5 };
     const links = document.querySelectorAll('.sb-nav a');
     if (links[map[name]] !== undefined) links[map[name]].classList.add('active');
 
+    if (name === 'pending') renderPending();
     if (name === 'approved') renderApproved();
     if (name === 'prices')   renderPrices();
     if (name === 'reports')  renderVerifiedReports();
@@ -428,7 +429,7 @@
       const prices = d ? [ ...(d.fuelPrices?.cpc||[]), ...(d.gasPrices?.litro||[]) ] : [];
       
       const getP = (type) => {
-         const f = prices.find(x => x.type.includes(type));
+         const f = prices.find(x => (x.fuel_type || x.size || '').includes(type));
          return f ? f.price : '—';
       };
 
@@ -448,7 +449,74 @@
     }
   }
 
+  
+  // ── PENDING REGISTRATIONS (LocalStorage bridge) ──────────────────
+  window.renderPending = function() {
+    const el = document.getElementById('pendingList');
+    const pending = JSON.parse(localStorage.getItem('fuelpass_pending') || '[]');
+    if (!pending.length) {
+      el.innerHTML = '<div class="empty-state"><span>📋</span><p>No pending registrations.</p></div>';
+      return;
+    }
+    el.innerHTML = `<table class="admin-table">
+      <thead><tr><th>Station</th><th>Owner</th><th>Phone/Email</th><th>Type</th><th>Actions</th></tr></thead>
+      <tbody>` + 
+      pending.map(p => `<tr>
+        <td><strong>${p.stationName}</strong><br><span style="font-size:0.75rem;">${p.district}</span></td>
+        <td>${p.ownerName}<br><span style="font-size:0.75rem;">NIC: ${p.nic}</span></td>
+        <td>${p.mobile}<br><span style="font-size:0.75rem;">${p.email}</span></td>
+        <td><span class="tag-approved">${p.stationType}</span></td>
+        <td>
+          <button class="action-btn" style="background:#10B981" onclick="approvePending('${p.id}')">Approve</button>
+          <button class="action-btn btn-reject" onclick="rejectPending('${p.id}')">Reject</button>
+        </td>
+      </tr>`).join('') +
+      '</tbody></table>';
+  }
+
+  window.approvePending = function(id) {
+    const pending = JSON.parse(localStorage.getItem('fuelpass_pending') || '[]');
+    const reg = pending.find(p => p.id === id);
+    if (!reg) return;
+    
+    // Switch to Add Owner panel and prepopulate it
+    showPanel('addowner');
+    
+    // Make sure ownerType toggle corresponds
+    const type = (reg.stationType==='Litro'||reg.stationType==='LAUGFS'||reg.stationType==='Both') ? 'gas' : 'fuel';
+    setOwnerType(type);
+    
+    document.getElementById('aoName').value = reg.stationName;
+    document.getElementById('aoCompany').value = reg.stationType;
+    document.getElementById('aoDistrict').value = reg.district;
+    document.getElementById('aoAddress').value = reg.address;
+    document.getElementById('aoPhone').value = reg.stationPhone;
+    document.getElementById('aoOwnerName').value = reg.ownerName;
+    document.getElementById('aoMobile').value = reg.mobile;
+    document.getElementById('aoEmail').value = reg.email;
+    document.getElementById('aoNIC').value = reg.nic;
+    
+    autoGenCode();
+    autoGenPw();
+    
+    // Tell admin what to do
+    showAdminToast('📝 Pre-filled from registration! Verify details and click Create Owner.', 'success');
+    
+    // Automatically remove from pending queue once admin proceeds
+    const newPending = pending.filter(p => p.id !== id);
+    localStorage.setItem('fuelpass_pending', JSON.stringify(newPending));
+  }
+
+  window.rejectPending = function(id) {
+    if (!confirm('Are you sure you want to reject and delete this registration?')) return;
+    const pending = JSON.parse(localStorage.getItem('fuelpass_pending') || '[]');
+    localStorage.setItem('fuelpass_pending', JSON.stringify(pending.filter(p => p.id !== id)));
+    showAdminToast('🗑️ Application rejected.', 'success');
+    renderPending();
+  }
+
   // ── ADD OWNER DIRECTLY ────────────────────────────────────
+
   let ownerType = 'fuel';
   window.setOwnerType = function(type) {
     ownerType = type;
@@ -579,7 +647,7 @@
     const d = res?.data;
     const prices = d ? [ ...(d.fuelPrices?.cpc||[]), ...(d.gasPrices?.litro||[]), ...(d.gasPrices?.laugfs||[]) ] : [];
     const getP = (type) => {
-       const f = prices.find(x => x.type === type);
+       const f = prices.find(x => (x.fuel_type || x.size) === type);
        return f ? f.price : '';
     };
 
