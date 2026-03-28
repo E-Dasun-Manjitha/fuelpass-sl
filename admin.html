@@ -421,7 +421,15 @@
     if (name === 'approved') renderApproved();
     if (name === 'prices')   renderPrices();
     if (name === 'reports')  renderVerifiedReports();
-    if (name === 'addowner') { document.getElementById('aoCredBox').style.display='none'; autoGenCode(); autoGenPw(); }
+    if (name === 'addowner') { 
+      document.getElementById('aoCredBox').style.display='none'; 
+      // Ensure type toggle is always visible for manual entries
+      const toggleContainer = document.getElementById('typeToggleFuel').parentElement.parentElement;
+      toggleContainer.style.display = 'block';
+      const existingLockMsg = document.getElementById('lockNoticeText');
+      if (existingLockMsg) existingLockMsg.remove();
+      autoGenCode(); autoGenPw(); 
+    }
   }
 
   // ── DASHBOARD ─────────────────────────────────────────────
@@ -469,16 +477,16 @@
       return;
     }
     el.innerHTML = `<table class="admin-table">
-      <thead><tr><th>Station</th><th>Owner</th><th>Phone/Email</th><th>Type</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Station</th><th>Owner Details</th><th>Registration / Location</th><th>Type</th><th>Actions</th></tr></thead>
       <tbody>` + 
       pending.map(p => `<tr>
-        <td><strong>${p.stationName}</strong><br><span style="font-size:0.75rem;">${p.district}</span></td>
-        <td>${p.ownerName}<br><span style="font-size:0.75rem;">NIC: ${p.nic}</span></td>
-        <td>${p.mobile}<br><span style="font-size:0.75rem;">${p.email}</span></td>
+        <td><strong>${p.stationName}</strong><br><span style="font-size:0.75rem;">Phone: ${p.stationPhone||'N/A'}</span></td>
+        <td>${p.ownerName}<br><span style="font-size:0.75rem;">NIC: ${p.nic}</span><br><span style="font-size:0.75rem;">Mobile: ${p.mobile}</span><br><span style="font-size:0.75rem;">Email: ${p.email}</span></td>
+        <td><span style="font-size:0.75rem;"><strong>Biz Reg:</strong> ${p.bizReg || 'None'}</span><br><span style="font-size:0.75rem;"><strong>Address:</strong> ${p.address}, ${p.district}</span><br><span style="font-size:0.75rem;display:block;margin-top:4px;color:var(--text-muted);">"${p.reason||'No reason provided'}"</span></td>
         <td><span class="tag-approved">${p.stationType}</span></td>
-        <td>
-          <button class="action-btn" style="background:#10B981" onclick="approvePending('${p.id}')">Approve</button>
-          <button class="action-btn btn-reject" onclick="rejectPending('${p.id}')">Reject</button>
+        <td style="min-width:120px;">
+          <button class="action-btn" style="background:#10B981;margin-bottom:6px;width:100%" onclick="approvePending('${p.id}')">Approve</button>
+          <button class="action-btn btn-reject" style="width:100%" onclick="rejectPending('${p.id}')">Reject</button>
         </td>
       </tr>`).join('') +
       '</tbody></table>';
@@ -496,6 +504,7 @@
     const type = (reg.stationType==='Litro'||reg.stationType==='LAUGFS'||reg.stationType==='Both') ? 'gas' : 'fuel';
     setOwnerType(type);
     
+    // Pre-fill the remaining data into Add Owner screen
     document.getElementById('aoName').value = reg.stationName;
     document.getElementById('aoCompany').value = reg.stationType;
     document.getElementById('aoDistrict').value = reg.district;
@@ -505,6 +514,19 @@
     document.getElementById('aoMobile').value = reg.mobile;
     document.getElementById('aoEmail').value = reg.email;
     document.getElementById('aoNIC').value = reg.nic;
+    
+    // Hide the toggle buttons entirely so they can't switch it and mess up the pre-populated interface
+    const toggleContainer = document.getElementById('typeToggleFuel').parentElement.parentElement;
+    toggleContainer.style.display = 'none';
+
+    // Add a notice message about the locked interface
+    const existingLockMsg = document.getElementById('lockNoticeText');
+    if (!existingLockMsg) {
+      const lockMsg = document.createElement('div');
+      lockMsg.id = 'lockNoticeText';
+      lockMsg.innerHTML = '<div class="notice-box notice-info">🔒 Interface locked to <b>' + (type==="fuel"?"Fuel Station":"Gas Dealer") + '</b> based on the owner&apos;s registration.</div>';
+      toggleContainer.after(lockMsg);
+    }
     
     autoGenCode();
     autoGenPw();
