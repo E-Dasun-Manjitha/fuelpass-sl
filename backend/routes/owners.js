@@ -50,8 +50,8 @@ router.post('/', async (req, res) => {
     `, [stId, station_code.toUpperCase(), station_name, owner_name, email, mobile, hash]);
     res.status(201).json({ success: true, data: result.rows[0] });
   } catch (err) {
-    if (err.code === '23505') return res.status(409).json({ success: false, error: 'Station code already exists' });
-    res.status(500).json({ success: false, error: 'Server error' });
+    if (err.code === '23505') return res.status(409).json({ success: false, error: 'Email or Station Code already exists in database.' });
+    res.status(500).json({ success: false, error: err.message || 'Server error' });
   }
 });
 

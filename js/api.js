@@ -30,7 +30,7 @@ async function apiFetch(path, options = {}) {
     return data;
   } catch (err) {
     console.warn(`API call failed [${path}]:`, err.message);
-    return null;
+    return { success: false, error: err.message };
   }
 }
 
