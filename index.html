@@ -73,12 +73,13 @@
             <div class="hero-badge"><span>🇱🇰</span> Sri Lanka Fuel Intelligence</div>
             <h1>Real-Time Fuel &<br/>Gas Tracking</h1>
             <p>Check fuel availability, verify your National Fuel Pass quota, find nearby stations, and stay informed during shortage situations.</p>
-            <div class="hero-search">
+            <div class="hero-search" style="position:relative;">
               <div class="search-box">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="heroSearch" placeholder="Search stations, cities, or vehicle number…" onkeydown="if(event.key==='Enter') handleHeroSearch()" />
-                <button class="search-btn" onclick="handleHeroSearch()">Search</button>
+                <input type="text" id="heroSearch" placeholder="Search stations, cities, or vehicle number…" autocomplete="off" oninput="showSuggestions(this.value, 'hero')" onkeydown="if(event.key==='Enter') { hideSuggestions('hero'); handleHeroSearch(); }" onblur="setTimeout(()=>hideSuggestions('hero'), 200)" />
+                <button class="search-btn" onclick="hideSuggestions('hero'); handleHeroSearch()">Search</button>
               </div>
+              <div id="heroSuggestions" class="suggestions-dropdown" style="display:none;"></div>
             </div>
             <div class="hero-stats">
               <div class="hstat"><span class="hstat-val" id="statStations">248</span><span class="hstat-label">Stations</span></div>
@@ -278,11 +279,12 @@
         <p>Browse all fuel stations across Sri Lanka with real-time availability</p>
       </div>
       <div class="container">
-        <div class="stations-search-bar">
+        <div class="stations-search-bar" style="position:relative;">
           <div class="search-box">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="stationsSearch" placeholder="Search by name, city, or district…" oninput="searchStations()" onkeydown="if(event.key==='Enter') searchStations()" />
+            <input type="text" id="stationsSearch" placeholder="Search by name, city, or district…" autocomplete="off" oninput="searchStations(); showSuggestions(this.value, 'stations')" onkeydown="if(event.key==='Enter') { hideSuggestions('stations'); searchStations(); }" onblur="setTimeout(()=>hideSuggestions('stations'), 200)" />
           </div>
+          <div id="stationsSuggestions" class="suggestions-dropdown" style="display:none;"></div>
         </div>
         <div class="filter-row">
           <select id="sDistrictFilter" class="filter-select" onchange="searchStations()">

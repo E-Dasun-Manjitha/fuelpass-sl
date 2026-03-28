@@ -149,6 +149,113 @@ function filterStations() {
     '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">No stations match the selected filters.</p>';
 }
 
+// ============================================================
+// AUTOCOMPLETE SUGGESTIONS
+// ============================================================
+const SRI_LANKA_DISTRICTS = [
+  "Colombo","Gampaha","Kalutara","Kandy","Matale","Nuwara Eliya",
+  "Galle","Matara","Hambantota","Jaffna","Kilinochchi","Mannar",
+  "Vavuniya","Mullaitivu","Trincomalee","Batticaloa","Ampara",
+  "Kurunegala","Puttalam","Anuradhapura","Polonnaruwa","Badulla",
+  "Monaragala","Ratnapura","Kegalle"
+];
+
+function getLevenshteinDistance(a, b) {
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+window.showSuggestions = function(query, target) {
+  const q = query.toLowerCase().trim();
+  const container = document.getElementById(`${target}Suggestions`);
+  if (!container) return;
+  
+  if (q.length < 2) {
+    container.style.display = 'none';
+    return;
+  }
+
+  let matches = [];
+
+  // 1. Fuzzy match districts (tolerance: 1 typo for small words, 2 for larger)
+  SRI_LANKA_DISTRICTS.forEach(d => {
+    const dLower = d.toLowerCase();
+    if (dLower === q || dLower.includes(q)) {
+      matches.push({ type: 'District', icon: '📍', text: d, score: 0 });
+    } else {
+      const l = getLevenshteinDistance(q, dLower);
+      if ((d.length <= 6 && l <= 1) || (d.length > 6 && l <= 2)) {
+        matches.push({ type: 'District', icon: '📍', text: d, score: l });
+      }
+    }
+  });
+
+  // 2. Exact substring match for Stations & Gas
+  let stCount = 0;
+  DB.stations.forEach(s => {
+    if (stCount < 5 && s.name && s.name.toLowerCase().includes(q)) {
+      matches.push({ type: 'Fuel', icon: '⛽', text: s.name });
+      stCount++;
+    }
+  });
+  
+  let gasCount = 0;
+  DB.gasShops.forEach(s => {
+    if (gasCount < 3 && s.name && s.name.toLowerCase().includes(q)) {
+      matches.push({ type: 'Gas', icon: '🔥', text: s.name });
+      gasCount++;
+    }
+  });
+
+  // Sort: exact districts first, then fuzzy districts, then stations
+  matches.sort((a,b) => {
+    if (a.type === 'District' && b.type !== 'District') return -1;
+    if (b.type === 'District' && a.type !== 'District') return 1;
+    if (a.score !== undefined && b.score !== undefined) return a.score - b.score;
+    return 0;
+  });
+
+  matches = matches.slice(0, 8); // Top 8 suggestions
+
+  if (matches.length === 0) {
+    container.innerHTML = `<div class="sugg-item" style="cursor:default;color:var(--text-muted); justify-content:center;">No suggestions found.</div>`;
+  } else {
+    container.innerHTML = matches.map(m => `
+      <div class="sugg-item" onmousedown="applySuggestion('${m.text.replace(/'/g, "\\'")}', '${target}')">
+        <span class="sugg-icon">${m.icon}</span>
+        <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.text}</span>
+        <span class="sugg-type">${m.type}</span>
+      </div>
+    `).join('');
+  }
+  container.style.display = 'block';
+};
+
+window.applySuggestion = function(val, target) {
+  document.getElementById(`${target}Search`).value = val;
+  document.getElementById(`${target}Suggestions`).style.display = 'none';
+  if (target === 'hero') handleHeroSearch();
+  if (target === 'stations') searchStations();
+};
+
+window.hideSuggestions = function(target) {
+  const container = document.getElementById(`${target}Suggestions`);
+  if (container) container.style.display = 'none';
+};
+
 function searchStations() {
   const query   = (document.getElementById('stationsSearch')?.value || '').trim().toLowerCase();
   const district= document.getElementById('sDistrictFilter')?.value || '';

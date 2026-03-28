@@ -2097,3 +2097,52 @@ table { min-width: 400px; }
   .nav-link { min-height: 48px; display: flex; align-items: center; }
 }
 
+/* =========================================================
+   SUGGESTIONS DROPDOWN (AUTOCOMPLETE)
+   ========================================================= */
+.suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: left;
+}
+.suggestions-dropdown .sugg-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.95rem;
+  color: white;
+}
+.suggestions-dropdown .sugg-item:last-child {
+  border-bottom: none;
+}
+.suggestions-dropdown .sugg-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+.suggestions-dropdown .sugg-icon {
+  font-size: 1.1rem;
+}
+.suggestions-dropdown .sugg-type {
+  font-size: 0.7rem;
+  background: rgba(255,255,255,0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
