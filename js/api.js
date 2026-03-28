@@ -23,6 +23,7 @@ async function apiFetch(path, options = {}) {
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       headers: Auth.getHeaders(),
+      cache: 'no-store', // Force bypass all browser disk caches natively
       ...options,
     });
     const data = await res.json();
