@@ -150,13 +150,16 @@ function filterStations() {
 }
 
 function searchStations() {
-  const query   = (document.getElementById('stationsSearch')?.value || '').toLowerCase();
+  const query   = (document.getElementById('stationsSearch')?.value || '').trim().toLowerCase();
   const district= document.getElementById('sDistrictFilter')?.value || '';
   const status  = document.getElementById('sStatusFilter')?.value || '';
   const company = document.getElementById('sCompanyFilter')?.value || '';
 
   const results = DB.stations.filter(s => {
-    const qOk = !query   || s.name.toLowerCase().includes(query) || s.district.toLowerCase().includes(query) || s.address.toLowerCase().includes(query);
+    const qOk = !query   || 
+      (s.name && s.name.toLowerCase().includes(query)) || 
+      (s.district && s.district.toLowerCase().includes(query)) || 
+      (s.address && s.address.toLowerCase().includes(query));
     const dOk = !district || s.district === district;
     const cOk = !company  || s.company  === company;
     const sOk = !status   || getStationOverallStatus(s) === status;
