@@ -7,7 +7,7 @@ const app  = express();
 const PORT = process.env.PORT || 4000;
 
 // ---- Middleware ----
-app.use(cors({
+const corsOptions = {
   origin: function(origin, callback) {
     if (!origin || /localhost:\d+|127\.0\.0\.1:\d+|fuelpass-sl.*\.vercel\.app$/.test(origin)) {
       callback(null, true);
@@ -18,8 +18,15 @@ app.use(cors({
     }
   },
   credentials: true,
-}));
+};
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Prevent browser caching for all API routes
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
 
 // ---- Health check ----
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
