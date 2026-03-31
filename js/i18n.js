@@ -192,6 +192,13 @@ const TRANSLATIONS = {
     last_delivery_short: 'Last Delivery',
     next_delivery_short: 'Next Delivery',
     dist_all:        'All Districts',
+    v_vehicles:      'vehicles',
+    p_people:        'people',
+    report_shop_name: 'Shop Name',
+    report_product_ph: 'Select product',
+    rStation_ph:     'e.g. CPC Filling Station – Nugegoda',
+    rStation_ph_gas: 'e.g. Litro Dealer – Gampaha',
+    rNotes_ph:       'e.g. queue moving fast...',
 
     // --- Districts ---
     dist_Col: 'Colombo', dist_Gam: 'Gampaha', dist_Kal: 'Kalutara',
@@ -544,6 +551,13 @@ const TRANSLATIONS = {
     reg_next_3:      '3. පරිපාලනය අනුමත කර ඔබට පිරවුම්හල් කේතය සහ මුරපදය එවනු ලැබේ',
     reg_next_4:      '4. ඔබ FuelPass SL මුල් පිටුවට පිවිසී යාවත්කාලීන කිරීම් ඉදිරිපත් කරයි',
     reg_contact:     '📞 සම්බන්ධ වීමට: admin@fuelpasssl.lk හෝ ඉක්මන් අනුමැතිය සඳහා අමතන්න.',
+    v_vehicles:      'වාහන',
+    p_people:        'පුද්ගලයින්',
+    report_shop_name: 'వෙළඳසැලේ නම',
+    report_product_ph: 'නිෂ්පාදනය තෝරන්න',
+    rStation_ph:     'උදා: CPC පිරවුම්හල – නුගේගොඩ',
+    rStation_ph_gas: 'උදා: ලිට්රෝ අලෙවිකරු – ගම්පහ',
+    rNotes_ph:       'උදා: පෝලිම වේගයෙන් ඉදිරියට යයි...',
   },
 
   ta: {
@@ -794,6 +808,13 @@ const TRANSLATIONS = {
     reg_next_3:      '3. நிர்வாகம் அங்கீகரித்து உங்கள் நிலைய குறியீடு + கடவுச்சொல்லை அனுப்பும்',
     reg_next_4:      '4. நீங்கள் FuelPass SL முகப்புப் பக்கத்தில் உள்நுழைந்து விபரங்களைப் புதுப்பிக்கலாம்',
     reg_contact:     '📞 தொடர்பு: admin@fuelpasssl.lk அல்லது விரைவான அனுமதியில் எங்களை அழைக்கவும்.',
+    v_vehicles:      'வாகனங்கள்',
+    p_people:        'நபர்கள்',
+    report_shop_name: 'கடைப் பெயர்',
+    report_product_ph: 'தயாரிப்பைத் தேர்ந்தெடுக்கவும்',
+    rStation_ph:     'உதாரணம்: CPC எரிபொருள் நிலையம் – நுகேகொட',
+    rStation_ph_gas: 'உதாரணம்: லிட்ரோ டீலர் – கம்பஹா',
+    rNotes_ph:       'உதாரணம்: வரிசை வேகமாக நகர்கிறது...',
   }
 };
 

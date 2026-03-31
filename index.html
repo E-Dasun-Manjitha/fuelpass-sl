@@ -3,662 +3,395 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FuelPass SL – Real-Time Fuel & Gas Tracker | Sri Lanka</title>
-  <meta name="description" content="Track real-time fuel availability, prices, and LPG cylinder stock across Sri Lanka. Check your National Fuel Pass quota, odd/even eligibility, and nearby stations." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>FuelPass SL – Real-Time Tracking</title>
+  <meta name="description" content="Real-time fuel and LPG gas tracking platform for Sri Lanka." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="icon" type="image/png" href="logo.png" />
-  <link rel="apple-touch-icon" href="logo.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Category Selector */
+    .category-selector { display: flex; gap: 12px; margin: 20px 0; }
+    .cat-btn {
+      flex: 1;
+      padding: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xs);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .cat-btn:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); }
+    .cat-btn.active {
+      background: rgba(59,130,246,0.15);
+      border-color: rgba(59,130,246,0.4);
+      color: var(--blue);
+      box-shadow: 0 0 16px rgba(59,130,246,0.2);
+    }
+    .cat-btn#catGasBtn.active {
+      background: rgba(245,158,11,0.15);
+      border-color: rgba(245,158,11,0.4);
+      color: var(--amber);
+      box-shadow: 0 0 16px rgba(245,158,11,0.2);
+    }
+  </style>
 </head>
-<body>
-  <!-- ============ SPLASH LOADER ============ -->
+<body class="hidden">
+  <!-- SPLASH LOADER -->
   <div id="splash-loader">
     <div class="splash-inner">
       <div class="splash-logo">
-        <img src="logo.png" alt="FuelPass SL"
-          style="width:110px;height:110px;object-fit:contain;
-                 filter:drop-shadow(0 0 24px rgba(59,130,246,0.6)) drop-shadow(0 0 8px rgba(245,158,11,0.5));
-                 animation:splashLogoPulse 2s ease-in-out infinite;" />
+        <img src="logo.png" alt="FuelPass SL" style="width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(59,130,246,0.6));" />
       </div>
-      <h2>FuelPass <span style="background:linear-gradient(135deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">SL</span></h2>
-      <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-      <p>Loading real-time data…</p>
+      <h2 data-i18n="splash_title">FuelPass SL</h2>
+      <div class="splash-bar">
+        <div class="splash-bar-fill"></div>
+      </div>
+      <p data-i18n="splash_loading">Connecting to regional data servers...</p>
     </div>
   </div>
 
-  <!-- ============ NAV ============ -->
+  <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <div class="nav-brand">
-        <img src="logo.png" alt="FuelPass SL Logo" style="width:38px;height:38px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />
+      <div class="nav-brand" onclick="navigateTo('dashboard')">
+        <img src="logo.png" alt="FuelPass SL" style="width:34px;height:34px;object-fit:contain;" />
         <span>FuelPass <em>SL</em></span>
       </div>
-      <div class="nav-links" id="navLinks">
-        <a href="#dashboard" class="nav-link active" data-page="dashboard" data-i18n="nav_dashboard">Dashboard</a>
-        <a href="#stations" class="nav-link" data-page="stations" data-i18n="nav_stations">Stations</a>
-        <a href="#gas" class="nav-link" data-page="gas" data-i18n="nav_gas">LPG Gas</a>
-        <a href="#prices" class="nav-link" data-page="prices" data-i18n="nav_prices">Prices</a>
-        <a href="#eligibility" class="nav-link" data-page="eligibility" data-i18n="nav_eligibility">Eligibility</a>
-        <a href="#report" class="nav-link" data-page="report" data-i18n="nav_report">Report</a>
+      <div class="nav-links">
+        <a class="nav-link active" onclick="navigateTo('dashboard')" data-i18n="nav_dashboard">Dashboard</a>
+        <a class="nav-link" onclick="navigateTo('stations')" data-i18n="nav_stations">Stations</a>
+        <a class="nav-link" onclick="navigateTo('gas')" data-i18n="nav_gas">LPG Gas</a>
+        <a class="nav-link" onclick="navigateTo('prices')" data-i18n="nav_prices">Prices</a>
+        <a class="nav-link" onclick="navigateTo('eligibility')" data-i18n="nav_eligibility">Eligibility</a>
+        <a class="nav-link" onclick="navigateTo('report')" data-i18n="nav_report">Report</a>
       </div>
       <div class="nav-actions">
         <!-- Language Switcher -->
         <div class="lang-switcher" role="group" aria-label="Language">
-          <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
+          <button class="lang-btn" data-lang="en" onclick="applyLanguage('en')">EN</button>
           <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
           <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
         </div>
-        <div class="live-badge"><span class="live-dot"></span> <span data-i18n="nav_live">LIVE</span></div>
-        <button class="owner-login-btn" id="ownerLoginBtn" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
-        <a href="admin.html" class="admin-nav-btn" title="Admin Panel" data-i18n="nav_admin">⚙️ Admin</a>
-        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
-          <span></span><span></span><span></span>
-        </button>
+        <div class="live-badge" data-i18n="nav_live">
+          <span class="live-dot"></span> LIVE
+        </div>
+        <a href="admin.html" class="admin-nav-btn" data-i18n="nav_admin">⚙️ Admin</a>
       </div>
     </div>
   </nav>
 
-  <!-- ============ MAIN APP ============ -->
-  <main id="app">
-
-    <!-- ===== PAGE: DASHBOARD ===== -->
-    <section id="page-dashboard" class="page active">
-      <!-- Hero -->
-      <div class="hero">
-        <div class="hero-bg">
-          <div class="hero-orb orb-1"></div>
-          <div class="hero-orb orb-2"></div>
-          <div class="hero-orb orb-3"></div>
-        </div>
-        <div class="hero-content">
-          <!-- LEFT: text content -->
-          <div class="hero-left">
-            <div class="hero-badge"><span>🇱🇰</span> <span data-i18n="hero_badge">Sri Lanka Fuel Intelligence</span></div>
-            <h1 data-i18n="hero_title" data-i18n-html>Real-Time Fuel &<br/>Gas Tracking</h1>
-            <p data-i18n="hero_subtitle">Check fuel availability, verify your National Fuel Pass quota, find nearby stations, and stay informed during shortage situations.</p>
-            <div class="hero-search" style="position:relative;">
-              <div class="search-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="heroSearch" data-i18n="hero_search_ph" placeholder="Search stations, cities, or vehicle number…" autocomplete="off" oninput="showSuggestions(this.value, 'hero')" onkeydown="if(event.key==='Enter') { hideSuggestions('hero'); handleHeroSearch(); }" onblur="setTimeout(()=>hideSuggestions('hero'), 200)" />
-                <button class="search-btn" data-i18n="hero_search_btn" onclick="hideSuggestions('hero'); handleHeroSearch()">Search</button>
-              </div>
-              <div id="heroSuggestions" class="suggestions-dropdown" style="display:none;"></div>
+  <main>
+    <!-- DASHBOARD PAGE -->
+    <section id="dashboard" class="page active">
+      <!-- HERO -->
+      <header class="hero">
+        <div class="container hero-content">
+          <div class="hero-text">
+            <span class="hero-badge" data-i18n="hero_badge">Sri Lanka Fuel Service</span>
+            <h1 data-i18n-html="hero_title" data-i18n="hero_title">Live Fuel &<br/>Gas Tracking</h1>
+            <p data-i18n="hero_subtitle">Check fuel availability, verify national fuel quota, and find nearest station updates from verified owners and community reports across the island.</p>
+            <div class="hero-search-wrap">
+              <input type="text" id="heroSearch" placeholder="Search town, district or vehicle number..." data-i18n="hero_search_ph" oninput="handleHeroSearch()" />
+              <button onclick="handleHeroSearch()" data-i18n="hero_search_btn">Search</button>
+              <div id="searchSuggestions" class="search-suggestions glassmorphic hidden"></div>
             </div>
             <div class="hero-stats">
-              <div class="hstat"><span class="hstat-val" id="statStations">248</span><span class="hstat-label" data-i18n="stat_stations">Stations</span></div>
-              <div class="hstat"><span class="hstat-val" id="statAvail">189</span><span class="hstat-label" data-i18n="stat_available">Available</span></div>
-              <div class="hstat"><span class="hstat-val" id="statGas">312</span><span class="hstat-label" data-i18n="stat_gas_shops">Gas Shops</span></div>
-              <div class="hstat"><span class="hstat-val" id="statUpdated">2m</span><span class="hstat-label" data-i18n="stat_last_upd">Last Update</span></div>
+              <div class="h-stat">
+                <span id="statStationsCount" class="h-val">0</span>
+                <span class="h-label" data-i18n="stat_stations">Stations</span>
+              </div>
+              <div class="h-stat">
+                <span id="statAvailableCount" class="h-val" style="color:var(--green)">0</span>
+                <span class="h-label" data-i18n="stat_available">Available</span>
+              </div>
+              <div class="h-stat">
+                <span id="statGasCount" class="h-val">0</span>
+                <span class="h-label" data-i18n="stat_gas_shops">Gas Shops</span>
+              </div>
+              <div class="h-stat">
+                <span class="h-val">LIVE</span>
+                <span class="h-label" data-i18n="stat_last_upd">Last Update</span>
+              </div>
             </div>
           </div>
-
-          <!-- RIGHT: animated logo visual -->
-          <div class="hero-visual" aria-hidden="true">
-            <!-- Outer slow-rotating ring -->
-            <div class="hv-ring hv-ring-1"></div>
-            <div class="hv-ring hv-ring-2"></div>
-            <!-- Pulse halos -->
-            <div class="hv-halo hv-halo-1"></div>
-            <div class="hv-halo hv-halo-2"></div>
-            <div class="hv-halo hv-halo-3"></div>
-            <!-- Center logo -->
-            <div class="hv-logo-wrap">
-              <img src="logo.png" alt="FuelPass SL" class="hv-logo-img" />
+          <div class="hero-map-wrap glassmorphic">
+            <div id="heroMap" class="hero-map"></div>
+            <div class="map-overlay">
+              <button class="map-action-btn" onclick="locateUser()" title="Find My Location">📍</button>
             </div>
-            <!-- Orbiting icon: fuel -->
-            <div class="hv-orbit hv-orbit-1">
-              <div class="hv-orb-icon">⛽</div>
-            </div>
-            <!-- Orbiting icon: gas -->
-            <div class="hv-orbit hv-orbit-2">
-              <div class="hv-orb-icon">🔥</div>
-            </div>
-            <!-- Orbiting icon: location -->
-            <div class="hv-orbit hv-orbit-3">
-              <div class="hv-orb-icon">📍</div>
-            </div>
-            <!-- Orbiting icon: ID card -->
-            <div class="hv-orbit hv-orbit-4">
-              <div class="hv-orb-icon">🪪</div>
-            </div>
-            <!-- Floating stat chips -->
-            <div class="hv-chip hv-chip-1">✅ Petrol Available</div>
-            <div class="hv-chip hv-chip-2">📡 Live Updates</div>
-            <div class="hv-chip hv-chip-3">🗺️ Find Nearest</div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <!-- Fuel Price Ticker -->
-      <div class="ticker-wrap">
-        <div class="ticker-label">⛽ LIVE PRICES</div>
-        <div class="ticker-track" id="tickerTrack">
-          <div class="ticker-items" id="tickerItems"></div>
-        </div>
-      </div>
-
-      <!-- Quick Cards -->
-      <div class="container">
+      <!-- SECTIONS -->
+      <div class="container mt-4">
         <div class="section-header">
-          <h2 data-i18n="nav_dashboard">Today's Overview</h2>
-          <span class="updated-tag" id="overviewUpdated" data-i18n="updated_just_now">Updated just now</span>
+          <h2 data-i18n="overview_title">Today's Overview</h2>
+          <span class="update-time" data-i18n="overview_upd">Updated just now</span>
         </div>
+
+        <!-- Ticker -->
+        <div class="ticker-wrap glassmorphic">
+          <div class="ticker-label" data-i18n="nav_live">LIVE</div>
+          <div class="ticker" id="ticker">
+            <div class="ticker-item" data-i18n="ticker_connecting">Connecting to real-time regional fuel & gas reports...</div>
+          </div>
+        </div>
+
         <div class="overview-grid">
-          <div class="overview-card card-petrol glassmorphic">
-            <div class="oc-icon">⛽</div>
-            <div class="oc-info">
-              <h3>Petrol 92</h3>
-              <div class="oc-price" id="ocPrice92">—</div>
-              <div class="oc-status status-available" id="ocStatus92">Available</div>
+          <div class="overview-left">
+            <div class="quick-stats">
+              <div class="stat-item glassmorphic">
+                <span class="si-title" data-i18n="card_petrol92">Petrol 92</span>
+                <div class="si-val-wrap">
+                  <span id="sumPetrol92" class="si-val">52%</span>
+                  <span class="si-label" data-i18n="stat_available">available</span>
+                </div>
+              </div>
+              <div class="stat-item glassmorphic">
+                <span class="si-title" data-i18n="card_petrol95">Petrol 95</span>
+                <div class="si-val-wrap">
+                  <span id="sumPetrol95" class="si-val">38%</span>
+                  <span class="si-label" data-i18n="stat_available">available</span>
+                </div>
+              </div>
+              <div class="stat-item glassmorphic">
+                <span class="si-title" data-i18n="card_diesel">Diesel</span>
+                <div class="si-val-wrap">
+                  <span id="sumDiesel" class="si-val">64%</span>
+                  <span class="si-label" data-i18n="stat_available">available</span>
+                </div>
+              </div>
+              <div class="stat-item glassmorphic">
+                <span class="si-title" data-i18n="card_superDiesel">Super Diesel</span>
+                <div class="si-val-wrap">
+                  <span id="sumSuperDiesel" class="si-val">41%</span>
+                  <span class="si-label" data-i18n="stat_available">available</span>
+                </div>
+              </div>
             </div>
-            <div class="oc-chart">
-              <canvas id="chart92" width="80" height="40"></canvas>
-            </div>
-          </div>
-          <div class="overview-card card-diesel glassmorphic">
-            <div class="oc-icon">🚛</div>
-            <div class="oc-info">
-              <h3>Auto Diesel</h3>
-              <div class="oc-price" id="ocPriceDsl">—</div>
-              <div class="oc-status status-limited" id="ocStatusDsl">Limited</div>
-            </div>
-            <div class="oc-chart">
-              <canvas id="chartDsl" width="80" height="40"></canvas>
-            </div>
-          </div>
-          <div class="overview-card card-gas glassmorphic">
-            <div class="oc-icon">🔥</div>
-            <div class="oc-info">
-              <h3>LP Gas 12.5kg</h3>
-              <div class="oc-price" id="ocPriceGas">—</div>
-              <div class="oc-status status-available" id="ocStatusGas">Available</div>
-            </div>
-            <div class="oc-chart">
-              <canvas id="chartGas" width="80" height="40"></canvas>
-            </div>
-          </div>
-          <div class="overview-card card-quota glassmorphic" onclick="navigateTo('eligibility')">
-            <div class="oc-icon">🪪</div>
-            <div class="oc-info">
-              <h3>Check Quota</h3>
-              <div class="oc-price">Fuel Pass</div>
-              <div class="oc-status status-info">Verify Now →</div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Map Section -->
-        <div class="section-header mt-4">
-          <h2 data-i18n="map_h">Nearby Stations & Gas Shops</h2>
-          <div class="map-controls">
-            <button class="mc-btn active" id="mcFuel" onclick="setMapFilter('fuel')">⛽ <span data-i18n="fuel">Fuel</span></button>
-            <button class="mc-btn" id="mcGas" onclick="setMapFilter('gas')">🔥 <span data-i18n="gas">Gas</span></button>
-            <button class="mc-btn" id="mcAll" onclick="setMapFilter('all')">📍 <span data-i18n="all">All</span></button>
-            <button class="mc-btn locate-btn" onclick="locateUser()">📍 <span data-i18n="my_location">My Location</span></button>
+            <div class="stations-preview">
+              <div class="sp-header">
+                <h3 data-i18n="nav_stations">Nearest Fuel Stations</h3>
+                <div class="filter-row" style="margin-top:10px;">
+                  <select id="distFilter" class="filter-select" onchange="filterStations()" data-i18n="dist_all">
+                    <option value="" data-i18n="dist_all">All Districts</option>
+                  </select>
+                  <button class="sp-btn" onclick="navigateTo('stations')" data-i18n="view_all">View All</button>
+                </div>
+              </div>
+              <div id="stationsList" class="stations-grid"></div>
+            </div>
           </div>
-        </div>
-        <div class="map-wrapper glassmorphic">
-          <div id="mainMap"></div>
-          <div class="map-legend">
-            <div class="ml-item"><span class="ml-dot dot-available"></span> <span data-i18n="available">Available</span></div>
-            <div class="ml-item"><span class="ml-dot dot-limited"></span> <span data-i18n="limited">Limited</span></div>
-            <div class="ml-item"><span class="ml-dot dot-out"></span> <span data-i18n="out_of_stock">Out of Stock</span></div>
-            <div class="ml-item"><span class="ml-dot dot-gas"></span> <span data-i18n="gas">LPG Gas</span></div>
-          </div>
-        </div>
 
-        <!-- ===== FIND NEAREST STATIONS ===== -->
-        <div class="section-header mt-4">
-          <h2>📍 Find Nearest Station</h2>
-          <span class="updated-tag">Uses your GPS location</span>
-        </div>
-        <div class="glassmorphic" style="padding:20px 22px;border-radius:16px;margin-bottom:10px;">
-          <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:14px;">Allow location access to instantly find the closest fuel stations and gas dealers, sorted by distance — with one-tap Google Maps directions.</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-            <button id="nearestBtn" class="elig-btn" style="padding:10px 22px;display:flex;align-items:center;gap:8px;" onclick="findNearestStations('fuel')">
-              ⛽ Find Nearest Fuel Station
-            </button>
-            <button id="nearestGasBtn" class="elig-btn" style="padding:10px 22px;background:linear-gradient(135deg,#7C3AED,#5B21B6);display:flex;align-items:center;gap:8px;" onclick="findNearestStations('gas')">
-              🔥 Find Nearest Gas Shop
-            </button>
-            <button id="clearNearestBtn" class="elig-btn" style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);display:none;" onclick="clearNearestResults()">
-              🔙 Clear Results
-            </button>
-          </div>
-          <div id="nearestResults"></div>
-        </div>
+          <div class="overview-right">
+            <div class="eligibility-quick glassmorphic">
+              <h3 data-i18n="nav_eligibility">Quick Eligibility Check</h3>
+              <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px;" data-i18n="elig_quick_p">Check if your vehicle is eligible for fuel today based on NFP rules.</p>
+              <div class="elig-form">
+                <select id="eqVehicle" class="elig-input">
+                  <option value="Motorcycle" data-i18n="v_motorcycle">Motorcycle / Scooters</option>
+                  <option value="Three Wheeler" data-i18n="v_three_wheeler">Three Wheeler</option>
+                  <option value="Car" data-i18n="v_car">Car / Jeep / Van</option>
+                  <option value="Bus" data-i18n="v_bus">Bus</option>
+                  <option value="Lorry" data-i18n="v_lorry">Lorry / Truck</option>
+                </select>
+                <input type="text" id="eqPlate" class="elig-input" placeholder="Plate No (e.g. WP ABC-1234)" data-i18n="v_plate_ph" />
+                <button class="elig-btn" onclick="handleQuickEligCheck()" data-i18n="elig_check_now">Check Now</button>
+                <div id="eqResult" class="elig-result hidden"></div>
+              </div>
+            </div>
 
-        <!-- Stations List -->
-        <div class="section-header mt-4">
-          <h2>All Stations</h2>
+            <div class="reports-feed glassmorphic">
+              <h3 data-i18n="recent_reports">Recent Reports</h3>
+              <div id="recentReports" class="reports-list"></div>
+              <button class="action-btn" style="width:100%;margin-top:12px;" onclick="navigateTo('report')" data-i18n="report_update">Report Availability</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATIONS PAGE -->
+    <section id="stations" class="page">
+      <div class="mini-hero">
+        <h1 data-i18n="nav_stations">Fuel Stations</h1>
+        <p data-i18n="page_stations_p">Real-time fuel availability from CPC, LIOC, and community reports across Sri Lanka.</p>
+      </div>
+      <div class="container">
+        <div class="filter-bar glassmorphic">
+          <input type="text" id="stationSearch" placeholder="Search by name, town or district..." data-i18n="stations_search_ph" oninput="searchStations()" />
           <div class="filter-row">
-            <select id="districtFilter" class="filter-select" onchange="filterStations()">
-              <option value="">All Districts</option>
-              <option value="Colombo">Colombo</option>
-              <option value="Gampaha">Gampaha</option>
-              <option value="Kalutara">Kalutara</option>
-              <option value="Kandy">Kandy</option>
-              <option value="Matale">Matale</option>
-              <option value="Nuwara Eliya">Nuwara Eliya</option>
-              <option value="Galle">Galle</option>
-              <option value="Matara">Matara</option>
-              <option value="Hambantota">Hambantota</option>
-              <option value="Jaffna">Jaffna</option>
-              <option value="Kilinochchi">Kilinochchi</option>
-              <option value="Mannar">Mannar</option>
-              <option value="Vavuniya">Vavuniya</option>
-              <option value="Mullaitivu">Mullaitivu</option>
-              <option value="Trincomalee">Trincomalee</option>
-              <option value="Batticaloa">Batticaloa</option>
-              <option value="Ampara">Ampara</option>
-              <option value="Kurunegala">Kurunegala</option>
-              <option value="Puttalam">Puttalam</option>
-              <option value="Anuradhapura">Anuradhapura</option>
-              <option value="Polonnaruwa">Polonnaruwa</option>
-              <option value="Badulla">Badulla</option>
-              <option value="Monaragala">Monaragala</option>
-              <option value="Ratnapura">Ratnapura</option>
-              <option value="Kegalle">Kegalle</option>
+            <select id="pDistFilter" class="filter-select" onchange="searchStations()">
+              <option value="" data-i18n="dist_all">All Districts</option>
             </select>
-            <select id="fuelFilter" class="filter-select" onchange="filterStations()">
-              <option value="">All Fuel Types</option>
-              <option value="petrol92">Petrol 92</option>
-              <option value="petrol95">Petrol 95</option>
-              <option value="diesel">Auto Diesel</option>
-              <option value="superDiesel">Super Diesel</option>
-            </select>
-            <select id="companyFilter" class="filter-select" onchange="filterStations()">
-              <option value="">All Companies</option>
+            <select id="pTypeFilter" class="filter-select" onchange="searchStations()">
+              <option value="">All Types</option>
               <option value="CPC">CPC</option>
               <option value="IOC">Lanka IOC</option>
+              <option value="SINOPEC">SINOPEC</option>
             </select>
+            <label class="check-wrap">
+              <input type="checkbox" id="availFilter" onchange="searchStations()" />
+              <span data-i18n="stat_available">Available Only</span>
+            </label>
           </div>
         </div>
-        <div id="stationsList" class="stations-list"></div>
+        <div id="stationsPageList" class="stations-grid"></div>
       </div>
     </section>
 
-    <!-- ===== PAGE: STATIONS ===== -->
-    <section id="page-stations" class="page">
-      <div class="page-hero mini-hero">
-        <h1>Fuel Stations</h1>
-        <p>Browse all fuel stations across Sri Lanka with real-time availability</p>
+    <!-- GAS PAGE -->
+    <section id="gas" class="page">
+      <div class="mini-hero gas-hero">
+        <h1 data-i18n="nav_gas">LPG Gas</h1>
+        <p data-i18n="page_gas_p">Track Litro and LAUGFS gas availability at dealers nationwide.</p>
       </div>
       <div class="container">
-        <div class="stations-search-bar" style="position:relative;">
-          <div class="search-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="stationsSearch" placeholder="Search by name, city, or district…" autocomplete="off" oninput="searchStations(); showSuggestions(this.value, 'stations')" onkeydown="if(event.key==='Enter') { hideSuggestions('stations'); searchStations(); }" onblur="setTimeout(()=>hideSuggestions('stations'), 200)" />
-          </div>
-          <div id="stationsSuggestions" class="suggestions-dropdown" style="display:none;"></div>
-        </div>
-          <select id="sDistrictFilter" class="filter-select" onchange="searchStations()">
-            <option value="" data-i18n="dist_all">All Districts</option>
-            <option value="Colombo" data-i18n="dist_Col">Colombo</option>
-            <option value="Gampaha" data-i18n="dist_Gam">Gampaha</option>
-            <option value="Kalutara" data-i18n="dist_Kal">Kalutara</option>
-            <option value="Kandy" data-i18n="dist_Kan">Kandy</option>
-            <option value="Matale" data-i18n="dist_Mat">Matale</option>
-            <option value="Nuwara Eliya" data-i18n="dist_NE">Nuwara Eliya</option>
-            <option value="Galle" data-i18n="dist_Gal">Galle</option>
-            <option value="Matara" data-i18n="dist_Mara">Matara</option>
-            <option value="Hambantota" data-i18n="dist_Ham">Hambantota</option>
-            <option value="Jaffna" data-i18n="dist_Jaf">Jaffna</option>
-            <option value="Kilinochchi" data-i18n="dist_Kil">Kilinochchi</option>
-            <option value="Mannar" data-i18n="dist_Man">Mannar</option>
-            <option value="Vavuniya" data-i18n="dist_Vav">Vavuniya</option>
-            <option value="Mullaitivu" data-i18n="dist_Mul">Mullaitivu</option>
-            <option value="Batticaloa" data-i18n="dist_Bat">Batticaloa</option>
-            <option value="Ampara" data-i18n="dist_Amp">Ampara</option>
-            <option value="Trincomalee" data-i18n="dist_Tri">Trincomalee</option>
-            <option value="Kurunegala" data-i18n="dist_Kur">Kurunegala</option>
-            <option value="Puttalam" data-i18n="dist_Put">Puttalam</option>
-            <option value="Anuradhapura" data-i18n="dist_Anu">Anuradhapura</option>
-            <option value="Polonnaruwa" data-i18n="dist_Pol">Polonnaruwa</option>
-            <option value="Badulla" data-i18n="dist_Bad">Badulla</option>
-            <option value="Monaragala" data-i18n="dist_Mon">Monaragala</option>
-            <option value="Ratnapura" data-i18n="dist_Rat">Ratnapura</option>
-            <option value="Kegalle" data-i18n="dist_Keg">Kegalle</option>
-          </select>
-          <select id="sStatusFilter" class="filter-select" onchange="searchStations()">
-            <option value="" data-i18n="status_all">All Statuses</option>
-            <option value="available" data-i18n="available">Available</option>
-            <option value="limited" data-i18n="limited">Limited</option>
-            <option value="out" data-i18n="out_of_stock">Out of Stock</option>
-          </select>
-          <select id="sCompanyFilter" class="filter-select" onchange="searchStations()">
-            <option value="" data-i18n="company_all">All Companies</option>
-            <option value="CPC">CPC</option>
-            <option value="IOC">Lanka IOC</option>
-          </select>
-        <div class="results-count" id="sResultsCount"></div>
-        <div id="stationsPageList" class="stations-list"></div>
-      </div>
-    </section>
+        <!-- Gas Price Card -->
+        <div class="gas-price-cards" id="gasPriceBanner"></div>
 
-    <!-- ===== PAGE: GAS ===== -->
-    <section id="page-gas" class="page">
-      <div class="page-hero mini-hero gas-hero">
-        <h1 data-i18n="page_gas_h1">LPG Gas Dealers</h1>
-        <p data-i18n="page_gas_p">Find Litro Gas & LAUGFS dealers near you</p>
-      </div>
-      <div class="container">
-        <!-- Gas Price Summary -->
-        <div class="gas-price-cards">
-          <div class="gpc glassmorphic litro-card">
-            <div class="gpc-brand">
-              <div class="brand-badge litro">Litro Gas</div>
-            </div>
-            <div class="gpc-items" id="litroPrices"></div>
-          </div>
-          <div class="gpc glassmorphic laugfs-card">
-            <div class="gpc-brand">
-              <div class="brand-badge laugfs">LAUGFS Gas</div>
-            </div>
-            <div class="gpc-items" id="laugfsPrices"></div>
-          </div>
-        </div>
-
-        <!-- Gas Shops -->
-        <div class="section-header mt-4">
-          <h2>Gas Dealers</h2>
+        <div class="filter-bar glassmorphic" style="margin-top:24px;">
+          <input type="text" id="gasSearch" placeholder="Search by city, shop name..." data-i18n="gas_search_ph" oninput="filterGasShops()" />
           <div class="filter-row">
-            <select id="gasProviderFilter" class="filter-select" onchange="filterGasShops()">
-              <option value="">All Providers</option>
+            <select id="gDistFilter" class="filter-select" onchange="filterGasShops()">
+              <option value="" data-i18n="dist_all">All Districts</option>
+            </select>
+            <select id="gBrandFilter" class="filter-select" onchange="filterGasShops()">
+              <option value="">All Brands</option>
               <option value="Litro">Litro Gas</option>
               <option value="LAUGFS">LAUGFS Gas</option>
             </select>
-            <select id="gasCylinderFilter" class="filter-select" onchange="filterGasShops()">
-              <option value="">All Cylinders</option>
-              <option value="12.5kg">12.5 kg</option>
-              <option value="5kg">5 kg</option>
-              <option value="37.5kg">37.5 kg</option>
-            </select>
-            <select id="gasDistrictFilter" class="filter-select" onchange="filterGasShops()">
-              <option value="">All Districts</option>
-              <option value="Colombo">Colombo</option>
-              <option value="Gampaha">Gampaha</option>
-              <option value="Kalutara">Kalutara</option>
-              <option value="Kandy">Kandy</option>
-              <option value="Matale">Matale</option>
-              <option value="Nuwara Eliya">Nuwara Eliya</option>
-              <option value="Galle">Galle</option>
-              <option value="Matara">Matara</option>
-              <option value="Hambantota">Hambantota</option>
-              <option value="Jaffna">Jaffna</option>
-              <option value="Kilinochchi">Kilinochchi</option>
-              <option value="Mannar">Mannar</option>
-              <option value="Vavuniya">Vavuniya</option>
-              <option value="Mullaitivu">Mullaitivu</option>
-              <option value="Trincomalee">Trincomalee</option>
-              <option value="Batticaloa">Batticaloa</option>
-              <option value="Ampara">Ampara</option>
-              <option value="Kurunegala">Kurunegala</option>
-              <option value="Puttalam">Puttalam</option>
-              <option value="Anuradhapura">Anuradhapura</option>
-              <option value="Polonnaruwa">Polonnaruwa</option>
-              <option value="Badulla">Badulla</option>
-              <option value="Monaragala">Monaragala</option>
-              <option value="Ratnapura">Ratnapura</option>
-              <option value="Kegalle">Kegalle</option>
-            </select>
           </div>
         </div>
-        <div id="gasShopsList" class="stations-list"></div>
+        <div id="gasShopsList" class="stations-grid"></div>
       </div>
     </section>
 
-    <!-- ===== PAGE: PRICES ===== -->
-    <section id="page-prices" class="page">
-      <div class="page-hero mini-hero prices-hero">
-        <h1 data-i18n="page_prices_h1">Fuel & Gas Prices</h1>
-        <p data-i18n="page_prices_p">Current official prices from CPC, Lanka IOC, Litro & LAUGFS</p>
+    <!-- PRICES PAGE -->
+    <section id="prices" class="page">
+      <div class="mini-hero prices-hero">
+        <h1 data-i18n="nav_prices">Fuel & Gas Prices</h1>
+        <p data-i18n="page_prices_p">Latest official retail prices of fuel and domestic gas cylinders.</p>
       </div>
       <div class="container">
-        <div class="prices-grid">
-          <!-- CPC Prices -->
-          <div class="price-table-card glassmorphic">
-            <div class="ptc-header">
-              <div class="ptc-logo cpc-logo">CPC</div>
-              <div>
-                <h3 data-i18n="prices_fuel_h_cpc">Ceylon Petroleum Corporation</h3>
-                <span class="ptc-date" id="cpcDate">Effective: March 2026</span>
+        <div class="prices-grid" id="pricesGrid"></div>
+      </div>
+    </section>
+
+    <!-- ELIGIBILITY PAGE -->
+    <section id="eligibility" class="page">
+      <div class="mini-hero elig-hero">
+        <h1 data-i18n="nav_eligibility">Quota Eligibility</h1>
+        <p data-i18n="page_eligibility_p">Check your National Fuel Pass weekly quota and odd/even day availability.</p>
+      </div>
+      <div class="container">
+        <div class="eligibility-grid">
+          <div class="elig-card full-elig-card glassmorphic">
+            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+              <div class="elig-icon">🎫</div>
+              <div style="flex:1;">
+                <h3 data-i18n="elig_h3">Check Your Quota</h3>
+                <p data-i18n="elig_p">Enter your vehicle details to see how much fuel you can fill this week. Calculations based on 2022 NFP standard quotas.</p>
+                <div class="elig-form" style="margin-top:20px;max-width:500px;">
+                  <div class="form-group">
+                    <label data-i18n="elig_vehicle_type">Vehicle Type</label>
+                    <select id="vType" class="elig-input">
+                      <option value="Motorcycle" data-i18n="v_motorcycle">Motorcycle / Scooters (4L)</option>
+                      <option value="Three Wheeler" data-i18n="v_three_wheeler">Three Wheeler (5L-8L)</option>
+                      <option value="Car" data-i18n="v_car">Car / Jeep / Van (20L)</option>
+                      <option value="Bus" data-i18n="v_bus">Bus (40L-60L)</option>
+                      <option value="Lorry" data-i18n="v_lorry">Lorry / Land Vehicle (40L)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label data-i18n="v_plate_ph">Plate Number</label>
+                    <input type="text" id="vPlate" class="elig-input" placeholder="ABC-1234" />
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                      <label data-i18n="elig_already_used">Already Used (L)</label>
+                      <input type="number" id="vUsed" class="elig-input" value="0" min="0" />
+                    </div>
+                    <div class="form-group">
+                      <label data-i18n="elig_want_fill">Want to Fill (L)</label>
+                      <input type="number" id="vFill" class="elig-input" value="10" min="1" />
+                    </div>
+                  </div>
+                  <button class="elig-btn" onclick="calculateQuota()" data-i18n="elig_check_now">Verify & Check Eligibility</button>
+                </div>
               </div>
             </div>
-            <table class="price-table">
-              <thead><tr><th data-i18n="price_fuel_type">Fuel Type</th><th data-i18n="price_lkr">Price (LKR)</th><th data-i18n="price_change">Change</th></tr></thead>
-              <tbody id="cpcPriceTable"></tbody>
-            </table>
+            <div id="vResult" class="hidden" style="margin-top:24px;"></div>
           </div>
-          <!-- IOC Prices -->
-          <div class="price-table-card glassmorphic">
-            <div class="ptc-header">
-              <div class="ptc-logo ioc-logo">IOC</div>
-              <div>
-                <h3 data-i18n="prices_fuel_h_ioc">Lanka IOC</h3>
-                <span class="ptc-date" id="iocDate">Effective: March 2026</span>
-              </div>
-            </div>
-            <table class="price-table">
-              <thead><tr><th>Fuel Type</th><th>Price (LKR)</th><th>Change</th></tr></thead>
-              <tbody id="iocPriceTable"></tbody>
-            </table>
-          </div>
-          <!-- Gas Prices -->
-          <div class="price-table-card glassmorphic full-width">
-            <div class="ptc-header">
-              <div class="ptc-logo gas-logo">GAS</div>
-              <div>
-                <h3 data-i18n="prices_gas_h_all">LPG Cylinder Prices</h3>
-                <span class="ptc-date">Litro Gas Lanka & LAUGFS Gas PLC</span>
-              </div>
-            </div>
-            <table class="price-table">
-              <thead><tr><th data-i18n="footer_providers">Provider</th><th data-i18n="elig_cylinder">Cylinder Size</th><th data-i18n="price_lkr">Price (LKR)</th><th data-i18n="report_status">Status</th></tr></thead>
-              <tbody id="gasPriceTable"></tbody>
-            </table>
-          </div>
-        </div>
-        <!-- Quota Table -->
-        <div class="section-header mt-4">
-          <h2>Weekly Fuel Quotas</h2>
-          <span class="updated-tag">National Fuel Pass System</span>
-        </div>
-        <div class="price-table-card glassmorphic">
-          <table class="price-table">
-            <thead><tr><th>Vehicle Category</th><th>Fuel Type</th><th>Weekly Quota</th><th>Notes</th></tr></thead>
-            <tbody id="quotaTable"></tbody>
-          </table>
         </div>
       </div>
     </section>
 
-    <!-- ===== PAGE: ELIGIBILITY ===== -->
-    <section id="page-eligibility" class="page">
-      <div class="page-hero mini-hero elig-hero">
-        <h1 data-i18n="page_elig_h1">Check Eligibility</h1>
-        <p data-i18n="page_elig_p">Enter your vehicle number to instantly check if you can refuel today, your quota, and simulate fill amounts</p>
+    <!-- REPORT PAGE -->
+    <section id="report" class="page">
+      <div class="mini-hero report-hero">
+        <h1 data-i18n="nav_report">Report Availability</h1>
+        <p data-i18n="page_report_p">Help the community by sharing updates on fuel or gas stocks at your local station.</p>
       </div>
-      <div class="container">
-
-        <!-- ── OFFICIAL FUELPASS PORTAL BANNER ── -->
-        <a href="https://fuelpass.gov.lk/" target="_blank" rel="noopener noreferrer" class="fuelpass-gov-banner glassmorphic" id="fuelpassGovBanner">
-          <div class="fpb-left">
-            <div class="fpb-icon">🏛️</div>
-            <div class="fpb-text">
-              <strong data-i18n="elig_official_h">Official National Fuel Pass Portal</strong>
-              <span data-i18n="elig_official_p">Register your vehicle, get your QR code &amp; manage your quota on the government site</span>
+      <div class="container" style="max-width:800px;">
+        
+        <!-- Tabbed view or sections -->
+        <div class="report-container">
+          <!-- OWNER PORTAL SECTION -->
+          <div id="ownerPortal" class="report-card glassmorphic" style="border-color:rgba(124,58,237,0.3);margin-bottom:32px;">
+            <div style="display:flex;gap:16px;align-items:center;">
+              <div style="font-size:2.5rem;">🏪</div>
+              <div>
+                <h3 data-i18n="owner_h3">Are you a Station Owner?</h3>
+                <p style="font-size:0.875rem;color:var(--text-secondary);" data-i18n="owner_desc">Log in with your Station Code and Password to submit verified real-time updates.</p>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:16px;">
+              <button class="elig-btn" style="background:var(--violet);" onclick="openOwnerLogin()" data-i18n="owner_login_btn">🔑 Owner Login</button>
+              <a href="register.html"><button class="elig-btn" style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);" data-i18n="owner_reg_btn">📝 Register Station</button></a>
             </div>
           </div>
-          <div class="fpb-right">
-            <span class="fpb-domain">fuelpass.gov.lk</span>
-            <span class="fpb-arrow">→</span>
-          </div>
-        </a>
 
-        <!-- ── COMBINED QUICK CHECK ── -->
-        <div class="quick-check-wrapper glassmorphic">
-          <div class="qc-header">
-            <span class="qc-icon">⛽</span>
-            <div>
-              <h2 data-i18n="elig_check_h">Can I Fill Fuel Today?</h2>
-              <p data-i18n="elig_check_p">Enter your vehicle number and type — get an instant full eligibility report</p>
+          <!-- VERIFIED OWNER REPORT (visible after login) -->
+          <div id="verifiedReportArea" class="report-card glassmorphic hidden" style="border-color:var(--green);margin-bottom:32px;">
+            <div class="owner-banner glassmorphic">
+              <div class="ob-info">
+                <span class="ob-badge" data-i18n="owner_verified">✅ VERIFIED OWNER</span>
+                <h3 id="ownerStationName">—</h3>
+              </div>
+              <button class="action-small-btn" onclick="doOwnerLogout()" data-i18n="report_logout">🚪 Logout</button>
             </div>
-          </div>
-          <div class="qc-form">
-            <input type="text" id="qcPlate" placeholder="e.g. ABC-1234 · AB-5678 · WP CAR 1234 · CAB-5678" class="elig-input qc-input" maxlength="20" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')runCombinedCheck()" />
-            <select id="qcVehicleType" class="elig-input qc-select" onchange="onVehicleTypeChange()">
-              <option value="car">🚗 Car / Taxi (20 L/week)</option>
-              <option value="motorcycle">🏍️ Motorcycle (4 L/week)</option>
-              <option value="threewheeler">🛺 Three-Wheeler (5 L/week)</option>
-              <option value="van">🚐 Van / Dual-Purpose (40 L/week)</option>
-              <option value="suv">🚙 SUV / Jeep (20 L/week)</option>
-              <option value="bus_private">🚌 Private Bus (100 L/week)</option>
-              <option value="bus_school">🏫 School Bus/Van (60 L/week)</option>
-              <option value="truck_small">🚚 Lorry ≤8 wheels (80 L/week)</option>
-              <option value="truck_large">🚛 Lorry >8 wheels (100 L/week)</option>
-              <option value="tractor">🚜 Tractor (20 L/week)</option>
-              <option value="other">🚘 Other (20 L/week)</option>
-            </select>
-            <small style="color:var(--text-muted);font-size:0.72rem;margin-top:4px;display:block;">ℹ️ For new plates (AB-1234 or ABC-1234) select type manually. Old plates (WP CAR 1234) auto-detect.</small>
-            <button class="elig-btn qc-btn" onclick="runCombinedCheck()">🔍 Check Now</button>
-          </div>
-          <!-- Result panel — always visible, starts with placeholder -->
-          <div id="combinedResult" class="combined-result">
-            <div class="cr-placeholder">
-              <span>🇱🇰</span>
-              <p data-i18n="elig_instruction">Enter your vehicle number above and click <strong>Check Now</strong> to see your full eligibility status.</p>
-              <p class="cr-demo-hint">💡 Demo numbers: <strong>CAB-1234</strong> · <strong>WP-8742</strong> · <strong>NB-5612</strong> · <strong>SG-3301</strong></p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── QUOTA SIMULATOR ── -->
-        <div class="section-header mt-4">
-          <h2 data-i18n="elig_sim_h">⚖️ Fuel Amount Simulator</h2>
-          <span class="updated-tag">Before &amp; After Filling</span>
-        </div>
-        <div class="simulator-wrapper glassmorphic">
-          <div class="sim-form">
-            <div class="sim-field">
-              <label>Vehicle Type</label>
-              <select id="simVehicleType" class="elig-input" onchange="updateSimulator()">
-                <option value="car">🚗 Car (20 L/week)</option>
-                <option value="motorcycle">🏍️ Motorcycle (4 L/week)</option>
-                <option value="threewheeler">🛺 Three-Wheeler (5 L/week)</option>
-                <option value="van">🚐 Van / Dual-Purpose (40 L/week)</option>
-                <option value="suv">🚙 SUV / Jeep (20 L/week)</option>
-                <option value="bus_private">🚌 Private Bus (100 L/week)</option>
-                <option value="bus_school">🏫 School Bus/Van (60 L/week)</option>
-                <option value="truck_small">🚚 Lorry ≤8 wheels (80 L/week)</option>
-                <option value="truck_large">🚛 Lorry >8 wheels (100 L/week)</option>
-                <option value="tractor">🚜 Tractor (20 L/week)</option>
-                <option value="other">🚘 Other (20 L/week)</option>
-              </select>
-            </div>
-            <div class="sim-field">
-              <label>Already Used This Week (L)</label>
-              <input type="number" id="simUsed" class="elig-input" value="0" min="0" max="200" oninput="updateSimulator()" placeholder="0" />
-            </div>
-            <div class="sim-field">
-              <label>I Want to Fill (L)</label>
-              <input type="number" id="simFill" class="elig-input" value="0" min="0" max="200" oninput="updateSimulator()" placeholder="0" />
-            </div>
-          </div>
-          <div id="simResult" class="sim-result">
-            <div class="cr-placeholder"><span>⚖️</span><p>Select your vehicle type to start simulating.</p></div>
-          </div>
-        </div>
-
-        <!-- ── ODD / EVEN CALENDAR ── -->
-        <div class="section-header mt-4">
-          <h2 data-i18n="elig_cal_h">📅 7-Day Odd / Even Calendar</h2>
-          <span class="updated-tag">Based on today's date</span>
-        </div>
-        <div class="glassmorphic" style="padding:24px;border-radius:16px;">
-          <p style="color:var(--text-secondary);font-size:0.875rem;margin-bottom:16px;">🔵 Odd days – plates ending in 1,3,5,7,9 &nbsp;|&nbsp; 🟡 Even days – plates ending in 0,2,4,6,8</p>
-          <div class="oec-grid" id="sevenDayCalendar"></div>
-        </div>
-
-        <!-- ── WEEKLY INFO ── -->
-        <div class="section-header mt-4">
-          <h2>📊 This Week's Info</h2>
-        </div>
-        <div id="weeklyOverview" class="weekly-overview glassmorphic" style="padding:24px;border-radius:16px;"></div>
-
-      </div>
-    </section>
-
-    <!-- ===== PAGE: REPORT ===== -->
-    <section id="page-report" class="page">
-      <div class="page-hero mini-hero report-hero">
-        <h1>Report Availability</h1>
-        <p>Station owners submit verified updates · Community members report what they see</p>
-      </div>
-      <div class="container">
-
-        <!-- Owner Panel Banner (shown when owner is logged in) -->
-        <div id="ownerActiveBanner" style="display:none;" class="owner-banner glassmorphic">
-          <div class="ob-info">
-            <span class="ob-badge">✅ VERIFIED OWNER</span>
-            <div>
-              <strong id="obOwnerName">—</strong>
-              <span id="obStationCode" style="color:var(--blue);font-size:0.8rem;margin-left:8px;">—</span>
-            </div>
-            <span style="font-size:0.78rem;color:var(--text-muted);">Your updates are shown as Verified to all users</span>
-          </div>
-          <button class="action-small-btn" onclick="ownerLogout()">🚪 Logout</button>
-        </div>
-
-        <!-- Not logged in notice -->
-        <div id="ownerLoginNotice" class="owner-login-notice glassmorphic">
-          <div>
-            <h3>🏪 Are you a Station Owner or Gas Dealer?</h3>
-            <p>Log in with your <strong>Station Code and Password</strong> to submit <span class="verified-tag">✅ Verified</span> real-time updates that users trust more.</p>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="elig-btn" onclick="openOwnerLogin()" style="padding:10px 20px;">🔑 Owner Login</button>
-            <a href="register.html"><button class="elig-btn" style="padding:10px 20px;background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);">📝 Register Station</button></a>
-          </div>
-        </div>
-
-        <div class="report-grid">
-          <!-- VERIFIED OWNER REPORT FORM -->
-          <div id="ownerReportForm" class="report-card glassmorphic" style="display:none;">
-            <h3>✅ Verified Owner Report</h3>
-            <p>You are logged in as a <strong>Verified Station Owner</strong>. Your updates carry a trust badge visible to all users.</p>
-            <form onsubmit="submitVerifiedReport(event)">
+            <form id="verifiedReportForm" onsubmit="submitVerifiedUpdate(event)">
               <div class="form-group">
-                <label>Product / Fuel Type</label>
-                <select id="vrProduct" class="form-input">
-                  <option value="">Select product</option>
-                  <option value="Petrol 92">Petrol 92</option>
-                  <option value="Petrol 95">Petrol 95</option>
-                  <option value="Auto Diesel">Auto Diesel</option>
-                  <option value="Super Diesel">Super Diesel</option>
-                  <option value="LPG 12.5 kg">LPG 12.5 kg</option>
-                  <option value="LPG 5 kg">LPG 5 kg</option>
-                  <option value="LPG 37.5 kg">LPG 37.5 kg</option>
+                <label data-i18n="report_product">Fuel / Product</label>
+                <select id="vrProduct" class="form-input" required>
+                  <!-- Populated by JS based on station type -->
                 </select>
               </div>
               <div class="form-group">
-                <label>Current Availability</label>
+                <label data-i18n="report_status">Availability Status</label>
                 <div class="status-picker">
-                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectVrStatus('available')">✅ Available</button>
-                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectVrStatus('limited')">⚠️ Limited</button>
-                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectVrStatus('out')">❌ Out of Stock</button>
+                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectVrStatus('available')"><span data-i18n="status_available">✅ Available</span></button>
+                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectVrStatus('limited')"><span data-i18n="status_limited">⚠️ Limited</span></button>
+                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectVrStatus('out')"><span data-i18n="status_out">❌ Out of Stock</span></button>
                 </div>
               </div>
               <div class="form-group">
                 <label data-i18n="report_queue">Current Queue Length</label>
                 <select id="vrQueue" class="form-input">
-                  <option value="none">No Queue</option>
-                  <option value="short">Short (&lt; 10 vehicles)</option>
-                  <option value="medium">Medium (10–30 vehicles)</option>
-                  <option value="long">Long (30+ vehicles)</option>
+                  <option value="none" data-i18n="queue_none">No Queue</option>
+                  <option value="short" id="vrOptQueueShort">Short (< 10 vehicles)</option>
+                  <option value="medium" id="vrOptQueueMed">Medium (10–30)</option>
+                  <option value="long" id="vrOptQueueLong">Long (30+ vehicles)</option>
                 </select>
               </div>
               <div class="form-group">
@@ -683,65 +416,52 @@
           <div class="report-card glassmorphic">
             <h3 data-i18n="report_comm_h">👥 Community Report</h3>
             <p data-i18n="report_comm_p">Help others by reporting what you see. Community reports are marked separately from verified owner updates.</p>
+            
+            <div class="category-selector">
+              <button type="button" id="catFuelBtn" class="cat-btn active" onclick="setReportCategory('fuel')">⛽ <span data-i18n="nav_stations">Fuel Stations</span></button>
+              <button type="button" id="catGasBtn" class="cat-btn" onclick="setReportCategory('gas')">🔥 <span data-i18n="nav_gas">LPG Gas</span></button>
+            </div>
+
             <form id="reportForm" onsubmit="submitReport(event)">
               <div class="form-group">
-                <label data-i18n="report_station_name">Station / Shop Name</label>
-                <input type="text" id="rStation" placeholder="e.g. CPC Filling Station – Nugegoda" class="form-input" required />
+                <label id="lblStationName" data-i18n="report_station_name">Station Name</label>
+                <input type="text" id="rStation" placeholder="e.g. CPC Filling Station – Nugegoda" data-i18n="rStation_ph" class="form-input" required />
               </div>
-              <div class="form-group">
-                <label data-i18n="report_type">Report Type</label>
-                <select id="rType" class="form-input" required>
-                  <option value="">Select type</option>
-                  <option value="fuel">Fuel Station</option>
-                  <option value="gas">LPG Gas Shop</option>
-                </select>
-              </div>
+
+              <!-- Product selection (dynamically changed) -->
               <div class="form-group">
                 <label data-i18n="report_product">Fuel / Product</label>
-                <select id="rProduct" class="form-input">
-                  <option value="">Select product</option>
-                  <option value="Petrol 92">Petrol 92</option>
-                  <option value="Petrol 95">Petrol 95</option>
-                  <option value="Auto Diesel">Auto Diesel</option>
-                  <option value="Super Diesel">Super Diesel</option>
-                  <option value="LPG 12.5 kg">LPG 12.5 kg</option>
-                  <option value="LPG 5 kg">LPG 5 kg</option>
+                <select id="rProduct" class="form-input" required>
+                  <option value="" data-i18n="report_product_ph">Select product</option>
                 </select>
               </div>
+
               <div class="form-group">
                 <label data-i18n="report_status">Availability Status</label>
                 <div class="status-picker" id="statusPicker">
-                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectStatus('available')">✅ Available</button>
-                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectStatus('limited')">⚠️ Limited</button>
-                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectStatus('out')">❌ Out of Stock</button>
+                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectStatus('available')"><span data-i18n="status_available">✅ Available</span></button>
+                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectStatus('limited')"><span data-i18n="status_limited">⚠️ Limited</span></button>
+                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectStatus('out')"><span data-i18n="status_out">❌ Out of Stock</span></button>
                 </div>
               </div>
+
               <div class="form-group">
-                <label>Queue Length (approx.)</label>
+                <label id="lblQueue" data-i18n="report_queue">Queue Length</label>
                 <select id="rQueue" class="form-input">
-                  <option value="none">No Queue</option>
-                  <option value="short">Short (&lt; 10 vehicles)</option>
-                  <option value="medium">Medium (10–30)</option>
-                  <option value="long">Long (30+ vehicles)</option>
+                  <option value="none" data-i18n="queue_none">No Queue</option>
+                  <option value="short" id="optQueueShort">Short (< 10 vehicles)</option>
+                  <option value="medium" id="optQueueMed">Medium (10–30)</option>
+                  <option value="long" id="optQueueLong">Long (30+ vehicles)</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label>Additional Notes (optional)</label>
-                <textarea id="rNotes" class="form-input form-textarea" placeholder="e.g. Petrol 92 only, queue moving fast…" rows="2"></textarea>
-              </div>
-              <button type="submit" class="elig-btn" style="width:100%" data-i18n="report_submit_comm">📤 Submit Community Report</button>
-            </form>
-          </div>
 
-          <!-- Reports Feed -->
-          <div class="report-card glassmorphic" style="grid-column:1/-1;">
-            <h3 data-i18n="recent_reports">🕐 Recent Reports</h3>
-            <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-              <button class="mc-btn active" id="filterAllBtn" onclick="filterReportsFeed('all')">All Reports</button>
-              <button class="mc-btn" id="filterVerifiedBtn" onclick="filterReportsFeed('verified')">✅ Verified Only</button>
-              <button class="mc-btn" id="filterCommunityBtn" onclick="filterReportsFeed('community')">👥 Community</button>
-            </div>
-            <div id="recentReports" class="recent-reports-list"></div>
+              <div class="form-group">
+                <label data-i18n="report_notes">Additional Notes (optional)</label>
+                <textarea id="rNotes" class="form-input form-textarea" placeholder="e.g. queue moving fast…" data-i18n="rNotes_ph" rows="2"></textarea>
+              </div>
+
+              <button type="submit" class="elig-btn" style="width:100%;" data-i18n="report_submit_comm">📡 Submit Community Report</button>
+            </form>
           </div>
         </div>
       </div>
@@ -800,9 +520,9 @@
     <div class="footer-bottom">
       <p>© 2026 FuelPass SL. Built to help Sri Lankans during fuel challenges. 🇱🇰
         &nbsp;·&nbsp;
-        <a href="admin.html" style="color:var(--text-muted);">⚙️ Admin Panel</a>
+        <a href="admin.html" style="color:var(--text-muted);" data-i18n="nav_admin">⚙️ Admin Panel</a>
         &nbsp;·&nbsp;
-        <a href="register.html" style="color:var(--text-muted);">📝 Register Station</a>
+        <a href="register.html" style="color:var(--text-muted);" data-i18n="nav_register">📝 Register Station</a>
       </p>
     </div>
   </footer>
@@ -856,35 +576,17 @@
   <script src="js/map.js?v=3"></script>
   <script src="js/nearest.js?v=3"></script>
   <script src="js/eligibility.js?v=3"></script>
-  <script src="js/ui.js?v=4"></script>
+  <script src="js/ui.js?v=10"></script>
   <script src="js/app.js?v=4"></script>
   <script src="js/owner.js?v=4"></script>
   <script>
-    // Bootstrap: try live API first, fallback to static data
     document.addEventListener('DOMContentLoaded', async () => {
-      // Restore saved language (before first render)
       try { applyLanguage(localStorage.getItem('fp_lang') || 'en'); } catch(e) {}
-
-      try {
-        await loadLiveData();       // fetches from Render backend – merges DB + static
-      } catch(e) {
-        console.warn('Live API unavailable – using static data:', e.message);
-        try { loadRealStationData(); } catch(e2) {}
-      }
-      // Re-render ALL pages with loaded data
-      try { updateStats(); }          catch(e) {}
-      try { filterStations(); }       catch(e) {}
-      try { searchStations(); }       catch(e) {}   // <-- Stations page list
-      try { filterGasShops(); }       catch(e) {}   // <-- Gas page list
-      try { buildTicker(); }          catch(e) {}
-      try { renderRecentReports(); }  catch(e) {}
-      try { renderGasPage(); }        catch(e) {}
-      try { renderPricesPage(); }     catch(e) {}
-      if (typeof map !== 'undefined' && map) try { renderMapMarkers(); } catch(e) {}
-      console.log('✅ UI fully refreshed with live data');
+      try { await loadLiveData(); } catch(e) { try { loadRealStationData(); } catch(e2) {} }
+      refreshUI();
+      // Init category
+      if (typeof setReportCategory === 'function') setReportCategory('fuel');
     });
   </script>
-
 </body>
 </html>
-
