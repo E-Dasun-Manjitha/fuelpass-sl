@@ -128,28 +128,52 @@ async function loadLiveData() {
     apiGetReports(),
   ]);
 
+  // ---- STATIONS: Merge live DB entries ON TOP of static real data ----
+  // Always start with the full static list (69 real Sri Lanka stations)
+  try { loadRealStationData(); } catch(e) {}
+
   if (stationsResp?.data?.length) {
     // Normalise API response to match existing DB shape
-    DB.stations = stationsResp.data.map(s => ({
+    const liveStations = stationsResp.data.map(s => ({
       ...s,
       fuels: s.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
       queue: Object.values(s.queues || {})[0] || 'none',
       lastUpdated: s.last_updated ? new Date(s.last_updated).toLocaleTimeString() : '--',
     }));
-    console.log(`✅ ${DB.stations.length} stations loaded from API`);
+
+    // Merge: upsert live stations into the static list (by id)
+    const existingIds = new Set(DB.stations.map(s => s.id));
+    liveStations.forEach(live => {
+      const idx = DB.stations.findIndex(s => s.id === live.id);
+      if (idx !== -1) {
+        DB.stations[idx] = live; // update existing
+      } else {
+        DB.stations.push(live);  // add new (admin-created)
+      }
+    });
+    console.log(`✅ ${liveStations.length} live DB stations merged → total ${DB.stations.length} stations`);
   } else {
-    console.warn('⚠️ Using static fallback station data');
-    try { loadRealStationData(); } catch(e) {}
+    console.warn('⚠️ API returned no stations — showing static data only');
   }
 
+
   if (gasResp?.data?.length) {
-    DB.gasShops = gasResp.data.map(g => ({
+    const liveGas = gasResp.data.map(g => ({
       ...g,
       stock: g.stock || {},
       lastDelivery: g.last_delivery || '--',
       nextDelivery: g.next_delivery || '--',
     }));
-    console.log(`✅ ${DB.gasShops.length} gas shops loaded from API`);
+    // Merge into static list
+    liveGas.forEach(live => {
+      const idx = DB.gasShops.findIndex(g => g.id === live.id);
+      if (idx !== -1) {
+        DB.gasShops[idx] = live;
+      } else {
+        DB.gasShops.push(live);
+      }
+    });
+    console.log(`✅ ${liveGas.length} live DB gas shops merged → total ${DB.gasShops.length}`);
   }
 
   if (pricesResp?.data) {
