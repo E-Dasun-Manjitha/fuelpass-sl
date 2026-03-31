@@ -7,7 +7,7 @@
   <meta name="description" content="Track real-time fuel availability, prices, and LPG cylinder stock across Sri Lanka. Check your National Fuel Pass quota, odd/even eligibility, and nearby stations." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="icon" type="image/png" href="logo.png" />
@@ -37,17 +37,23 @@
         <span>FuelPass <em>SL</em></span>
       </div>
       <div class="nav-links" id="navLinks">
-        <a href="#dashboard" class="nav-link active" data-page="dashboard">Dashboard</a>
-        <a href="#stations" class="nav-link" data-page="stations">Stations</a>
-        <a href="#gas" class="nav-link" data-page="gas">LPG Gas</a>
-        <a href="#prices" class="nav-link" data-page="prices">Prices</a>
-        <a href="#eligibility" class="nav-link" data-page="eligibility">Eligibility</a>
-        <a href="#report" class="nav-link" data-page="report">Report</a>
+        <a href="#dashboard" class="nav-link active" data-page="dashboard" data-i18n="nav_dashboard">Dashboard</a>
+        <a href="#stations" class="nav-link" data-page="stations" data-i18n="nav_stations">Stations</a>
+        <a href="#gas" class="nav-link" data-page="gas" data-i18n="nav_gas">LPG Gas</a>
+        <a href="#prices" class="nav-link" data-page="prices" data-i18n="nav_prices">Prices</a>
+        <a href="#eligibility" class="nav-link" data-page="eligibility" data-i18n="nav_eligibility">Eligibility</a>
+        <a href="#report" class="nav-link" data-page="report" data-i18n="nav_report">Report</a>
       </div>
       <div class="nav-actions">
-        <div class="live-badge"><span class="live-dot"></span> LIVE</div>
-        <button class="owner-login-btn" id="ownerLoginBtn" onclick="openOwnerLogin()">🔑 Owner Login</button>
-        <a href="admin.html" class="admin-nav-btn" title="Admin Panel">⚙️ Admin</a>
+        <!-- Language Switcher -->
+        <div class="lang-switcher" role="group" aria-label="Language">
+          <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
+          <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
+          <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
+        </div>
+        <div class="live-badge"><span class="live-dot"></span> <span data-i18n="nav_live">LIVE</span></div>
+        <button class="owner-login-btn" id="ownerLoginBtn" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
+        <a href="admin.html" class="admin-nav-btn" title="Admin Panel" data-i18n="nav_admin">⚙️ Admin</a>
         <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
           <span></span><span></span><span></span>
         </button>
@@ -70,22 +76,22 @@
         <div class="hero-content">
           <!-- LEFT: text content -->
           <div class="hero-left">
-            <div class="hero-badge"><span>🇱🇰</span> Sri Lanka Fuel Intelligence</div>
-            <h1>Real-Time Fuel &<br/>Gas Tracking</h1>
-            <p>Check fuel availability, verify your National Fuel Pass quota, find nearby stations, and stay informed during shortage situations.</p>
+            <div class="hero-badge"><span>🇱🇰</span> <span data-i18n="hero_badge">Sri Lanka Fuel Intelligence</span></div>
+            <h1 data-i18n="hero_title" data-i18n-html>Real-Time Fuel &<br/>Gas Tracking</h1>
+            <p data-i18n="hero_subtitle">Check fuel availability, verify your National Fuel Pass quota, find nearby stations, and stay informed during shortage situations.</p>
             <div class="hero-search" style="position:relative;">
               <div class="search-box">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="heroSearch" placeholder="Search stations, cities, or vehicle number…" autocomplete="off" oninput="showSuggestions(this.value, 'hero')" onkeydown="if(event.key==='Enter') { hideSuggestions('hero'); handleHeroSearch(); }" onblur="setTimeout(()=>hideSuggestions('hero'), 200)" />
-                <button class="search-btn" onclick="hideSuggestions('hero'); handleHeroSearch()">Search</button>
+                <input type="text" id="heroSearch" data-i18n="hero_search_ph" placeholder="Search stations, cities, or vehicle number…" autocomplete="off" oninput="showSuggestions(this.value, 'hero')" onkeydown="if(event.key==='Enter') { hideSuggestions('hero'); handleHeroSearch(); }" onblur="setTimeout(()=>hideSuggestions('hero'), 200)" />
+                <button class="search-btn" data-i18n="hero_search_btn" onclick="hideSuggestions('hero'); handleHeroSearch()">Search</button>
               </div>
               <div id="heroSuggestions" class="suggestions-dropdown" style="display:none;"></div>
             </div>
             <div class="hero-stats">
-              <div class="hstat"><span class="hstat-val" id="statStations">248</span><span class="hstat-label">Stations</span></div>
-              <div class="hstat"><span class="hstat-val" id="statAvail">189</span><span class="hstat-label">Available</span></div>
-              <div class="hstat"><span class="hstat-val" id="statGas">312</span><span class="hstat-label">Gas Shops</span></div>
-              <div class="hstat"><span class="hstat-val" id="statUpdated">2m</span><span class="hstat-label">Last Update</span></div>
+              <div class="hstat"><span class="hstat-val" id="statStations">248</span><span class="hstat-label" data-i18n="stat_stations">Stations</span></div>
+              <div class="hstat"><span class="hstat-val" id="statAvail">189</span><span class="hstat-label" data-i18n="stat_available">Available</span></div>
+              <div class="hstat"><span class="hstat-val" id="statGas">312</span><span class="hstat-label" data-i18n="stat_gas_shops">Gas Shops</span></div>
+              <div class="hstat"><span class="hstat-val" id="statUpdated">2m</span><span class="hstat-label" data-i18n="stat_last_upd">Last Update</span></div>
             </div>
           </div>
 
@@ -796,32 +802,42 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/data.js"></script>
   <script src="js/stations_real.js"></script>
-  <script src="js/api.js?v=22"></script>
+  <script src="js/i18n.js?v=1"></script>
+  <script src="js/api.js?v=23"></script>
   <script src="js/auth.js?v=3"></script>
   <script src="js/vehicles.js?v=3"></script>
   <script src="js/map.js?v=3"></script>
   <script src="js/nearest.js?v=3"></script>
   <script src="js/eligibility.js?v=3"></script>
-  <script src="js/ui.js?v=3"></script>
-  <script src="js/app.js?v=3"></script>
-  <script src="js/owner.js?v=3"></script>
+  <script src="js/ui.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
+  <script src="js/owner.js?v=4"></script>
   <script>
     // Bootstrap: try live API first, fallback to static data
     document.addEventListener('DOMContentLoaded', async () => {
+      // Restore saved language (before first render)
+      try { applyLanguage(localStorage.getItem('fp_lang') || 'en'); } catch(e) {}
+
       try {
-        await loadLiveData();       // fetches from Render backend
+        await loadLiveData();       // fetches from Render backend – merges DB + static
       } catch(e) {
         console.warn('Live API unavailable – using static data:', e.message);
         try { loadRealStationData(); } catch(e2) {}
       }
-      // Re-render UI with loaded data
-      try { updateStats(); }       catch(e) {}
-      try { filterStations(); }    catch(e) {}
-      try { buildTicker(); }       catch(e) {}
-      try { renderRecentReports(); } catch(e) {}
+      // Re-render ALL pages with loaded data
+      try { updateStats(); }          catch(e) {}
+      try { filterStations(); }       catch(e) {}
+      try { searchStations(); }       catch(e) {}   // <-- Stations page list
+      try { filterGasShops(); }       catch(e) {}   // <-- Gas page list
+      try { buildTicker(); }          catch(e) {}
+      try { renderRecentReports(); }  catch(e) {}
+      try { renderGasPage(); }        catch(e) {}
+      try { renderPricesPage(); }     catch(e) {}
       if (typeof map !== 'undefined' && map) try { renderMapMarkers(); } catch(e) {}
+      console.log('✅ UI fully refreshed with live data');
     });
   </script>
+
 </body>
 </html>
 

@@ -2146,3 +2146,48 @@ table { min-width: 400px; }
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* =========================================================
+   LANGUAGE SWITCHER
+   ========================================================= */
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 3px;
+}
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+.lang-btn:hover {
+  color: white;
+  background: rgba(255,255,255,0.1);
+}
+.lang-btn.active {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: white;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.4);
+}
+
+/* Noto font for Sinhala & Tamil unicode */
+[lang="si"], .lang-btn[data-lang="si"] {
+  font-family: 'Noto Sans Sinhala', 'Inter', sans-serif;
+}
+[lang="ta"], .lang-btn[data-lang="ta"] {
+  font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
+}
+
