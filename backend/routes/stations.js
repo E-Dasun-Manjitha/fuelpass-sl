@@ -84,4 +84,24 @@ router.post('/:id/status', verifyToken, async (req, res) => {
   }
 });
 
+// PATCH /api/stations/:id/status – Bulk admin update
+router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { fuels, queue } = req.body; // fuels = { petrol92: 'available', petrol95: 'out', ... }
+    const queries = Object.entries(fuels).map(([type, status]) => {
+      return db.query(`
+        INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
+        VALUES ($1,$2,$3,$4,NOW(),'admin')
+        ON CONFLICT (station_id, fuel_type)
+        DO UPDATE SET status=$3, queue=$4, last_updated=NOW(), updated_by='admin'
+      `, [req.params.id, type, status, queue || 'none']);
+    });
+    await Promise.all(queries);
+    res.json({ success: true, message: 'Station status bulk updated' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
 module.exports = router;

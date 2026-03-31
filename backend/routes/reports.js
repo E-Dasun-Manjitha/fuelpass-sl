@@ -77,4 +77,41 @@ router.delete('/:id', verifyToken, async (req, res) => {
   }
 });
 
+// PATCH /api/reports/:id/verify – Admin marks report as verified and updates station
+router.patch('/:id/verify', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reportRes = await db.query('SELECT * FROM reports WHERE id = $1', [id]);
+    if (!reportRes.rows.length) return res.status(404).json({ success: false, error: 'Report not found' });
+    const r = reportRes.rows[0];
+
+    // Mark verified
+    await db.query('UPDATE reports SET verified = true WHERE id = $1', [id]);
+
+    // SYNC TO STATION (Auto-Update)
+    if (r.station_code || r.station_name) {
+       // Find station id by code or name
+       let sId = r.station_code;
+       if (!sId) {
+          const sRes = await db.query('SELECT id FROM stations WHERE name = $1 LIMIT 1', [r.station_name]);
+          if (sRes.rows.length) sId = sRes.rows[0].id;
+       }
+
+       if (sId && r.product && r.status) {
+          await db.query(`
+            INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
+            VALUES ($1, $2, $3, $4, NOW(), 'verified-report')
+            ON CONFLICT (station_id, fuel_type)
+            DO UPDATE SET status=$3, queue=$4, last_updated=NOW(), updated_by='verified-report'
+          `, [sId, r.product, r.status, r.queue || 'none']);
+       }
+    }
+
+    res.json({ success: true, message: 'Report verified and station updated' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
 module.exports = router;

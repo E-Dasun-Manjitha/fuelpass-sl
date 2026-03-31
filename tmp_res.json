@@ -1,0 +1,165 @@
+{
+  "success": true,
+  "data": {
+    "fuelPrices": {
+      "cpc": [
+        {
+          "id": 1,
+          "provider": "CPC",
+          "fuel_type": "Petrol 92 Octane",
+          "price": 398,
+          "prev_price": 317,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 2,
+          "provider": "CPC",
+          "fuel_type": "Petrol 95 Octane",
+          "price": 455,
+          "prev_price": 365,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 3,
+          "provider": "CPC",
+          "fuel_type": "Auto Diesel",
+          "price": 382,
+          "prev_price": 303,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 4,
+          "provider": "CPC",
+          "fuel_type": "Super Diesel (Euro4)",
+          "price": 443,
+          "prev_price": 353,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 5,
+          "provider": "CPC",
+          "fuel_type": "Kerosene",
+          "price": 255,
+          "prev_price": 195,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        }
+      ],
+      "ioc": [
+        {
+          "id": 6,
+          "provider": "IOC",
+          "fuel_type": "Servo 92 Octane",
+          "price": 398,
+          "prev_price": 317,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 7,
+          "provider": "IOC",
+          "fuel_type": "Servo 95 Octane",
+          "price": 455,
+          "prev_price": 365,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 8,
+          "provider": "IOC",
+          "fuel_type": "Auto Diesel",
+          "price": 382,
+          "prev_price": 303,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 9,
+          "provider": "IOC",
+          "fuel_type": "XP Super Diesel",
+          "price": 443,
+          "prev_price": 353,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 10,
+          "provider": "IOC",
+          "fuel_type": "XP-95 Premium",
+          "price": 460,
+          "prev_price": 370,
+          "unit": "L",
+          "effective": "2026-03-27T00:00:00.000Z",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        }
+      ]
+    },
+    "gasPrices": {
+      "litro": [
+        {
+          "id": 1,
+          "provider": "Litro",
+          "size": "12.5 kg",
+          "price": 4040,
+          "status": "available",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 2,
+          "provider": "Litro",
+          "size": "5 kg",
+          "price": 1620,
+          "status": "limited",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 3,
+          "provider": "Litro",
+          "size": "37.5 kg",
+          "price": 9970,
+          "status": "available",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        }
+      ],
+      "laugfs": [
+        {
+          "id": 4,
+          "provider": "LAUGFS",
+          "size": "12.5 kg",
+          "price": 4040,
+          "status": "available",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 5,
+          "provider": "LAUGFS",
+          "size": "5 kg",
+          "price": 1620,
+          "status": "out",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        },
+        {
+          "id": 6,
+          "provider": "LAUGFS",
+          "size": "37.5 kg",
+          "price": 9970,
+          "status": "limited",
+          "updated_at": "2026-03-27T11:50:38.581Z"
+        }
+      ]
+    }
+  }
+}

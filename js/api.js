@@ -138,6 +138,17 @@ async function apiDeleteContact(id) {
   return apiFetch(`/api/contact/${id}`, { method: 'DELETE' });
 }
 
+async function apiUpdateStationStatus(id, payload) {
+  return apiFetch(`/api/stations/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+async function apiVerifyReport(id) {
+  return apiFetch(`/api/reports/${id}/verify`, { method: 'PATCH' });
+}
+
 // ============================================================
 // BOOTSTRAP – Load live data into DB on page start
 // Falls back to static data if API is unreachable

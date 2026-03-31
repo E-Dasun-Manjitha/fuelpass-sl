@@ -221,8 +221,11 @@
             <button id="nearestBtn" class="elig-btn" style="padding:10px 22px;display:flex;align-items:center;gap:8px;" onclick="findNearestStations('fuel')">
               ⛽ Find Nearest Fuel Station
             </button>
-            <button class="elig-btn" style="padding:10px 22px;background:linear-gradient(135deg,#7C3AED,#5B21B6);display:flex;align-items:center;gap:8px;" onclick="findNearestStations('gas')">
+            <button id="nearestGasBtn" class="elig-btn" style="padding:10px 22px;background:linear-gradient(135deg,#7C3AED,#5B21B6);display:flex;align-items:center;gap:8px;" onclick="findNearestStations('gas')">
               🔥 Find Nearest Gas Shop
+            </button>
+            <button id="clearNearestBtn" class="elig-btn" style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);display:none;" onclick="clearNearestResults()">
+              🔙 Clear Results
             </button>
           </div>
           <div id="nearestResults"></div>

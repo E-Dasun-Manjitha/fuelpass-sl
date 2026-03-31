@@ -121,14 +121,11 @@
       <div class="sb-section-label">Overview</div>
       <a class="active" onclick="showPanel('dashboard')">📊 Dashboard</a>
       <div class="sb-section-label">Owner Management</div>
-      <a onclick="showPanel('pending')">⏳ Pending Registrations</a>
       <a onclick="showPanel('addowner')">➕ Add New Owner</a>
       <a onclick="showPanel('approved')">🏪 All Station Owners</a>
       <div class="sb-section-label">Data Management</div>
       <a onclick="showPanel('prices')">💰 Update Fuel Prices</a>
       <a onclick="showPanel('reports')">📋 Verified Reports</a>
-      <a onclick="showPanel('feedback')">💬 User Feedback</a>
-      <a onclick="showPanel('managestations')">🚉 Manage Stations</a>
       <div class="sb-section-label">Site</div>
       <a onclick="window.open('index.html','_blank')">🌐 View Live Site</a>
     </nav>
@@ -137,15 +134,6 @@
 
   <!-- Main Content -->
   <main class="admin-main">
-
-    <!-- ── PENDING REGISTRATIONS ── -->
-    <div id="panel-pending" class="admin-panel animate-fade-in">
-      <div class="panel-header">
-        <h2>⏳ Pending Registrations</h2>
-        <p>Review and approve new fuel stations submitted via the public portal's Register page.</p>
-      </div>
-      <div id="pendingList"></div>
-    </div>
 
     <!-- ── DASHBOARD ── -->
     <div id="panel-dashboard" class="admin-panel active">
@@ -333,30 +321,15 @@
       <p class="updated-info" id="priceLastUpdated"></p>
     </div>
 
-    <!-- ── USER FEEDBACK ── -->
-    <div id="panel-feedback" class="admin-panel">
-      <div class="admin-topbar">
-        <h1>💬 User Feedback & Messages</h1>
-      </div>
-      <div class="admin-card">
-        <div id="feedbackList"></div>
-      </div>
-    </div>
-
-    <!-- ── MANAGE STATIONS ── -->
-    <div id="panel-managestations" class="admin-panel">
-      <div class="admin-topbar">
-        <h1>🚉 Master Station Management</h1>
-        <div class="admin-actions">
-           <input type="text" placeholder="Search stations..." oninput="renderManageStations(this.value)" style="padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:white;min-width:250px;">
-        </div>
-      </div>
-      <div class="admin-card">
-        <div id="manageStationsList"></div>
-      </div>
-    </div>
-
     <!-- ── VERIFIED REPORTS ── -->
+    <div id="panel-reports" class="admin-panel">
+      <div class="admin-topbar">
+        <h1>📋 Verified Station Reports</h1>
+      </div>
+      <div class="admin-card">
+        <div id="reportsList"></div>
+      </div>
+    </div>
 
   </main>
 </div>
@@ -388,41 +361,10 @@
   </div>
 </div>
 
-<!-- ── STATION EDIT MODAL ── -->
-<div id="stationEditModal" style="display:none;" class="modal-overlay">
-  <div class="approve-modal" style="max-width:500px;">
-    <h3>🚉 Edit Station Status</h3>
-    <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:16px;" id="esStationInfo"></p>
-    <input type="hidden" id="esStationId">
-    
-    <div class="am-row">
-      <label>Product & Availability</label>
-      <div id="esFuelStatusList" style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
-        <!-- Dynamically filled -->
-      </div>
-    </div>
-
-    <div class="am-row" style="margin-top:20px;">
-      <label>🔄 Queue Status</label>
-      <select id="esQueue" class="am-input" style="background:#0f172a;">
-        <option value="none">No Queue</option>
-        <option value="short">Short Queue</option>
-        <option value="medium">Medium Queue</option>
-        <option value="long">Long Queue/Heavy</option>
-      </select>
-    </div>
-
-    <div style="display:flex;gap:10px;margin-top:24px;">
-      <button class="action-btn btn-approve" style="flex:1;padding:12px;" onclick="saveStationEdit()">💾 Save Changes</button>
-      <button class="action-btn btn-reject" style="padding:12px 20px;" onclick="closeStationEdit()">Cancel</button>
-    </div>
-  </div>
-</div>
-
 <div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
 
 
-<script src="js/api.js?v=25"></script>
+<script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script>
   let approveTargetId = null;
@@ -461,7 +403,7 @@
     document.querySelectorAll('.sb-nav a').forEach(a => a.classList.remove('active'));
     const panel = document.getElementById('panel-' + name);
     if (panel) panel.classList.add('active');
-    const map = { dashboard:0, pending:1, addowner:2, approved:3, prices:4, reports:5, feedback:6, managestations:7 };
+    const map = { dashboard:0, pending:1, addowner:2, approved:3, prices:4, reports:5 };
     const links = document.querySelectorAll('.sb-nav a');
     if (links[map[name]] !== undefined) links[map[name]].classList.add('active');
 
@@ -469,32 +411,20 @@
     if (name === 'approved') renderApproved();
     if (name === 'prices')   renderPrices();
     if (name === 'reports')  renderVerifiedReports();
-    if (name === 'feedback') renderFeedback();
-    if (name === 'managestations') renderManageStations();
-    if (name === 'addowner') { 
-      document.getElementById('aoCredBox').style.display='none'; 
-      // Ensure type toggle is always visible for manual entries
-      const toggleContainer = document.getElementById('typeToggleFuel').parentElement.parentElement;
-      toggleContainer.style.display = 'block';
-      const existingLockMsg = document.getElementById('lockNoticeText');
-      if (existingLockMsg) existingLockMsg.remove();
-      autoGenCode(); autoGenPw(); 
-    }
+    if (name === 'addowner') { document.getElementById('aoCredBox').style.display='none'; autoGenCode(); autoGenPw(); }
   }
 
   // ── DASHBOARD ─────────────────────────────────────────────
   async function initAdminPanel() {
     document.getElementById('dashTime').textContent = 'Loading...';
     try {
-      const [ownersRes, reportsRes, pricesRes, contactRes] = await Promise.all([
+      const [ownersRes, reportsRes, pricesRes] = await Promise.all([
         apiGetOwners(),
         apiGetReports(true),
-        apiGetPrices(),
-        apiGetContactMessages()
+        apiGetPrices()
       ]);
       const owners = ownersRes?.data || [];
       const reports = reportsRes?.data || [];
-      const contact = contactRes?.data || [];
       const d = pricesRes?.data;
       const prices = d ? [ ...(d.fuelPrices?.cpc||[]), ...(d.gasPrices?.litro||[]) ] : [];
       
@@ -506,8 +436,9 @@
       document.getElementById('dashTime').textContent = 'Loaded: ' + new Date().toLocaleTimeString();
       document.getElementById('statCards').innerHTML = `
         <div class="stat-card"><div class="sv">${owners.length}</div><div class="sl">Station Owners</div></div>
+        <div class="stat-card"><div class="sv">${owners.filter(o=>['CPC','IOC','SINOPEC'].includes(o.station_name?.toUpperCase() || o.station_code?.substring(0,3))).length}</div><div class="sl">Fuel Stations</div></div>
+        <div class="stat-card"><div class="sv">${owners.filter(o=>['LIT','LAU','BOT'].some(c=>o.station_code?.includes(c))).length || 4}</div><div class="sl">Gas Dealers</div></div>
         <div class="stat-card"><div class="sv">${reports.length}</div><div class="sl">Verified Reports</div></div>
-        <div class="stat-card"><div class="sv">${contact.length}</div><div class="sl">Total Feedbacks</div></div>
         <div class="stat-card"><div class="sv">LKR ${getP('92')}</div><div class="sl">Petrol 92</div></div>
         <div class="stat-card"><div class="sv">LKR ${getP('Auto Diesel')}</div><div class="sl">Diesel</div></div>
         <div class="stat-card"><div class="sv">LKR ${getP('12.5')}</div><div class="sl">LP Gas 12.5kg</div></div>
@@ -528,16 +459,16 @@
       return;
     }
     el.innerHTML = `<table class="admin-table">
-      <thead><tr><th>Station</th><th>Owner Details</th><th>Registration / Location</th><th>Type</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Station</th><th>Owner</th><th>Phone/Email</th><th>Type</th><th>Actions</th></tr></thead>
       <tbody>` + 
       pending.map(p => `<tr>
-        <td><strong>${p.stationName}</strong><br><span style="font-size:0.75rem;">Phone: ${p.stationPhone||'N/A'}</span></td>
-        <td>${p.ownerName}<br><span style="font-size:0.75rem;">NIC: ${p.nic}</span><br><span style="font-size:0.75rem;">Mobile: ${p.mobile}</span><br><span style="font-size:0.75rem;">Email: ${p.email}</span></td>
-        <td><span style="font-size:0.75rem;"><strong>Biz Reg:</strong> ${p.bizReg || 'None'}</span><br><span style="font-size:0.75rem;"><strong>Address:</strong> ${p.address}, ${p.district}</span><br><span style="font-size:0.75rem;display:block;margin-top:4px;color:var(--text-muted);">"${p.reason||'No reason provided'}"</span></td>
+        <td><strong>${p.stationName}</strong><br><span style="font-size:0.75rem;">${p.district}</span></td>
+        <td>${p.ownerName}<br><span style="font-size:0.75rem;">NIC: ${p.nic}</span></td>
+        <td>${p.mobile}<br><span style="font-size:0.75rem;">${p.email}</span></td>
         <td><span class="tag-approved">${p.stationType}</span></td>
-        <td style="min-width:120px;">
-          <button class="action-btn" style="background:#10B981;margin-bottom:6px;width:100%" onclick="approvePending('${p.id}')">Approve</button>
-          <button class="action-btn btn-reject" style="width:100%" onclick="rejectPending('${p.id}')">Reject</button>
+        <td>
+          <button class="action-btn" style="background:#10B981" onclick="approvePending('${p.id}')">Approve</button>
+          <button class="action-btn btn-reject" onclick="rejectPending('${p.id}')">Reject</button>
         </td>
       </tr>`).join('') +
       '</tbody></table>';
@@ -555,7 +486,6 @@
     const type = (reg.stationType==='Litro'||reg.stationType==='LAUGFS'||reg.stationType==='Both') ? 'gas' : 'fuel';
     setOwnerType(type);
     
-    // Pre-fill the remaining data into Add Owner screen
     document.getElementById('aoName').value = reg.stationName;
     document.getElementById('aoCompany').value = reg.stationType;
     document.getElementById('aoDistrict').value = reg.district;
@@ -565,19 +495,6 @@
     document.getElementById('aoMobile').value = reg.mobile;
     document.getElementById('aoEmail').value = reg.email;
     document.getElementById('aoNIC').value = reg.nic;
-    
-    // Hide the toggle buttons entirely so they can't switch it and mess up the pre-populated interface
-    const toggleContainer = document.getElementById('typeToggleFuel').parentElement.parentElement;
-    toggleContainer.style.display = 'none';
-
-    // Add a notice message about the locked interface
-    const existingLockMsg = document.getElementById('lockNoticeText');
-    if (!existingLockMsg) {
-      const lockMsg = document.createElement('div');
-      lockMsg.id = 'lockNoticeText';
-      lockMsg.innerHTML = '<div class="notice-box notice-info">🔒 Interface locked to <b>' + (type==="fuel"?"Fuel Station":"Gas Dealer") + '</b> based on the owner&apos;s registration.</div>';
-      toggleContainer.after(lockMsg);
-    }
     
     autoGenCode();
     autoGenPw();
@@ -657,7 +574,6 @@
       const res = await apiAddOwner({
         station_code: code,
         station_name: name,
-        company, district, address, phone,
         owner_name: ownerName,
         email, mobile, password
       });
@@ -784,221 +700,37 @@
       showAdminToast('❌ Network error.', 'error');
     }
   }
-  // ── USER FEEDBACK ────────────────────────────────────────
-  window.renderFeedback = async function() {
-    const el = document.getElementById('feedbackList');
-    el.innerHTML = '<div style="padding:20px;text-align:center;">Loading messages...</div>';
-    try {
-      const res = await apiGetContactMessages();
-      console.log('Feedback API Res:', res);
-      const msgs = res?.data || [];
-      if (!msgs.length) {
-        el.innerHTML = '<div class="empty-state"><span>💬</span><p>No messages received yet.</p></div>';
-        return;
-      }
-      el.innerHTML = `<table class="admin-table">
-        <thead><tr><th>User</th><th>Message</th><th>Time</th><th>Actions</th></tr></thead>
-        <tbody>` + 
-        msgs.map(m => `
-          <tr id="msg-row-${m.id}">
-            <td>
-              <strong style="color:var(--text-primary);">${m.name}</strong><br/>
-              <span style="font-size:0.75rem;color:var(--text-muted);">${m.email || 'No email'}</span>
-            </td>
-            <td>
-              <div style="font-size:0.75rem;font-weight:600;color:var(--blue);margin-bottom:2px;">${m.subject}</div>
-              <p style="font-size:0.85rem;line-height:1.4;">${m.message}</p>
-              ${m.reply ? `<div style="margin-top:8px;padding:8px;background:rgba(16,185,129,0.06);border-left:2px solid #10B981;font-size:0.78rem;">
-                <strong>Admin Reply:</strong> ${m.reply}
-              </div>` : ''}
-            </td>
-            <td style="font-size:0.72rem;white-space:nowrap;">${new Date(m.created_at).toLocaleString()}</td>
-            <td>
-              <div style="display:flex;gap:6px;">
-                <button class="action-btn btn-reject" style="padding:5px 10px;font-size:0.75rem;" onclick="deleteMessage(${m.id})">🗑️ Delete</button>
-              </div>
-            </td>
-          </tr>
-        `).join('') + 
-        '</tbody></table>';
-    } catch(err) {
-      el.innerHTML = '<div style="padding:20px;color:red;text-align:center;">Error loading messages.</div>';
-    }
-  }
-
-  window.deleteMessage = async function(id) {
-    if (!confirm('Permanently delete this message?')) return;
-    try {
-      const res = await apiDeleteContact(id);
-      if (res && res.success) {
-        document.getElementById(`msg-row-${id}`).remove();
-        showAdminToast('✅ Message deleted.');
-      }
-    } catch(err) { showAdminToast('❌ Failed to delete.', 'error'); }
-  }
 
   // ── VERIFIED REPORTS ──────────────────────────────────────
-  // ── MANAGE STATIONS ──────────────────────────────────────
-  let ALL_ADMIN_STATIONS = [];
-
-  window.renderManageStations = async function(search = '') {
-    const el = document.getElementById('manageStationsList');
-    if (!search && !ALL_ADMIN_STATIONS.length) {
-      el.innerHTML = '<div style="padding:20px;text-align:center;">Loading stations...</div>';
-    }
-    
-    try {
-      if (!ALL_ADMIN_STATIONS.length) {
-        const res = await apiGetStations();
-        ALL_ADMIN_STATIONS = res?.data || [];
-      }
-      
-      const filtered = ALL_ADMIN_STATIONS.filter(s => 
-        (s.name || '').toLowerCase().includes(search.toLowerCase()) || 
-        (s.district || '').toLowerCase().includes(search.toLowerCase()) || 
-        (s.address || '').toLowerCase().includes(search.toLowerCase())
-      );
-
-      if (!filtered.length) {
-        el.innerHTML = '<div class="empty-state"><span>🚉</span><p>No stations found.</p></div>';
-        return;
-      }
-
-      el.innerHTML = `<table class="admin-table">
-        <thead><tr><th>Station</th><th>Dist</th><th>Fuel Status</th><th>Queue</th><th>Actions</th></tr></thead>
-        <tbody>` +
-        filtered.map(s => {
-          const fuels = Object.entries(s.fuels || {}).map(([type, status]) => {
-             const dot = status === 'available' ? '🟢' : status === 'limited' ? '🟠' : '🔴';
-             return `<span title="${type}">${dot}</span>`;
-          }).join(' ');
-          
-          const firstQueue = Object.values(s.queues || {})[0] || '—';
-          
-          return `<tr id="manage-row-${s.id}">
-            <td>
-              <strong style="color:var(--text-primary);">${s.name}</strong><br/>
-              <span style="font-size:0.75rem;color:var(--text-muted);">${s.company} · ${s.address}</span>
-            </td>
-            <td>${s.district}</td>
-            <td><div style="display:flex;gap:4px;">${fuels || '<span style="color:var(--text-muted);font-size:0.7rem;">No data</span>'}</div></td>
-            <td><span style="font-size:0.8rem;text-transform:capitalize;">${firstQueue}</span></td>
-            <td>
-              <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
-            </td>
-          </tr>`;
-        }).join('') +
-        '</tbody></table>';
-    } catch(err) {
-      el.innerHTML = '<div style="padding:20px;color:red;text-align:center;">Error loading stations.</div>';
-    }
-  }
-
-  window.openStationEdit = function(id) {
-    const s = ALL_ADMIN_STATIONS.find(x => x.id === id);
-    if (!s) return;
-    document.getElementById('esStationId').value = id;
-    document.getElementById('esStationInfo').textContent = `${s.name} (${s.company}) - ${s.district}`;
-    
-    const fuelTypes = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
-    const list = document.getElementById('esFuelStatusList');
-    list.innerHTML = fuelTypes.map(f => {
-      const current = s.fuels ? s.fuels[f] : 'out';
-      return `
-        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);">
-          <strong style="text-transform:capitalize;font-size:0.85rem;">${f.replace('petrol', 'Petrol ')}</strong>
-          <select class="fuel-select-${f}" style="background:#0f172a;color:white;border:1px solid #334155;padding:4px 8px;border-radius:4px;font-size:0.82rem;">
-            <option value="available" ${current==='available'?'selected':''}>🟢 Available</option>
-            <option value="limited" ${current==='limited'?'selected':''}>🟠 Limited</option>
-            <option value="out" ${current==='out'?'selected':''}>🔴 Out of Stock</option>
-          </select>
-        </div>
-      `;
-    }).join('');
-
-    const firstQueue = Object.values(s.queues || {})[0] || 'none';
-    document.getElementById('esQueue').value = firstQueue;
-    document.getElementById('stationEditModal').style.display = 'flex';
-  }
-
-  window.closeStationEdit = () => { document.getElementById('stationEditModal').style.display = 'none'; };
-
-  window.saveStationEdit = async function() {
-    const id = document.getElementById('esStationId').value;
-    const fuels = {};
-    ['petrol92', 'petrol95', 'diesel', 'superDiesel'].forEach(f => {
-      fuels[f] = document.querySelector(`.fuel-select-${f}`).value;
-    });
-    const queue = document.getElementById('esQueue').value;
-
-    try {
-      const res = await apiUpdateStationStatus(id, { fuels, queue });
-      if (res && res.success) {
-        showAdminToast('✅ Station updated successfully!');
-        closeStationEdit();
-        ALL_ADMIN_STATIONS = []; // Force refresh
-        renderManageStations();
-      }
-    } catch(err) { showAdminToast('❌ Update failed.', 'error'); }
-  }
-
-  // ── REPORTS ──────────────────────────────────────────────
   window.renderVerifiedReports = async function() {
     const el = document.getElementById('reportsList');
     el.innerHTML = '<div style="padding:20px;text-align:center;">Loading reports...</div>';
     try {
-      const res = await apiGetReports(); // Get all (pending + verified)
+      const res = await apiGetReports(true); // verified only
       const reports = res?.data || [];
       if (!reports.length) {
-        el.innerHTML = '<div class="empty-state"><span>📋</span><p>No reports found.</p></div>';
+        el.innerHTML = '<div class="empty-state"><span>📋</span><p>No verified reports yet.</p></div>';
         return;
       }
       el.innerHTML = `<table class="admin-table">
-        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Queue</th><th>Submitter</th><th>Flag</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Queue</th><th>Submitter</th><th>Time</th></tr></thead>
         <tbody>` +
         reports.map(r => {
           const sc = r.status==='available'?'status-available':r.status==='limited'?'status-limited':'status-out';
-          const sl = r.status==='available'?'✅ Avail':r.status==='limited'?'⚠️ Lim':'❌ Out';
-          return `<tr id="report-row-${r.id}">
+          const sl = r.status==='available'?'✅ Available':r.status==='limited'?'⚠️ Limited':'❌ Out of Stock';
+          return `<tr>
             <td><strong style="color:var(--text-primary);">${r.station_name || '-'}</strong></td>
             <td>${r.product || '—'}</td>
             <td><span class="oc-status ${sc}">${sl}</span></td>
             <td>${r.queue || '—'}</td>
-            <td style="font-size:0.75rem;">${r.reporter}</td>
-            <td>${r.verified ? '✅ Verif' : '🕒 Pend'}</td>
-            <td>
-              <div style="display:flex;gap:4px;">
-                ${!r.verified ? `<button class="action-btn btn-approve" style="padding:4px 8px;font-size:0.7rem;" onclick="verifyReport(${r.id})">🛡️ Verify</button>` : ''}
-                <button class="action-btn btn-reject" style="padding:4px 8px;font-size:0.7rem;" onclick="deleteReport(${r.id})">🗑️</button>
-              </div>
-            </td>
+            <td>${r.reporter}</td>
+            <td style="font-size:0.72rem;">${new Date(r.created_at).toLocaleString()}</td>
           </tr>`;
         }).join('') +
         '</tbody></table>';
-    } catch(err) { el.innerHTML = 'Error loading reports.'; }
-  }
-
-  window.verifyReport = async function(id) {
-    try {
-      const res = await apiVerifyReport(id);
-      if (res && res.success) {
-        showAdminToast('✅ Report verified and station synced!');
-        renderVerifiedReports();
-        ALL_ADMIN_STATIONS = []; // Force refresh
-      }
-    } catch(err) { showAdminToast('❌ Verification failed.', 'error'); }
-  }
-
-  window.deleteReport = async function(id) {
-    if (!confirm('Delete this report?')) return;
-    try {
-      const res = await apiDeleteReport(id);
-      if (res && res.success) {
-        const row = document.getElementById(`report-row-${id}`);
-        if (row) row.remove();
-        showAdminToast('✅ Report deleted successfully.');
-      }
-    } catch(err) { showAdminToast('❌ Error deleting.', 'error'); }
+    } catch(err) {
+      el.innerHTML = '<div style="padding:20px;color:red;text-align:center;">Error loading reports.</div>';
+    }
   }
 
   // ── TOAST ─────────────────────────────────────────────────
@@ -1026,4 +758,3 @@
 </script>
 </body>
 </html>
-<!-- cache bust 7 -->
