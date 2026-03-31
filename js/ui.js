@@ -146,7 +146,7 @@ function filterStations() {
 
   document.getElementById('stationsList').innerHTML =
     filteredStations.map(s => renderStationCard(s)).join('') ||
-    '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">No stations match the selected filters.</p>';
+    `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">${t('no_stations_found')}</p>`;
 }
 
 // ============================================================
@@ -231,7 +231,7 @@ window.showSuggestions = function(query, target) {
   matches = matches.slice(0, 8); // Top 8 suggestions
 
   if (matches.length === 0) {
-    container.innerHTML = `<div class="sugg-item" style="cursor:default;color:var(--text-muted); justify-content:center;">No suggestions found.</div>`;
+    container.innerHTML = `<div class="sugg-item" style="cursor:default;color:var(--text-muted); justify-content:center;">${t('no_suggestions') || 'No suggestions found.'}</div>`;
   } else {
     container.innerHTML = matches.map(m => `
       <div class="sugg-item" onmousedown="applySuggestion('${m.text.replace(/'/g, "\\'")}', '${target}')">
@@ -278,7 +278,7 @@ function searchStations() {
 
   document.getElementById('stationsPageList').innerHTML =
     results.map(s => renderStationCard(s, `openStationModal(DB.stations.find(st=>st.id==='${s.id}'))`)).join('') ||
-    '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">No stations found.</p>';
+    `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">${t('no_stations_found')}</p>`;
 }
 
 function handleHeroSearch() {
@@ -355,7 +355,7 @@ function filterGasShops() {
 
   document.getElementById('gasShopsList').innerHTML =
     results.map(s => renderGasShopCard(s)).join('') ||
-    '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">No gas shops found.</p>';
+    `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">${t('no_gas_found') || 'No gas shops found.'}</p>`;
 }
 
 // ---- PRICES PAGE ----

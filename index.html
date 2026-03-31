@@ -143,8 +143,8 @@
       <!-- Quick Cards -->
       <div class="container">
         <div class="section-header">
-          <h2>Today's Overview</h2>
-          <span class="updated-tag" id="overviewUpdated">Updated just now</span>
+          <h2 data-i18n="nav_dashboard">Today's Overview</h2>
+          <span class="updated-tag" id="overviewUpdated" data-i18n="updated_just_now">Updated just now</span>
         </div>
         <div class="overview-grid">
           <div class="overview-card card-petrol glassmorphic">
@@ -192,21 +192,21 @@
 
         <!-- Map Section -->
         <div class="section-header mt-4">
-          <h2>Nearby Stations & Gas Shops</h2>
+          <h2 data-i18n="map_h">Nearby Stations & Gas Shops</h2>
           <div class="map-controls">
-            <button class="mc-btn active" id="mcFuel" onclick="setMapFilter('fuel')">⛽ Fuel</button>
-            <button class="mc-btn" id="mcGas" onclick="setMapFilter('gas')">🔥 Gas</button>
-            <button class="mc-btn" id="mcAll" onclick="setMapFilter('all')">📍 All</button>
-            <button class="mc-btn locate-btn" onclick="locateUser()">📍 My Location</button>
+            <button class="mc-btn active" id="mcFuel" onclick="setMapFilter('fuel')">⛽ <span data-i18n="fuel">Fuel</span></button>
+            <button class="mc-btn" id="mcGas" onclick="setMapFilter('gas')">🔥 <span data-i18n="gas">Gas</span></button>
+            <button class="mc-btn" id="mcAll" onclick="setMapFilter('all')">📍 <span data-i18n="all">All</span></button>
+            <button class="mc-btn locate-btn" onclick="locateUser()">📍 <span data-i18n="my_location">My Location</span></button>
           </div>
         </div>
         <div class="map-wrapper glassmorphic">
           <div id="mainMap"></div>
           <div class="map-legend">
-            <div class="ml-item"><span class="ml-dot dot-available"></span> Available</div>
-            <div class="ml-item"><span class="ml-dot dot-limited"></span> Limited</div>
-            <div class="ml-item"><span class="ml-dot dot-out"></span> Out of Stock</div>
-            <div class="ml-item"><span class="ml-dot dot-gas"></span> LPG Gas</div>
+            <div class="ml-item"><span class="ml-dot dot-available"></span> <span data-i18n="available">Available</span></div>
+            <div class="ml-item"><span class="ml-dot dot-limited"></span> <span data-i18n="limited">Limited</span></div>
+            <div class="ml-item"><span class="ml-dot dot-out"></span> <span data-i18n="out_of_stock">Out of Stock</span></div>
+            <div class="ml-item"><span class="ml-dot dot-gas"></span> <span data-i18n="gas">LPG Gas</span></div>
           </div>
         </div>
 
@@ -295,32 +295,45 @@
           </div>
           <div id="stationsSuggestions" class="suggestions-dropdown" style="display:none;"></div>
         </div>
-        <div class="filter-row">
           <select id="sDistrictFilter" class="filter-select" onchange="searchStations()">
-            <option value="">All Districts</option>
-            <option value="Colombo">Colombo</option>
-            <option value="Gampaha">Gampaha</option>
-            <option value="Kandy">Kandy</option>
-            <option value="Galle">Galle</option>
-            <option value="Matara">Matara</option>
-            <option value="Jaffna">Jaffna</option>
-            <option value="Kurunegala">Kurunegala</option>
-            <option value="Ratnapura">Ratnapura</option>
-            <option value="Anuradhapura">Anuradhapura</option>
-            <option value="Badulla">Badulla</option>
+            <option value="" data-i18n="dist_all">All Districts</option>
+            <option value="Colombo" data-i18n="dist_Col">Colombo</option>
+            <option value="Gampaha" data-i18n="dist_Gam">Gampaha</option>
+            <option value="Kalutara" data-i18n="dist_Kal">Kalutara</option>
+            <option value="Kandy" data-i18n="dist_Kan">Kandy</option>
+            <option value="Matale" data-i18n="dist_Mat">Matale</option>
+            <option value="Nuwara Eliya" data-i18n="dist_NE">Nuwara Eliya</option>
+            <option value="Galle" data-i18n="dist_Gal">Galle</option>
+            <option value="Matara" data-i18n="dist_Mara">Matara</option>
+            <option value="Hambantota" data-i18n="dist_Ham">Hambantota</option>
+            <option value="Jaffna" data-i18n="dist_Jaf">Jaffna</option>
+            <option value="Kilinochchi" data-i18n="dist_Kil">Kilinochchi</option>
+            <option value="Mannar" data-i18n="dist_Man">Mannar</option>
+            <option value="Vavuniya" data-i18n="dist_Vav">Vavuniya</option>
+            <option value="Mullaitivu" data-i18n="dist_Mul">Mullaitivu</option>
+            <option value="Batticaloa" data-i18n="dist_Bat">Batticaloa</option>
+            <option value="Ampara" data-i18n="dist_Amp">Ampara</option>
+            <option value="Trincomalee" data-i18n="dist_Tri">Trincomalee</option>
+            <option value="Kurunegala" data-i18n="dist_Kur">Kurunegala</option>
+            <option value="Puttalam" data-i18n="dist_Put">Puttalam</option>
+            <option value="Anuradhapura" data-i18n="dist_Anu">Anuradhapura</option>
+            <option value="Polonnaruwa" data-i18n="dist_Pol">Polonnaruwa</option>
+            <option value="Badulla" data-i18n="dist_Bad">Badulla</option>
+            <option value="Monaragala" data-i18n="dist_Mon">Monaragala</option>
+            <option value="Ratnapura" data-i18n="dist_Rat">Ratnapura</option>
+            <option value="Kegalle" data-i18n="dist_Keg">Kegalle</option>
           </select>
           <select id="sStatusFilter" class="filter-select" onchange="searchStations()">
-            <option value="">All Statuses</option>
-            <option value="available">Available</option>
-            <option value="limited">Limited</option>
-            <option value="out">Out of Stock</option>
+            <option value="" data-i18n="status_all">All Statuses</option>
+            <option value="available" data-i18n="available">Available</option>
+            <option value="limited" data-i18n="limited">Limited</option>
+            <option value="out" data-i18n="out_of_stock">Out of Stock</option>
           </select>
           <select id="sCompanyFilter" class="filter-select" onchange="searchStations()">
-            <option value="">All Companies</option>
+            <option value="" data-i18n="company_all">All Companies</option>
             <option value="CPC">CPC</option>
             <option value="IOC">Lanka IOC</option>
           </select>
-        </div>
         <div class="results-count" id="sResultsCount"></div>
         <div id="stationsPageList" class="stations-list"></div>
       </div>
@@ -416,7 +429,7 @@
               </div>
             </div>
             <table class="price-table">
-              <thead><tr><th>Fuel Type</th><th>Price (LKR)</th><th>Change</th></tr></thead>
+              <thead><tr><th data-i18n="price_fuel_type">Fuel Type</th><th data-i18n="price_lkr">Price (LKR)</th><th data-i18n="price_change">Change</th></tr></thead>
               <tbody id="cpcPriceTable"></tbody>
             </table>
           </div>
@@ -444,7 +457,7 @@
               </div>
             </div>
             <table class="price-table">
-              <thead><tr><th>Provider</th><th>Cylinder Size</th><th>Price (LKR)</th><th>Status</th></tr></thead>
+              <thead><tr><th data-i18n="footer_providers">Provider</th><th data-i18n="elig_cylinder">Cylinder Size</th><th data-i18n="price_lkr">Price (LKR)</th><th data-i18n="report_status">Status</th></tr></thead>
               <tbody id="gasPriceTable"></tbody>
             </table>
           </div>
@@ -741,16 +754,16 @@
     <div class="container footer-inner">
       <div class="footer-brand">
         <h3>FuelPass SL</h3>
-        <p>Real-time fuel & gas tracking for Sri Lanka. Data sourced from CPC, Lanka IOC, Litro Gas, and LAUGFS Gas, plus community reports.</p>
+        <p data-i18n="footer_brand_p">Real-time fuel & gas tracking for Sri Lanka. Data sourced from CPC, Lanka IOC, Litro Gas, and LAUGFS Gas, plus community reports.</p>
       </div>
       <div class="footer-links">
-        <h4>Quick Links</h4>
-        <a onclick="navigateTo('dashboard')">Dashboard</a>
-        <a onclick="navigateTo('stations')">Fuel Stations</a>
-        <a onclick="navigateTo('gas')">LPG Gas</a>
-        <a onclick="navigateTo('prices')">Prices</a>
-        <a onclick="navigateTo('eligibility')">Eligibility</a>
-        <a onclick="navigateTo('report')">Report</a>
+        <h4 data-i18n="footer_quick_links">Quick Links</h4>
+        <a onclick="navigateTo('dashboard')" data-i18n="nav_dashboard">Dashboard</a>
+        <a onclick="navigateTo('stations')" data-i18n="nav_stations">Fuel Stations</a>
+        <a onclick="navigateTo('gas')" data-i18n="nav_gas">LPG Gas</a>
+        <a onclick="navigateTo('prices')" data-i18n="nav_prices">Prices</a>
+        <a onclick="navigateTo('eligibility')" data-i18n="nav_eligibility">Eligibility</a>
+        <a onclick="navigateTo('report')" data-i18n="nav_report">Report</a>
       </div>
       <div class="footer-links">
         <h4 data-i18n="footer_providers">Providers</h4>
@@ -778,10 +791,10 @@
         <p data-i18n="footer_notice_p">This system aggregates publicly available data and community reports. For official information, always verify with CPC, Lanka IOC, or the Ministry of Power & Energy.</p>
       </div>
       <div class="footer-links">
-        <h4>Portal</h4>
-        <a href="admin.html">⚙️ Admin Panel</a>
-        <a href="register.html">📝 Register Station</a>
-        <a onclick="openOwnerLogin()" style="cursor:pointer;">🔑 Owner Login</a>
+        <h4 data-i18n="footer_portal">Portal</h4>
+        <a href="admin.html" data-i18n="nav_admin">⚙️ Admin Panel</a>
+        <a href="register.html" data-i18n="nav_register">📝 Register Station</a>
+        <a onclick="openOwnerLogin()" style="cursor:pointer;" data-i18n="footer_owner_login">🔑 Owner Login</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -809,19 +822,22 @@
     <div class="modal-content glassmorphic" style="max-width:420px;">
       <button class="modal-close" onclick="closeOwnerLogin()">✕</button>
       <div style="padding:8px 0;">
-        <h3 style="font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:6px;">🔑 Station Owner Login</h3>
-        <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">Log in with your Station Code and Password provided by FuelPass SL admin.</p>
+        <h3 style="font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:6px;" data-i18n="owner_login_h">🔑 Station Owner Login</h3>
+        <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;" data-i18n="owner_login_p">Log in with your Station Code and Password provided by FuelPass SL admin.</p>
         <div class="form-group">
-          <label style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);">Station Code</label>
-          <input type="text" id="loginStationCode" class="form-input" placeholder="e.g. CPC-COL-001" oninput="this.value=this.value.toUpperCase()" style="margin-top:4px;" />
+          <label style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);" data-i18n="reg_station_code">Station Code</label>
+          <input type="text" id="loginStationCode" class="form-input" placeholder="e.g. CPC-COL-001" data-i18n="reg_station_code_ph" oninput="this.value=this.value.toUpperCase()" style="margin-top:4px;" />
         </div>
         <div class="form-group" style="margin-top:12px;">
-          <label style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);">Password</label>
-          <input type="password" id="loginPassword" class="form-input" placeholder="Your assigned password" style="margin-top:4px;" onkeydown="if(event.key==='Enter')doOwnerLogin()" />
+          <label style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);" data-i18n="reg_password">Password</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="Your assigned password" data-i18n="reg_password_ph" style="margin-top:4px;" onkeydown="if(event.key==='Enter')doOwnerLogin()" />
         </div>
         <div id="loginErrorMsg" style="display:none;color:var(--red);font-size:0.82rem;margin:8px 0;"></div>
-        <button class="elig-btn" style="width:100%;margin-top:16px;" onclick="doOwnerLogin()">Login as Station Owner</button>
-        <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">Not registered yet? <a href="register.html" style="color:var(--blue);">Register your station →</a></p>
+        <button class="elig-btn" style="width:100%;margin-top:16px;" onclick="doOwnerLogin()" data-i18n="nav_owner_login">Login as Station Owner</button>
+        <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">
+          <span data-i18n="owner_not_reg">Not registered yet?</span> 
+          <a href="register.html" style="color:var(--blue);"><span data-i18n="owner_register_now">Register your station →</span></a>
+        </p>
       </div>
     </div>
   </div>

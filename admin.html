@@ -126,25 +126,32 @@
   <!-- Sidebar -->
   <aside class="admin-sidebar">
     <div class="sb-brand">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <img src="logo.png" alt="FuelPass SL" style="width:36px;height:36px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />
-        <h2 style="margin:0;">FuelPass SL</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <img src="logo.png" alt="FuelPass SL" style="width:36px;height:36px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />
+          <h2 style="margin:0;">FuelPass SL</h2>
+        </div>
       </div>
-      <span>ADMIN PANEL</span>
+      <div class="lang-switcher" style="margin-top:12px;margin-bottom:16px;">
+        <button class="lang-btn" data-lang="en" onclick="applyLanguage('en')">EN</button>
+        <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
+        <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமிழ்</button>
+      </div>
+      <span data-i18n="nav_admin">ADMIN PANEL</span>
     </div>
     <nav class="sb-nav">
       <div class="sb-section-label" data-i18n="nav_dashboard">Overview</div>
       <a class="active" onclick="showPanel('dashboard')">📊 <span data-i18n="nav_dashboard">Dashboard</span></a>
-      <div class="sb-section-label">Owner Management</div>
+      <div class="sb-section-label" data-i18n="admin_owner_management">Owner Management</div>
       <a onclick="showPanel('pending')">⏳ <span data-i18n="admin_pending">Pending Registrations</span></a>
       <a onclick="showPanel('addowner')">➕ <span data-i18n="admin_add">Add New Owner</span></a>
       <a onclick="showPanel('approved')">🏪 <span data-i18n="admin_owners">All Station Owners</span></a>
-      <div class="sb-section-label">Data Management</div>
+      <div class="sb-section-label" data-i18n="admin_data_management">Data Management</div>
       <a onclick="showPanel('prices')">💰 <span data-i18n="admin_prices">Update Fuel Prices</span></a>
       <a onclick="showPanel('reports')">📋 <span data-i18n="admin_reports">Verified Reports</span></a>
       <a onclick="showPanel('feedback')">💬 <span data-i18n="admin_feedback">User Feedback</span></a>
       <a onclick="showPanel('managestations')">🚉 <span data-i18n="admin_stations">Manage Stations</span></a>
-      <div class="sb-section-label">Site</div>
+      <div class="sb-section-label" data-i18n="site_section">Site</div>
       <a onclick="window.open('index.html','_blank')">🌐 <span data-i18n="nav_live">View Live Site</span></a>
     </nav>
     <div class="sb-logout" onclick="adminLogout()">🚪 <span data-i18n="admin_logout">Logout</span></div>
@@ -156,8 +163,8 @@
     <!-- ── PENDING REGISTRATIONS ── -->
     <div id="panel-pending" class="admin-panel animate-fade-in">
       <div class="panel-header">
-        <h2>⏳ Pending Registrations</h2>
-        <p>Review and approve new fuel stations submitted via the public portal's Register page.</p>
+        <h2 data-i18n="admin_pending">⏳ Pending Registrations</h2>
+        <p data-i18n="admin_pending_subtitle">Review and approve new fuel stations submitted via the public portal Register page.</p>
       </div>
       <div id="pendingList"></div>
     </div>
@@ -170,12 +177,12 @@
       </div>
       <div class="stat-cards" id="statCards"></div>
       <div class="admin-card">
-        <h3>⚡ Quick Actions</h3>
+        <h3 data-i18n="admin_quick_actions">⚡ Quick Actions</h3>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="action-btn btn-approve" onclick="showPanel('addowner')" style="padding:10px 20px;font-size:0.85rem;">➕ Add New Station Owner</button>
-          <button class="action-btn btn-view" onclick="showPanel('approved')" style="padding:10px 20px;font-size:0.85rem;">🏪 View All Owners</button>
-          <button class="action-btn btn-approve" onclick="showPanel('prices')" style="padding:10px 20px;font-size:0.85rem;">💰 Update Fuel Prices</button>
-          <button class="action-btn btn-view" onclick="showPanel('reports')" style="padding:10px 20px;font-size:0.85rem;">📋 Verified Reports</button>
+          <button class="action-btn btn-approve" onclick="showPanel('addowner')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_add">➕ Add New Station Owner</button>
+          <button class="action-btn btn-view" onclick="showPanel('approved')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_view">🏪 View All Owners</button>
+          <button class="action-btn btn-approve" onclick="showPanel('prices')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_prices">💰 Update Fuel Prices</button>
+          <button class="action-btn btn-view" onclick="showPanel('reports')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_reports">📋 Verified Reports</button>
         </div>
       </div>
     </div>
@@ -524,12 +531,12 @@
 
       document.getElementById('dashTime').textContent = 'Loaded: ' + new Date().toLocaleTimeString();
       document.getElementById('statCards').innerHTML = `
-        <div class="stat-card"><div class="sv">${owners.length}</div><div class="sl">Station Owners</div></div>
-        <div class="stat-card"><div class="sv">${reports.length}</div><div class="sl">Verified Reports</div></div>
-        <div class="stat-card"><div class="sv">${contact.length}</div><div class="sl">Total Feedbacks</div></div>
-        <div class="stat-card"><div class="sv">LKR ${getP('92')}</div><div class="sl">Petrol 92</div></div>
-        <div class="stat-card"><div class="sv">LKR ${getP('Auto Diesel')}</div><div class="sl">Diesel</div></div>
-        <div class="stat-card"><div class="sv">LKR ${getP('12.5')}</div><div class="sl">LP Gas 12.5kg</div></div>
+        <div class="stat-card"><div class="sv">${owners.length}</div><div class="sl">${t('admin_stat_owners')}</div></div>
+        <div class="stat-card"><div class="sv">${reports.length}</div><div class="sl">${t('admin_reports')}</div></div>
+        <div class="stat-card"><div class="sv">${contact.length}</div><div class="sl">${t('admin_feedback')}</div></div>
+        <div class="stat-card"><div class="sv">LKR ${getP('92')}</div><div class="sl">${t('card_petrol92')}</div></div>
+        <div class="stat-card"><div class="sv">LKR ${getP('Auto Diesel')}</div><div class="sl">${t('card_diesel')}</div></div>
+        <div class="stat-card"><div class="sv">LKR ${getP('12.5')}</div><div class="sl">${t('card_gas')}</div></div>
       `;
     } catch(err) {
       console.error(err);
@@ -547,7 +554,13 @@
       return;
     }
     el.innerHTML = `<table class="admin-table">
-      <thead><tr><th>Station</th><th>Owner Details</th><th>Registration / Location</th><th>Type</th><th>Actions</th></tr></thead>
+      <thead><tr>
+        <th>${t('admin_th_station')}</th>
+        <th>${t('admin_th_owner')}</th>
+        <th>${t('admin_th_reg')}</th>
+        <th>${t('admin_th_type')}</th>
+        <th>${t('admin_th_actions')}</th>
+      </tr></thead>
       <tbody>` + 
       pending.map(p => `<tr>
         <td><strong>${p.stationName}</strong><br><span style="font-size:0.75rem;">Phone: ${p.stationPhone||'N/A'}</span></td>
@@ -555,8 +568,8 @@
         <td><span style="font-size:0.75rem;"><strong>Biz Reg:</strong> ${p.bizReg || 'None'}</span><br><span style="font-size:0.75rem;"><strong>Address:</strong> ${p.address}, ${p.district}</span><br><span style="font-size:0.75rem;display:block;margin-top:4px;color:var(--text-muted);">"${p.reason||'No reason provided'}"</span></td>
         <td><span class="tag-approved">${p.stationType}</span></td>
         <td style="min-width:120px;">
-          <button class="action-btn" style="background:#10B981;margin-bottom:6px;width:100%" onclick="approvePending('${p.id}')">Approve</button>
-          <button class="action-btn btn-reject" style="width:100%" onclick="rejectPending('${p.id}')">Reject</button>
+          <button class="action-btn" style="background:#10B981;margin-bottom:6px;width:100%" onclick="approvePending('${p.id}')">${t('admin_btn_approve')}</button>
+          <button class="action-btn btn-reject" style="width:100%" onclick="rejectPending('${p.id}')">${t('admin_btn_reject')}</button>
         </td>
       </tr>`).join('') +
       '</tbody></table>';

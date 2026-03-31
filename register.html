@@ -109,28 +109,28 @@
             <div class="form-group">
               <label data-i18n="reg_type">Station Type <span class="req">*</span></label>
               <select id="stationType" class="reg-select">
-                <option value="">Select type</option>
-                <option value="CPC">⛽ CPC Fuel Station</option>
-                <option value="IOC">⛽ Lanka IOC Station</option>
-                <option value="SINOPEC">⛽ SINOPEC Station</option>
-                <option value="Litro">🔥 Litro Gas Dealer</option>
-                <option value="LAUGFS">🔥 LAUGFS Gas Dealer</option>
-                <option value="Both">🔥 Litro + LAUGFS Dealer</option>
+                <option value="" data-i18n="reg_type_ph">Select type</option>
+                <option value="CPC" data-i18n="reg_type_cpc">⛽ CPC Fuel Station</option>
+                <option value="IOC" data-i18n="reg_type_ioc">⛽ Lanka IOC Station</option>
+                <option value="SINOPEC" data-i18n="reg_type_sinopec">⛽ SINOPEC Station</option>
+                <option value="Litro" data-i18n="reg_type_litro">🔥 Litro Gas Dealer</option>
+                <option value="LAUGFS" data-i18n="reg_type_laugfs">🔥 LAUGFS Gas Dealer</option>
+                <option value="Both" data-i18n="reg_type_both">🔥 Litro + LAUGFS Dealer</option>
               </select>
             </div>
             <div class="form-group">
               <label data-i18n="reg_district">District <span class="req">*</span></label>
               <select id="district" class="reg-select">
-                <option value="">Select district</option>
-                <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
-                <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
-                <option>Galle</option><option>Matara</option><option>Hambantota</option>
-                <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
-                <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
-                <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
-                <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
-                <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
-                <option>Kegalle</option>
+                <option value="" data-i18n="reg_district_ph">Select district</option>
+                <option data-i18n="dist_Col">Colombo</option><option data-i18n="dist_Gam">Gampaha</option><option data-i18n="dist_Kal">Kalutara</option>
+                <option data-i18n="dist_Kan">Kandy</option><option data-i18n="dist_Mat">Matale</option><option data-i18n="dist_NE">Nuwara Eliya</option>
+                <option data-i18n="dist_Gal">Galle</option><option data-i18n="dist_Mara">Matara</option><option data-i18n="dist_Ham">Hambantota</option>
+                <option data-i18n="dist_Jaf">Jaffna</option><option data-i18n="dist_Kil">Kilinochchi</option><option data-i18n="dist_Man">Mannar</option>
+                <option data-i18n="dist_Vav">Vavuniya</option><option data-i18n="dist_Mul">Mullaitivu</option><option data-i18n="dist_Bat">Batticaloa</option>
+                <option data-i18n="dist_Amp">Ampara</option><option data-i18n="dist_Tri">Trincomalee</option><option data-i18n="dist_Kur">Kurunegala</option>
+                <option data-i18n="dist_Put">Puttalam</option><option data-i18n="dist_Anu">Anuradhapura</option><option data-i18n="dist_Pol">Polonnaruwa</option>
+                <option data-i18n="dist_Bad">Badulla</option><option data-i18n="dist_Mon">Monaragala</option><option data-i18n="dist_Rat">Ratnapura</option>
+                <option data-i18n="dist_Keg">Kegalle</option>
               </select>
             </div>
             <div class="form-group full">
@@ -138,16 +138,16 @@
               <input type="text" id="address" class="form-input" placeholder="No. 15, Main Street, Nugegoda, Colombo" />
             </div>
             <div class="form-group">
-              <label>Google Maps Link (optional)</label>
-              <input type="url" id="mapsLink" class="form-input" placeholder="https://maps.google.com/..." />
-              <span class="form-hint">Share your location from Google Maps</span>
+              <label data-i18n="reg_maps">Google Maps Link (optional)</label>
+              <input type="url" id="mapsLink" class="form-input" placeholder="https://maps.google.com/..." data-i18n="reg_maps_ph" />
+              <span class="form-hint" data-i18n="reg_maps_hint">Share your location from Google Maps</span>
             </div>
             <div class="form-group">
               <label data-i18n="reg_phone">Station Phone Number <span class="req">*</span></label>
-              <input type="tel" id="stationPhone" class="form-input" placeholder="011-XXXXXXX" />
+              <input type="tel" id="stationPhone" class="form-input" placeholder="011-XXXXXXX" data-i18n="reg_phone_ph" />
             </div>
           </div>
-          <button class="reg-btn" onclick="goStep2()">Continue → Owner Details</button>
+          <button class="reg-btn" onclick="goStep2()" data-i18n="reg_btn_step2">Continue → Owner Details</button>
         </div>
 
         <!-- STEP 2: Owner Details -->
@@ -166,30 +166,30 @@
               <label data-i18n="reg_email">Email Address <span class="req">*</span></label>
               <input type="email" id="email" class="form-input" placeholder="owner@example.com" />
             </div>
-            <div class="form-group">
-              <label>Mobile Number <span class="req">*</span></label>
-              <input type="tel" id="mobile" class="form-input" placeholder="07X-XXXXXXX" />
+            <div class="form-group full">
+              <label data-i18n="reg_mobile">Mobile Number <span class="req">*</span></label>
+              <input type="tel" id="mobile" class="form-input" placeholder="07X-XXXXXXX" data-i18n="reg_mobile_ph" />
             </div>
             <div class="form-group full">
-              <label>Business Registration No. (optional)</label>
-              <input type="text" id="bizReg" class="form-input" placeholder="PV XXXXXXX / XX XXXXX" />
-              <span class="form-hint">Speeds up admin verification</span>
+              <label data-i18n="reg_biz_reg">Business Registration No. (optional)</label>
+              <input type="text" id="bizReg" class="form-input" placeholder="PV XXXXXXX / XX XXXXX" data-i18n="reg_biz_reg_ph" />
+              <span class="form-hint" data-i18n="reg_biz_reg_hint">Speeds up admin verification</span>
             </div>
             <div class="form-group full">
-              <label>Why do you want to join FuelPass SL?</label>
+              <label data-i18n="reg_reason">Why do you want to join FuelPass SL?</label>
               <textarea id="reason" class="form-input" rows="3" style="resize:vertical"
-                placeholder="Help customers find fuel availability at my station in real time..."></textarea>
+                placeholder="Help customers find fuel availability..." data-i18n="reg_reason_ph"></textarea>
             </div>
             <div class="form-group full">
               <div class="checkbox-row">
                 <input type="checkbox" id="agreeTerms" />
-                <label for="agreeTerms">I confirm that the information provided is accurate and I agree to submit only truthful, real-time stock updates. I understand that false reports will result in immediate suspension.</label>
+                <label for="agreeTerms" data-i18n="reg_confirm1">I confirm that the information provided is accurate and I agree to submit only truthful, real-time stock updates.</label>
               </div>
             </div>
             <div class="form-group full">
               <div class="checkbox-row">
                 <input type="checkbox" id="agreeData" />
-                <label for="agreeData">I consent to FuelPass SL storing and displaying my station's availability data to the public.</label>
+                <label for="agreeData" data-i18n="reg_confirm2">I consent to FuelPass SL storing and displaying my station's availability data to the public.</label>
               </div>
             </div>
           </div>
@@ -205,20 +205,20 @@
             <div class="big-icon">🎉</div>
             <h2 data-i18n="reg_success_h">Application Submitted!</h2>
             <p data-i18n="reg_success_p">Your registration has been submitted to the <strong>FuelPass SL admin team</strong> for review.</p>
-            <p>Your unique Application ID is:</p>
+            <p data-i18n="reg_success_id_label">Your unique Application ID is:</p>
             <div class="reg-id-box" id="appIdDisplay">—</div>
             <div class="notice-box notice-warn" style="text-align:left;">
-              📌 <strong>What happens next?</strong><br/>
-              1. Admin reviews your application (24–48 hours)<br/>
-              2. Admin verifies your NIC and station details<br/>
-              3. Admin approves and sends you your <strong>Station Code + Password</strong><br/>
-              4. You log in on the FuelPass SL homepage to submit updates<br/>
+              <span data-i18n="reg_next_h">📌 <strong>What happens next?</strong></span><br/>
+              <span data-i18n="reg_next_1">1. Admin reviews your application (24–48 hours)</span><br/>
+              <span data-i18n="reg_next_2">2. Admin verifies your NIC and station details</span><br/>
+              <span data-i18n="reg_next_3">3. Admin approves and sends you your <strong>Station Code + Password</strong></span><br/>
+              <span data-i18n="reg_next_4">4. You log in on the FuelPass SL homepage to submit updates</span>
             </div>
             <div class="notice-box notice-info" style="text-align:left;">
-              📞 Contact: <strong>admin@fuelpasssl.lk</strong> or call us if you need faster approval.
+              <span data-i18n="reg_contact">📞 Contact: <strong>admin@fuelpasssl.lk</strong> or call us if you need faster approval.</span>
             </div>
             <a href="index.html">
-              <button class="reg-btn" style="width:auto;padding:12px 32px;">← Back to FuelPass SL</button>
+              <button class="reg-btn" style="width:auto;padding:12px 32px;" data-i18n="reg_back">← Back to FuelPass SL</button>
             </a>
           </div>
         </div>
