@@ -640,7 +640,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>Current Queue Length</label>
+                <label data-i18n="report_queue">Current Queue Length</label>
                 <select id="vrQueue" class="form-input">
                   <option value="none">No Queue</option>
                   <option value="short">Short (&lt; 10 vehicles)</option>
@@ -649,7 +649,7 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Estimated Stock Duration</label>
+                <label data-i18n="report_stock_est">Estimated Stock Duration</label>
                 <select id="vrDuration" class="form-input">
                   <option value="">Not sure</option>
                   <option value="< 1 hour">&lt; 1 hour remaining</option>
@@ -659,24 +659,24 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Additional Notes</label>
+                <label data-i18n="report_notes">Additional Notes</label>
                 <textarea id="vrNotes" class="form-input form-textarea" rows="2" placeholder="Any additional info for customers…"></textarea>
               </div>
-              <button type="submit" class="elig-btn" style="width:100%;background:linear-gradient(135deg,var(--green),#059669);">📡 Publish Verified Update</button>
+              <button type="submit" class="elig-btn" style="width:100%;background:linear-gradient(135deg,var(--green),#059669);" data-i18n="report_submit_ver">📡 Publish Verified Update</button>
             </form>
           </div>
 
           <!-- COMMUNITY REPORT FORM (always visible) -->
           <div class="report-card glassmorphic">
-            <h3>👥 Community Report</h3>
-            <p>Help others by reporting what you see. Community reports are marked separately from verified owner updates.</p>
+            <h3 data-i18n="report_comm_h">👥 Community Report</h3>
+            <p data-i18n="report_comm_p">Help others by reporting what you see. Community reports are marked separately from verified owner updates.</p>
             <form id="reportForm" onsubmit="submitReport(event)">
               <div class="form-group">
-                <label>Station / Shop Name</label>
+                <label data-i18n="report_station_name">Station / Shop Name</label>
                 <input type="text" id="rStation" placeholder="e.g. CPC Filling Station – Nugegoda" class="form-input" required />
               </div>
               <div class="form-group">
-                <label>Report Type</label>
+                <label data-i18n="report_type">Report Type</label>
                 <select id="rType" class="form-input" required>
                   <option value="">Select type</option>
                   <option value="fuel">Fuel Station</option>
@@ -684,7 +684,7 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Fuel / Product</label>
+                <label data-i18n="report_product">Fuel / Product</label>
                 <select id="rProduct" class="form-input">
                   <option value="">Select product</option>
                   <option value="Petrol 92">Petrol 92</option>
@@ -696,7 +696,7 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Availability Status</label>
+                <label data-i18n="report_status">Availability Status</label>
                 <div class="status-picker" id="statusPicker">
                   <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectStatus('available')">✅ Available</button>
                   <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectStatus('limited')">⚠️ Limited</button>
@@ -716,13 +716,13 @@
                 <label>Additional Notes (optional)</label>
                 <textarea id="rNotes" class="form-input form-textarea" placeholder="e.g. Petrol 92 only, queue moving fast…" rows="2"></textarea>
               </div>
-              <button type="submit" class="elig-btn" style="width:100%">📤 Submit Community Report</button>
+              <button type="submit" class="elig-btn" style="width:100%" data-i18n="report_submit_comm">📤 Submit Community Report</button>
             </form>
           </div>
 
           <!-- Reports Feed -->
           <div class="report-card glassmorphic" style="grid-column:1/-1;">
-            <h3>🕐 Recent Reports</h3>
+            <h3 data-i18n="recent_reports">🕐 Recent Reports</h3>
             <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
               <button class="mc-btn active" id="filterAllBtn" onclick="filterReportsFeed('all')">All Reports</button>
               <button class="mc-btn" id="filterVerifiedBtn" onclick="filterReportsFeed('verified')">✅ Verified Only</button>

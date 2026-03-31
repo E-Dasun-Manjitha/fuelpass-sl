@@ -13,6 +13,14 @@
     .login-box { width:100%; max-width:420px; padding:40px; }
     .login-box h1 { font-family:'Space Grotesk',sans-serif; font-size:1.8rem; font-weight:800; text-align:center; margin-bottom:8px; background:linear-gradient(135deg,#fff,var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
     .login-box p { text-align:center; color:var(--text-muted); font-size:0.875rem; margin-bottom:28px; }
+    
+    /* Lang switcher in admin */
+    .admin-lang-switcher { position: absolute; top: 20px; right: 20px; z-index: 1000; }
+    .lang-switcher { display: flex; gap: 4px; background: rgba(15, 22, 41, 0.6); padding: 4px; border-radius: 8px; backdrop-filter: blur(12px); border: 1px solid var(--glass-border); }
+    .lang-btn { background: none; border: none; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+    .lang-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+    .lang-btn.active { color: white; background: var(--blue); box-shadow: 0 4px 12px var(--blue-glow); }
+
     .admin-layout { display:flex; min-height:100vh; }
     .admin-sidebar { width:240px; background:var(--bg-surface); border-right:1px solid var(--glass-border); padding:24px 0; flex-shrink:0; position:fixed; top:0; left:0; bottom:0; overflow-y:auto; z-index:100; }
     .sb-brand { padding:0 20px 24px; border-bottom:1px solid var(--glass-border); margin-bottom:12px; }
@@ -87,11 +95,18 @@
 
 <!-- ── LOGIN SCREEN ── -->
 <div id="adminLoginScreen" class="admin-login">
+  <div class="admin-lang-switcher">
+    <div class="lang-switcher" role="group" aria-label="Language">
+      <button class="lang-btn" data-lang="en" onclick="applyLanguage('en')">EN</button>
+      <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
+      <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
+    </div>
+  </div>
   <div class="login-box glassmorphic">
     <div style="text-align:center;margin-bottom:20px;">
       <img src="logo.png" alt="FuelPass SL" style="width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));" />
     </div>
-    <h1>🔐 Admin Panel</h1>
+    <h1 data-i18n="nav_admin">🔐 Admin Panel</h1>
     <p>FuelPass SL — Restricted Access</p>
     <div style="margin-bottom:16px;">
       <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">Admin Password</label>
@@ -99,7 +114,7 @@
     </div>
     <button class="elig-btn" style="width:100%;" onclick="adminLogin()">Login to Admin Panel</button>
     <p style="text-align:center;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">
-      <a href="index.html" style="color:var(--blue);">← Back to FuelPass SL</a>
+      <a href="index.html" style="color:var(--blue);"><span data-i18n="reg_back">← Back to FuelPass SL</span></a>
     </p>
     <div id="loginError" style="display:none;" class="notice-box notice-warn" style="margin-top:12px;">❌ Invalid password.</div>
   </div>
@@ -118,21 +133,21 @@
       <span>ADMIN PANEL</span>
     </div>
     <nav class="sb-nav">
-      <div class="sb-section-label">Overview</div>
-      <a class="active" onclick="showPanel('dashboard')">📊 Dashboard</a>
+      <div class="sb-section-label" data-i18n="nav_dashboard">Overview</div>
+      <a class="active" onclick="showPanel('dashboard')">📊 <span data-i18n="nav_dashboard">Dashboard</span></a>
       <div class="sb-section-label">Owner Management</div>
-      <a onclick="showPanel('pending')">⏳ Pending Registrations</a>
-      <a onclick="showPanel('addowner')">➕ Add New Owner</a>
-      <a onclick="showPanel('approved')">🏪 All Station Owners</a>
+      <a onclick="showPanel('pending')">⏳ <span data-i18n="admin_pending">Pending Registrations</span></a>
+      <a onclick="showPanel('addowner')">➕ <span data-i18n="admin_add">Add New Owner</span></a>
+      <a onclick="showPanel('approved')">🏪 <span data-i18n="admin_owners">All Station Owners</span></a>
       <div class="sb-section-label">Data Management</div>
-      <a onclick="showPanel('prices')">💰 Update Fuel Prices</a>
-      <a onclick="showPanel('reports')">📋 Verified Reports</a>
-      <a onclick="showPanel('feedback')">💬 User Feedback</a>
-      <a onclick="showPanel('managestations')">🚉 Manage Stations</a>
+      <a onclick="showPanel('prices')">💰 <span data-i18n="admin_prices">Update Fuel Prices</span></a>
+      <a onclick="showPanel('reports')">📋 <span data-i18n="admin_reports">Verified Reports</span></a>
+      <a onclick="showPanel('feedback')">💬 <span data-i18n="admin_feedback">User Feedback</span></a>
+      <a onclick="showPanel('managestations')">🚉 <span data-i18n="admin_stations">Manage Stations</span></a>
       <div class="sb-section-label">Site</div>
-      <a onclick="window.open('index.html','_blank')">🌐 View Live Site</a>
+      <a onclick="window.open('index.html','_blank')">🌐 <span data-i18n="nav_live">View Live Site</span></a>
     </nav>
-    <div class="sb-logout" onclick="adminLogout()">🚪 Logout</div>
+    <div class="sb-logout" onclick="adminLogout()">🚪 <span data-i18n="admin_logout">Logout</span></div>
   </aside>
 
   <!-- Main Content -->
@@ -150,7 +165,7 @@
     <!-- ── DASHBOARD ── -->
     <div id="panel-dashboard" class="admin-panel active">
       <div class="admin-topbar">
-        <h1>📊 Dashboard</h1>
+        <h1 data-i18n="nav_dashboard">📊 Dashboard</h1>
         <span class="updated-tag" id="dashTime"></span>
       </div>
       <div class="stat-cards" id="statCards"></div>
@@ -422,9 +437,13 @@
 <div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
 
 
+<script src="js/i18n.js"></script>
 <script src="js/api.js?v=25"></script>
 <script src="js/auth.js"></script>
 <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    applyLanguage(localStorage.getItem('fp_lang') || 'en');
+  });
   let approveTargetId = null;
 
   // ── AUTH ──────────────────────────────────────────────────

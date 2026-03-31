@@ -106,7 +106,7 @@ function renderMapMarkers() {
 function buildStationPopup(station) {
   const status = getStationOverallStatus(station);
   const statusClass = status === 'available' ? 'popup-avail' : status === 'limited' ? 'popup-limited' : 'popup-out';
-  const statusLabel = status === 'available' ? '✅ Available' : status === 'limited' ? '⚠️ Limited' : '❌ Out of Stock';
+  const statusLabel = t('status_' + status);
 
   // Get real prices from DB
   const priceSource = station.company === 'IOC' ? DB.fuelPrices.ioc : DB.fuelPrices.cpc;
@@ -132,10 +132,10 @@ function buildStationPopup(station) {
       <div style="margin-bottom:4px">
         <span class="popup-status ${statusClass}">${statusLabel}</span>
       </div>
-      <p style="font-size:0.7rem;color:#888;">Queue: ${station.queue} &bull; Updated: ${station.lastUpdated}</p>
+      <p style="font-size:0.7rem;color:#888;">${t('queue_text')}: ${t('queue_' + station.queue)} &bull; ${t('last_updated')}: ${station.lastUpdated}</p>
       <button onclick="openStationModal(DB.stations.find(s=>s.id==='${station.id}'))"
         style="margin-top:8px;width:100%;padding:6px;background:#3B82F6;color:white;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;">
-        View Details
+        ${t('view_details')}
       </button>
     </div>
   `;
@@ -144,7 +144,7 @@ function buildStationPopup(station) {
 function buildGasPopup(shop) {
   const status = getGasShopOverallStatus(shop);
   const statusClass = status==='available'?'popup-avail':status==='limited'?'popup-limited':'popup-out';
-  const statusLabel = status==='available'?'✅ Available':status==='limited'?'⚠️ Limited':'❌ Out of Stock';
+  const statusLabel = t('status_' + status);
 
   // Get real gas prices from DB
   const priceSource = shop.provider === 'LAUGFS' ? DB.gasPrices.laugfs : DB.gasPrices.litro;
@@ -161,13 +161,13 @@ function buildGasPopup(shop) {
     <div class="popup-card">
       <h4><strong>${shop.name}</strong></h4>
       <p>📍 ${shop.district} &bull; ${shop.provider}</p>
-      <div style="margin:6px 0;">${stockHtml || '<span style="font-size:0.75rem;color:#888;">Stock unknown</span>'}</div>
+      <div style="margin:6px 0;">${stockHtml || `<span style="font-size:0.75rem;color:#888;">${t('stock_unknown')}</span>`}</div>
       <span class="popup-status ${statusClass}">${statusLabel}</span>
-      <p style="font-size:0.7rem;color:#888;margin-top:6px;">🚚 Last delivery: ${shop.lastDelivery || '--'}</p>
+      <p style="font-size:0.7rem;color:#888;margin-top:6px;">🚚 ${t('last_delivery_short')}: ${shop.lastDelivery || '--'}</p>
       <p style="font-size:0.7rem;color:#888;">📞 ${shop.phone || '--'}</p>
       <button onclick="openGasShopModal(DB.gasShops.find(g=>g.id==='${shop.id}'))"
         style="margin-top:8px;width:100%;padding:6px;background:#7C3AED;color:white;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;">
-        🔥 View Details
+        🔥 ${t('view_details')}
       </button>
     </div>
   `;
@@ -178,7 +178,7 @@ function openGasShopModal(shop) {
   if (!shop) return;
   const status = getGasShopOverallStatus(shop);
   const sc = status==='available'?'status-available':status==='limited'?'status-limited':'status-out';
-  const sl = status.charAt(0).toUpperCase() + status.slice(1);
+  const sl = t('status_' + status);
 
   // Get real prices from DB
   const priceSource = shop.provider === 'LAUGFS' ? DB.gasPrices.laugfs : DB.gasPrices.litro;
@@ -208,12 +208,12 @@ function openGasShopModal(shop) {
     <div class="modal-fuels-grid">${stockItems || '<p style="color:var(--text-muted)">Stock info not available</p>'}</div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">
       <span>📞 ${shop.phone || '--'}</span>
-      <span>🚚 Last Delivery: ${shop.lastDelivery || '--'}</span>
-      <span>📅 Next Delivery: ${shop.nextDelivery || '--'}</span>
+      <span>🚚 ${t('last_delivery_short')}: ${shop.lastDelivery || '--'}</span>
+      <span>📅 ${t('next_delivery_short')}: ${shop.nextDelivery || '--'}</span>
     </div>
     <div class="modal-actions">
-      <button class="btn-directions" onclick="openDirections(${shop.lat},${shop.lng})">🗺️ Get Directions</button>
-      <button class="btn-report-this" onclick="closeModal();navigateTo('report')">📝 Report Status</button>
+      <button class="btn-directions" onclick="openDirections(${shop.lat},${shop.lng})">🗺️ ${t('directions')}</button>
+      <button class="btn-report-this" onclick="closeModal();navigateTo('report')">📝 ${t('report_update')}</button>
     </div>
   `;
   document.getElementById('stationModal').classList.remove('hidden');

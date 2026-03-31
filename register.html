@@ -8,6 +8,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <style>
+    /* Lang switcher in registration */
+    .reg-lang-switcher { position: absolute; top: 20px; right: 20px; z-index: 100; }
+    .lang-switcher { display: flex; gap: 4px; background: rgba(15, 22, 41, 0.6); padding: 4px; border-radius: 8px; backdrop-filter: blur(12px); border: 1px solid var(--glass-border); }
+    .lang-btn { background: none; border: none; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+    .lang-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+    .lang-btn.active { color: white; background: var(--blue); box-shadow: 0 4px 12px var(--blue-glow); }
+
     .reg-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 24px; position: relative; }
     .reg-page::before { content:''; position:fixed; inset:0; background: radial-gradient(ellipse at 20% 30%, rgba(59,130,246,0.12), transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(124,58,237,0.1), transparent 60%); pointer-events:none; }
     .reg-box { width: 100%; max-width: 720px; position: relative; z-index: 1; }
@@ -54,14 +61,22 @@
 </head>
 <body>
   <div class="reg-page">
+    <div class="reg-lang-switcher">
+      <div class="lang-switcher" role="group" aria-label="Language">
+        <button class="lang-btn" data-lang="en" onclick="applyLanguage('en')">EN</button>
+        <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
+        <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
+      </div>
+    </div>
+
     <div class="reg-box">
       <div class="reg-header">
-        <a href="index.html" class="back-link">← Back to FuelPass SL</a>
+        <a href="index.html" class="back-link"><span data-i18n="reg_back">← Back to FuelPass SL</span></a>
         <div style="margin-bottom:16px;">
           <img src="logo.png" alt="FuelPass SL" style="width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));" />
         </div>
-        <h1>🏪 Register Your Station</h1>
-        <p>Get verified access to submit real-time fuel &amp; gas availability updates</p>
+        <h1 data-i18n="reg_h1">🏪 Register Your Station</h1>
+        <p data-i18n="reg_p">Get verified access to submit real-time fuel &amp; gas availability updates</p>
       </div>
 
       <div class="reg-form-card glassmorphic">
@@ -69,30 +84,30 @@
         <div class="reg-steps" id="regSteps">
           <div class="reg-step active" id="step1Indicator">
             <div class="rs-circle">1</div>
-            <span class="rs-label">Station Info</span>
+            <span class="rs-label" data-i18n="reg_step1">Station Info</span>
           </div>
           <div class="reg-step" id="step2Indicator">
             <div class="rs-circle">2</div>
-            <span class="rs-label">Owner Details</span>
+            <span class="rs-label" data-i18n="reg_step2">Owner Details</span>
           </div>
           <div class="reg-step" id="step3Indicator">
             <div class="rs-circle">3</div>
-            <span class="rs-label">Confirmation</span>
+            <span class="rs-label" data-i18n="reg_step3">Confirmation</span>
           </div>
         </div>
 
         <!-- STEP 1: Station Info -->
         <div id="step1">
-          <div class="notice-box notice-info">
+          <div class="notice-box notice-info" data-i18n="reg_notice1">
             ℹ️ After submitting, a <strong>FuelPass SL admin</strong> will review and approve your application within 24–48 hours. You will receive a unique Station Code and Password to log in.
           </div>
           <div class="form-grid">
             <div class="form-group full">
-              <label>Station / Shop Name <span class="req">*</span></label>
+              <label data-i18n="reg_name">Station / Shop Name <span class="req">*</span></label>
               <input type="text" id="stationName" class="form-input" placeholder="e.g. CPC Filling Station – Nugegoda" />
             </div>
             <div class="form-group">
-              <label>Station Type <span class="req">*</span></label>
+              <label data-i18n="reg_type">Station Type <span class="req">*</span></label>
               <select id="stationType" class="reg-select">
                 <option value="">Select type</option>
                 <option value="CPC">⛽ CPC Fuel Station</option>
@@ -104,7 +119,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label>District <span class="req">*</span></label>
+              <label data-i18n="reg_district">District <span class="req">*</span></label>
               <select id="district" class="reg-select">
                 <option value="">Select district</option>
                 <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
@@ -119,7 +134,7 @@
               </select>
             </div>
             <div class="form-group full">
-              <label>Full Address <span class="req">*</span></label>
+              <label data-i18n="reg_address">Full Address <span class="req">*</span></label>
               <input type="text" id="address" class="form-input" placeholder="No. 15, Main Street, Nugegoda, Colombo" />
             </div>
             <div class="form-group">
@@ -128,7 +143,7 @@
               <span class="form-hint">Share your location from Google Maps</span>
             </div>
             <div class="form-group">
-              <label>Station Phone Number <span class="req">*</span></label>
+              <label data-i18n="reg_phone">Station Phone Number <span class="req">*</span></label>
               <input type="tel" id="stationPhone" class="form-input" placeholder="011-XXXXXXX" />
             </div>
           </div>
@@ -139,16 +154,16 @@
         <div id="step2" style="display:none">
           <div class="form-grid">
             <div class="form-group">
-              <label>Owner / Manager Full Name <span class="req">*</span></label>
+              <label data-i18n="reg_owner">Owner / Manager Full Name <span class="req">*</span></label>
               <input type="text" id="ownerName" class="form-input" placeholder="Perera, D.M.S." />
             </div>
             <div class="form-group">
-              <label>NIC Number <span class="req">*</span></label>
+              <label data-i18n="reg_nic">NIC Number <span class="req">*</span></label>
               <input type="text" id="nic" class="form-input" placeholder="XXXXXXXXV or XXXXXXXXXXXX" maxlength="12" />
               <span class="form-hint">Used for identity verification by admin</span>
             </div>
             <div class="form-group">
-              <label>Email Address <span class="req">*</span></label>
+              <label data-i18n="reg_email">Email Address <span class="req">*</span></label>
               <input type="email" id="email" class="form-input" placeholder="owner@example.com" />
             </div>
             <div class="form-group">
@@ -179,8 +194,8 @@
             </div>
           </div>
           <div style="display:flex;gap:12px;">
-            <button class="reg-btn" style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);" onclick="goStep1()">← Back</button>
-            <button class="reg-btn" onclick="submitRegistration()">✅ Submit Application</button>
+            <button class="reg-btn" style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);" onclick="goStep1()" data-i18n="nav_back">← Back</button>
+            <button class="reg-btn" onclick="submitRegistration()" data-i18n="reg_submit">✅ Submit Application</button>
           </div>
         </div>
 
@@ -188,8 +203,8 @@
         <div id="step3" style="display:none">
           <div class="success-screen">
             <div class="big-icon">🎉</div>
-            <h2>Application Submitted!</h2>
-            <p>Your registration has been submitted to the <strong>FuelPass SL admin team</strong> for review.</p>
+            <h2 data-i18n="reg_success_h">Application Submitted!</h2>
+            <p data-i18n="reg_success_p">Your registration has been submitted to the <strong>FuelPass SL admin team</strong> for review.</p>
             <p>Your unique Application ID is:</p>
             <div class="reg-id-box" id="appIdDisplay">—</div>
             <div class="notice-box notice-warn" style="text-align:left;">
@@ -212,8 +227,12 @@
     </div>
   </div>
 
+  <script src="js/i18n.js"></script>
   <script src="js/auth.js"></script>
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      applyLanguage(localStorage.getItem('fp_lang') || 'en');
+    });
     function goStep2() {
       const sName   = document.getElementById('stationName').value.trim();
       const sType   = document.getElementById('stationType').value;
