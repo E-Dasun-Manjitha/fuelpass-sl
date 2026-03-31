@@ -156,3 +156,49 @@ window.addEventListener('hashchange', () => {
     }
   } catch(e) {}
 });
+
+// ---- CONTACT / FEEDBACK ----
+async function handleFooterContact(e) {
+  e.preventDefault();
+  const name = document.getElementById('fcName').value;
+  const email = document.getElementById('fcEmail').value;
+  const message = document.getElementById('fcMessage').value;
+  const btn = e.target.querySelector('button');
+
+  if (!name || !message) return;
+
+  const originalText = btn.textContent;
+  btn.textContent = t('loading');
+  btn.disabled = true;
+
+  try {
+    const res = await apiSubmitContact({ name, email, message });
+    if (res && res.success) {
+      showToast('✅ Thank you! Feedback submitted.');
+      e.target.reset();
+    } else {
+      showToast('❌ Submission failed. Please try again.');
+    }
+  } catch(err) {
+    showToast('❌ Network error. Please try again.');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}
+
+// Global Toast helper
+window.showToast = function(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  toast.classList.add('visible');
+  setTimeout(() => {
+    toast.classList.remove('visible');
+    toast.classList.add('hidden');
+  }, 4000);
+}
+
+// Make globally available
+window.handleFooterContact = handleFooterContact;

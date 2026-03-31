@@ -118,6 +118,26 @@ async function apiDeleteOwner(id) {
   return apiFetch(`/api/owners/${id}`, { method: 'DELETE' });
 }
 
+// ---- Contact/Feedback ----
+async function apiSubmitContact(payload) {
+  return apiFetch('/api/contact', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+async function apiGetContactMessages() {
+  return apiFetch('/api/contact');
+}
+async function apiReplyContact(id, reply) {
+  return apiFetch(`/api/contact/${id}/reply`, {
+    method: 'PATCH',
+    body: JSON.stringify({ reply }),
+  });
+}
+async function apiDeleteContact(id) {
+  return apiFetch(`/api/contact/${id}`, { method: 'DELETE' });
+}
+
 // ============================================================
 // BOOTSTRAP – Load live data into DB on page start
 // Falls back to static data if API is unreachable

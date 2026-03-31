@@ -38,6 +38,7 @@ app.use('/api/gas-shops',require('./routes/gas'));
 app.use('/api/prices',   require('./routes/prices'));
 app.use('/api/reports',  require('./routes/reports'));
 app.use('/api/owners',   require('./routes/owners'));
+app.use('/api/contact',  require('./routes/contact'));
 
 // ---- 404 ----
 app.use((req, res) => res.status(404).json({ success: false, error: 'Endpoint not found' }));

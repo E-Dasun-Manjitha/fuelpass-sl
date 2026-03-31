@@ -119,7 +119,15 @@ const TRANSLATIONS = {
     directions:      'Directions',
     report_update:   '📋 Report Update',
 
-    // --- Toast / General ---
+    // --- Footer ---
+    footer_providers:  'Providers',
+    footer_feedback:   'Feedback & Contact',
+    fc_name_ph:        'Your Name',
+    fc_email_ph:       'Your Email (optional)',
+    fc_msg_ph:         'Your Feedback or Inquiry...',
+    fc_submit_btn:     'Submit Feedback',
+    footer_notice:     'Important Notice',
+    footer_notice_p:   'This system aggregates publicly available data and community reports. For official information, always verify with CPC, Lanka IOC, or the Ministry of Power & Energy.',
     loading:         'Loading…',
     error_generic:   'Something went wrong. Please try again.',
   },
@@ -239,7 +247,15 @@ const TRANSLATIONS = {
     directions:      'මාර්ගෝපදේශ',
     report_update:   '📋 යාවත්කාල වාර්තා',
 
-    // --- Toast / General ---
+    // --- Footer ---
+    footer_providers:  'සේවා සපයන්නන්',
+    footer_feedback:   'ප්‍රතිචාර සහ සම්බන්ධතාව',
+    fc_name_ph:        'ඔබේ නම',
+    fc_email_ph:       'ඔබේ විද්‍යුත් තැපෑල (අත්‍යවශ්‍ය නොවේ)',
+    fc_msg_ph:         'ඔබේ ප්‍රතිචාරය හෝ ප්‍රශ්නය...',
+    fc_submit_btn:     'ප්‍රතිචාරය යොමු කරන්න',
+    footer_notice:     'වැදගත් දැනුම්දීම',
+    footer_notice_p:   'මෙම පද්ධතිය ප්‍රසිද්ධියේ පවතින දත්ත සහ ප්‍රජා වාර්තා එක්රැස් කරයි. නිල තොරතුරු සඳහා, සෑම විටම CPC, Lanka IOC, හෝ බලශක්ති අමාත්‍යාංශය සමඟ සත්‍යාපනය කරන්න.',
     loading:         'පූරණය වෙමින්…',
     error_generic:   'දෝශයක් ඇතිවිය. නැවත උත්සාහ කරන්න.',
   },
@@ -359,7 +375,15 @@ const TRANSLATIONS = {
     directions:      'வழிகாட்டுதல்கள்',
     report_update:   '📋 புதுப்பிப்பு அறிக்கை',
 
-    // --- Toast / General ---
+    // --- Footer ---
+    footer_providers:  'வழங்குநர்கள்',
+    footer_feedback:   'கருத்து மற்றும் தொடர்பு',
+    fc_name_ph:        'உங்கள் பெயர்',
+    fc_email_ph:       'உங்கள் மின்னஞ்சல் (விரும்பினால்)',
+    fc_msg_ph:         'உங்கள் கருத்து அல்லது விசாரணை...',
+    fc_submit_btn:     'கருத்தைச் சமர்ப்பிக்கவும்',
+    footer_notice:     'முக்கிய அறிவிப்பு',
+    footer_notice_p:   'இந்த அமைப்பு பொதுவில் கிடைக்கும் தரவு மற்றும் சமூக அறிக்கைகளை ஒருங்கிணைக்கிறது. அதிகாரப்பூர்வ தகவலுக்கு, எப்போதும் CPC, Lanka IOC அல்லது எரிசக்தி அமைச்சகத்துடன் சரிபார்க்கவும்.',
     loading:         'ஏற்றுகிறது…',
     error_generic:   'பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.',
   }

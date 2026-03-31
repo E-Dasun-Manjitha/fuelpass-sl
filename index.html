@@ -750,16 +750,25 @@
         <a onclick="navigateTo('report')">Report</a>
       </div>
       <div class="footer-links">
-        <h4>Providers</h4>
-        <a href="#">Ceylon Petroleum Corp.</a>
-        <a href="#">Lanka IOC</a>
-        <a href="#">Litro Gas Lanka</a>
-        <a href="#">LAUGFS Gas PLC</a>
-        <a href="#">National Fuel Pass</a>
+        <h4 data-i18n="footer_providers">Providers</h4>
+        <a href="https://ceypetco.gov.lk/" target="_blank" rel="noopener">Ceylon Petroleum Corp.</a>
+        <a href="https://www.lankaioc.com/" target="_blank" rel="noopener">Lanka IOC</a>
+        <a href="https://www.litrogas.com/" target="_blank" rel="noopener">Litro Gas Lanka</a>
+        <a href="https://www.laugfsgas.lk/" target="_blank" rel="noopener">LAUGFS Gas PLC</a>
+        <a href="https://fuelpass.gov.lk/" target="_blank" rel="noopener">National Fuel Pass</a>
+      </div>
+      <div class="footer-contact">
+        <h4 data-i18n="footer_feedback">Feedback & Contact</h4>
+        <form class="footer-form" onsubmit="handleFooterContact(event)">
+          <input type="text" id="fcName" placeholder="Your Name" required data-i18n="fc_name_ph" />
+          <input type="email" id="fcEmail" placeholder="Your Email (optional)" data-i18n="fc_email_ph" />
+          <textarea id="fcMessage" placeholder="Your Feedback or Inquiry..." required data-i18n="fc_msg_ph"></textarea>
+          <button type="submit" class="elig-btn fc-btn" data-i18n="fc_submit_btn">Submit Feedback</button>
+        </form>
       </div>
       <div class="footer-info">
-        <h4>Important Notice</h4>
-        <p>This system aggregates publicly available data and community reports. For official information, always verify with CPC, Lanka IOC, or the Ministry of Power & Energy.</p>
+        <h4 data-i18n="footer_notice">Important Notice</h4>
+        <p data-i18n="footer_notice_p">This system aggregates publicly available data and community reports. For official information, always verify with CPC, Lanka IOC, or the Ministry of Power & Energy.</p>
       </div>
       <div class="footer-links">
         <h4>Portal</h4>

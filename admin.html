@@ -127,6 +127,7 @@
       <div class="sb-section-label">Data Management</div>
       <a onclick="showPanel('prices')">💰 Update Fuel Prices</a>
       <a onclick="showPanel('reports')">📋 Verified Reports</a>
+      <a onclick="showPanel('feedback')">💬 User Feedback</a>
       <div class="sb-section-label">Site</div>
       <a onclick="window.open('index.html','_blank')">🌐 View Live Site</a>
     </nav>
@@ -331,15 +332,27 @@
       <p class="updated-info" id="priceLastUpdated"></p>
     </div>
 
-    <!-- ── VERIFIED REPORTS ── -->
-    <div id="panel-reports" class="admin-panel">
+    <!-- ── USER FEEDBACK ── -->
+    <div id="panel-feedback" class="admin-panel">
       <div class="admin-topbar">
-        <h1>📋 Verified Station Reports</h1>
+        <h1>💬 User Feedback & Messages</h1>
       </div>
       <div class="admin-card">
-        <div id="reportsList"></div>
+        <div id="feedbackList"></div>
       </div>
     </div>
+
+    <!-- ── USER FEEDBACK ── -->
+    <div id="panel-feedback" class="admin-panel">
+      <div class="admin-topbar">
+        <h1>💬 User Feedback & Messages</h1>
+      </div>
+      <div class="admin-card">
+        <div id="feedbackList"></div>
+      </div>
+    </div>
+
+    <!-- ── VERIFIED REPORTS ── -->
 
   </main>
 </div>
@@ -421,6 +434,7 @@
     if (name === 'approved') renderApproved();
     if (name === 'prices')   renderPrices();
     if (name === 'reports')  renderVerifiedReports();
+    if (name === 'feedback') renderFeedback();
     if (name === 'addowner') { 
       document.getElementById('aoCredBox').style.display='none'; 
       // Ensure type toggle is always visible for manual entries
@@ -732,6 +746,57 @@
     } catch(err) {
       showAdminToast('❌ Network error.', 'error');
     }
+  }
+  // ── USER FEEDBACK ────────────────────────────────────────
+  window.renderFeedback = async function() {
+    const el = document.getElementById('feedbackList');
+    el.innerHTML = '<div style="padding:20px;text-align:center;">Loading messages...</div>';
+    try {
+      const res = await apiGetContactMessages();
+      const msgs = res?.data || [];
+      if (!msgs.length) {
+        el.innerHTML = '<div class="empty-state"><span>💬</span><p>No messages received yet.</p></div>';
+        return;
+      }
+      el.innerHTML = `<table class="admin-table">
+        <thead><tr><th>User</th><th>Message</th><th>Time</th><th>Actions</th></tr></thead>
+        <tbody>` + 
+        msgs.map(m => `
+          <tr id="msg-row-${m.id}">
+            <td>
+              <strong style="color:var(--text-primary);">${m.name}</strong><br/>
+              <span style="font-size:0.75rem;color:var(--text-muted);">${m.email || 'No email'}</span>
+            </td>
+            <td>
+              <div style="font-size:0.75rem;font-weight:600;color:var(--blue);margin-bottom:2px;">${m.subject}</div>
+              <p style="font-size:0.85rem;line-height:1.4;">${m.message}</p>
+              ${m.reply ? `<div style="margin-top:8px;padding:8px;background:rgba(16,185,129,0.06);border-left:2px solid #10B981;font-size:0.78rem;">
+                <strong>Admin Reply:</strong> ${m.reply}
+              </div>` : ''}
+            </td>
+            <td style="font-size:0.72rem;white-space:nowrap;">${new Date(m.created_at).toLocaleString()}</td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <button class="action-btn btn-reject" style="padding:5px 10px;font-size:0.75rem;" onclick="deleteMessage(${m.id})">🗑️ Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('') + 
+        '</tbody></table>';
+    } catch(err) {
+      el.innerHTML = '<div style="padding:20px;color:red;text-align:center;">Error loading messages.</div>';
+    }
+  }
+
+  window.deleteMessage = async function(id) {
+    if (!confirm('Permanently delete this message?')) return;
+    try {
+      const res = await apiDeleteContact(id);
+      if (res && res.success) {
+        document.getElementById(`msg-row-${id}`).remove();
+        showAdminToast('✅ Message deleted.');
+      }
+    } catch(err) { showAdminToast('❌ Failed to delete.', 'error'); }
   }
 
   // ── VERIFIED REPORTS ──────────────────────────────────────
