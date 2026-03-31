@@ -73,12 +73,12 @@ function renderStationCard(station, clickFn) {
   const badgeClass  = station.company === 'CPC' ? 'badge-cpc' : 'badge-ioc';
 
   const fuelsHtml = Object.entries(station.fuels).map(([k, v]) => {
-    const labels = { petrol92:'Petrol 92', petrol95:'Petrol 95', diesel:'Auto Diesel', superDiesel:'Super Diesel' };
+    const labels = { petrol92: t('card_petrol92'), petrol95: t('card_petrol95'), diesel: t('card_diesel'), superDiesel: t('card_superDiesel') };
     const chipClass = v === 'available' ? 'chip-available' : v === 'limited' ? 'chip-limited' : 'chip-out';
     return `<div class="fuel-chip ${chipClass}"><span class="chip-dot"></span>${labels[k]||k}</div>`;
   }).join('');
 
-  const queueLabel = station.queue === 'none' ? '✅ No Queue' : station.queue === 'short' ? '⏱️ Short Queue' : station.queue === 'medium' ? '⚠️ Medium Queue' : '🚗 Long Queue';
+  const queueLabel = station.queue === 'none' ? `✅ ${t('queue_none')}` : station.queue === 'short' ? `⏱️ ${t('queue_short')}` : station.queue === 'medium' ? `⚠️ ${t('queue_medium')}` : `🚗 ${t('queue_long')}`;
 
   return `
     <div class="station-card" onclick="${clickFn || `openStationModal(DB.stations.find(s=>s.id==='${station.id}'))`}" id="card-${station.id}">
@@ -91,7 +91,7 @@ function renderStationCard(station, clickFn) {
       </div>
       <div class="station-fuels">${fuelsHtml}</div>
       <div class="station-card-footer">
-        <span class="${statusClass} oc-status">${status.charAt(0).toUpperCase()+status.slice(1)}</span>
+        <span class="${statusClass} oc-status">${t('status_' + status)}</span>
         <span>${queueLabel}</span>
         <span class="station-updated">🕐 ${station.lastUpdated}</span>
       </div>
@@ -121,9 +121,9 @@ function renderGasShopCard(shop) {
       </div>
       <div class="station-fuels">${stockHtml}</div>
       <div class="station-card-footer">
-        <span class="${statusClass} oc-status">${status.charAt(0).toUpperCase()+status.slice(1)}</span>
+        <span class="${statusClass} oc-status">${t('status_' + status)}</span>
         <span>📦 ${shop.lastDelivery}</span>
-        <span>🚚 Next: ${shop.nextDelivery}</span>
+        <span>🚚 ${t('nav_live')}: ${shop.nextDelivery}</span>
       </div>
     </div>
   `;
@@ -397,7 +397,7 @@ function renderPricesPage() {
       <td>${g.provider}</td>
       <td>${g.size}</td>
       <td><span class="price-val">LKR ${g.price.toLocaleString()}</span></td>
-      <td><span class="oc-status ${statusClassFn(g.status)}">${statusLabel(g.status)}</span></td>
+      <td><span class="oc-status ${statusClassFn(g.status)}">${t('status_' + g.status)}</span></td>
     </tr>
   `).join('');
 
@@ -417,7 +417,7 @@ function renderGasPage() {
   // Litro
   document.getElementById('litroPrices').innerHTML = DB.gasPrices.litro.map(g => {
     const sc = g.status==='available'?'status-available':g.status==='limited'?'status-limited':'status-out';
-    const sl = g.status==='available'?'Available':g.status==='limited'?'Limited':'Out of Stock';
+    const sl = t('status_' + g.status);
     return `
       <div class="gpc-item">
         <div class="gpc-item-info">
@@ -432,7 +432,7 @@ function renderGasPage() {
   // LAUGFS
   document.getElementById('laugfsPrices').innerHTML = DB.gasPrices.laugfs.map(g => {
     const sc = g.status==='available'?'status-available':g.status==='limited'?'status-limited':'status-out';
-    const sl = g.status==='available'?'Available':g.status==='limited'?'Limited':'Out of Stock';
+    const sl = t('status_' + g.status);
     return `
       <div class="gpc-item">
         <div class="gpc-item-info">
@@ -464,10 +464,10 @@ function renderRecentReports() {
       <div class="rr-body">
         <span>⛽ ${r.product}</span>
         ${statusHtml(r.status)}
-        <span>🚗 ${r.queue.charAt(0).toUpperCase()+r.queue.slice(1)} Queue</span>
-        ${r.verified ? '<span class="rr-verified">✅ Verified</span>' : '<span style="color:var(--text-muted);font-size:0.7rem;">Unverified</span>'}
+        <span>🚗 ${t('queue_' + r.queue)}</span>
+        ${r.verified ? `<span class="rr-verified">✅ ${t('verified')}</span>` : `<span style="color:var(--text-muted);font-size:0.7rem;">${t('unverified')}</span>`}
       </div>
-      <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Reported by ${r.user}</div>
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">${t('reported_by')} ${r.user}</div>
     </div>
   `).join('');
 }
@@ -489,9 +489,9 @@ function openStationModal(station) {
   };
 
   const fuelItems = Object.entries(station.fuels).map(([k, v]) => {
-    const labels = { petrol92:'Petrol 92', petrol95:'Petrol 95', diesel:'Auto Diesel', superDiesel:'Super Diesel' };
+    const labels = { petrol92: t('card_petrol92'), petrol95: t('card_petrol95'), diesel: t('card_diesel'), superDiesel: t('card_superDiesel') };
     const chipC  = v==='available'?'chip-available':v==='limited'?'chip-limited':'chip-out';
-    const stLabel = v==='available'?'✅ Available':v==='limited'?'⚠️ Limited':'❌ Out of Stock';
+    const stLabel = t('status_' + v);
     const price  = realPrices[k];
     return `
       <div class="mf-item">
@@ -502,7 +502,7 @@ function openStationModal(station) {
     `;
   }).join('');
 
-  const queueLabel = station.queue === 'none' ? '✅ No Queue' : station.queue === 'short' ? '⏱️ Short' : station.queue === 'medium' ? '⚠️ Medium' : '🚗 Long Queue';
+  const queueLabel = station.queue === 'none' ? `✅ ${t('queue_none')}` : station.queue === 'short' ? `⏱️ ${t('queue_short')}` : station.queue === 'medium' ? `⚠️ ${t('queue_medium')}` : `🚗 ${t('queue_long')}`;
 
   document.getElementById('modalBody').innerHTML = `
     <div class="modal-station-name">${station.name}</div>
@@ -517,11 +517,11 @@ function openStationModal(station) {
     <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">
       <span>${queueLabel}</span>
       <span>📞 ${station.phone}</span>
-      <span>🕐 Updated: ${station.lastUpdated}</span>
+      <span>🕐 ${t('last_updated')}: ${station.lastUpdated}</span>
     </div>
     <div class="modal-actions">
-      <button class="btn-directions" onclick="openDirections(${station.lat},${station.lng})">🗺️ Get Directions</button>
-      <button class="btn-report-this" onclick="closeModal();navigateTo('report')">📝 Report Status</button>
+      <button class="btn-directions" onclick="openDirections(${station.lat},${station.lng})">🗺️ ${t('directions')}</button>
+      <button class="btn-report-this" onclick="closeModal();navigateTo('report')">📝 ${t('report_update')}</button>
     </div>
   `;
   document.getElementById('stationModal').classList.remove('hidden');

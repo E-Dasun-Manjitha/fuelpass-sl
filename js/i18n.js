@@ -33,6 +33,7 @@ const TRANSLATIONS = {
     card_petrol92:   'Petrol 92',
     card_petrol95:   'Petrol 95',
     card_diesel:     'Auto Diesel',
+    card_superDiesel:'Super Diesel',
     card_gas:        'LP Gas 12.5kg',
     lkr:             'LKR',
 
@@ -89,6 +90,9 @@ const TRANSLATIONS = {
     prices_type:     'Fuel Type',
     prices_cpc:      'CPC Price',
     prices_ioc:      'Lanka IOC Price',
+    prices_fuel_h_cpc: 'Ceylon Petroleum Corporation',
+    prices_fuel_h_ioc: 'Lanka IOC',
+    prices_gas_h_all:  'LPG Cylinder Prices',
     prices_change:   'Change',
     prices_unit:     'Per Litre',
 
@@ -97,7 +101,15 @@ const TRANSLATIONS = {
     page_elig_p:     'Verify your odd/even eligibility and weekly fuel quota',
     elig_enter_plate:'Enter Vehicle Number',
     elig_plate_ph:   'e.g. CAR-1234 or ABC-1234',
-    elig_check_btn:  'Check Eligibility',
+    elig_check_btn:  'Check Now',
+    elig_official_h: 'Official National Fuel Pass Portal',
+    elig_official_p: 'Register your vehicle, get your QR code & manage your quota on the government site',
+    elig_check_h:    'Can I Fill Fuel Today?',
+    elig_check_p:    'Enter your vehicle number and type — get an instant full eligibility report',
+    elig_instruction:'Enter your vehicle number above and click Check Now to see your full eligibility status.',
+    elig_sim_h:      '⚖️ Fuel Amount Simulator',
+    elig_cal_h:      '📅 7-Day Odd / Even Calendar',
+    elig_week_h:     '📊 This Week\'s Info',
 
     // --- Report Page ---
     page_report_h1:  'Report Fuel Status',
@@ -118,6 +130,11 @@ const TRANSLATIONS = {
     last_updated:    'Last Updated',
     directions:      'Directions',
     report_update:   '📋 Report Update',
+    reported_by:     'Reported by',
+    verified:        'Verified',
+    unverified:      'Unverified',
+    next_delivery:   'Next',
+    queue_text:      'Queue',
 
     // --- Footer ---
     footer_providers:  'Providers',
@@ -162,6 +179,7 @@ const TRANSLATIONS = {
     card_petrol92:   'පෙට්‍රල් 92',
     card_petrol95:   'පෙට්‍රල් 95',
     card_diesel:     'ඩීසල්',
+    card_superDiesel:'සුපර් ඩීසල්',
     card_gas:        'ද්‍රවිය ගෑස් 12.5kg',
     lkr:             'රු.',
 
@@ -218,6 +236,9 @@ const TRANSLATIONS = {
     prices_type:     'ඉන්ධන වර්ගය',
     prices_cpc:      'CPC මිල',
     prices_ioc:      'Lanka IOC මිල',
+    prices_fuel_h_cpc: 'ලංකා ඛනිජ තෙල් සංස්ථාව',
+    prices_fuel_h_ioc: 'Lanka IOC',
+    prices_gas_h_all:  'LPG ගෑස් සිලින්ඩර මිල',
     prices_change:   'වෙනස',
     prices_unit:     'ලීටරකට',
 
@@ -226,7 +247,15 @@ const TRANSLATIONS = {
     page_elig_p:     'ස්ථාන ඔත්තේ/ගෙවේ සුදුසුකම සහ සතිපතා ඉන්ධන කෝටාව සත්‍යාපනය කරන්න',
     elig_enter_plate:'වාහන අංකය ඇතුළත් කරන්න',
     elig_plate_ph:   'උදා: CAR-1234 හෝ ABC-1234',
-    elig_check_btn:  'සුදුසුකම් පරීක්ෂා කරන්න',
+    elig_check_btn:  'දැන් පරීක්ෂා කරන්න',
+    elig_official_h: 'රාජ්‍ය ඉන්ධන බලපත්‍ර වෙබ් අඩවිය',
+    elig_official_p: 'ගොස් ඔබේ වාහනය ලියාපදිංචි කර QR කේතය ලබා ගන්න',
+    elig_check_h:    'මට අද ඉන්ධන ලබා ගත හැකිද?',
+    elig_check_p:    'ඔබේ වාහන අංකය ඇතුළත් කර සම්පූර්ණ විස්තරයක් ලබා ගන්න',
+    elig_instruction:'ඔබේ වාහන අංකය ඇතුළත් කර සුදුසුකම් පරීක්ෂා කරන්න.',
+    elig_sim_h:      '⚖️ ඉන්ධන ප්‍රමාණය ගණනය කිරීම',
+    elig_cal_h:      '📅 දින 7ක ඔත්තේ/ඉරට්ටේ දින දර්ශනය',
+    elig_week_h:     '📊 මෙම සතියේ විස්තර',
 
     // --- Report Page ---
     page_report_h1:  'ඉන්ධන තත්ත්වය වාර්තා කරන්න',
@@ -247,6 +276,11 @@ const TRANSLATIONS = {
     last_updated:    'අවසන් යාවත්කාල',
     directions:      'මාර්ගෝපදේශ',
     report_update:   '📋 යාවත්කාල වාර්තා',
+    reported_by:     'වාර්තා කළේ',
+    verified:        'සත්‍යාපිතයි',
+    unverified:      'සත්‍යාපනය කර නැත',
+    next_delivery:   'ඊළඟ',
+    queue_text:      'පෝළිම',
 
     // --- Footer ---
     footer_providers:  'සේවා සපයන්නන්',
@@ -291,6 +325,7 @@ const TRANSLATIONS = {
     card_petrol92:   'பெட்ரோல் 92',
     card_petrol95:   'பெட்ரோல் 95',
     card_diesel:     'டீசல்',
+    card_superDiesel:'சூப்பர் டீசல்',
     card_gas:        'திரவ எரிவாயு 12.5kg',
     lkr:             'ரூ.',
 
@@ -347,6 +382,9 @@ const TRANSLATIONS = {
     prices_type:     'எரிபொருள் வகை',
     prices_cpc:      'CPC விலை',
     prices_ioc:      'Lanka IOC விலை',
+    prices_fuel_h_cpc: 'இலங்கை பெற்றோலியக் கூட்டுத்தாபனம்',
+    prices_fuel_h_ioc: 'Lanka IOC',
+    prices_gas_h_all:  'LPG சிலிண்டர் விலைகள்',
     prices_change:   'மாற்றம்',
     prices_unit:     'ஒரு லிட்டருக்கு',
 
@@ -355,7 +393,15 @@ const TRANSLATIONS = {
     page_elig_p:     'இரட்டை/ஒற்றை தகுதி மற்றும் வாராந்திர எரிபொருள் கோட்டா உறுதிப்படுத்துங்கள்',
     elig_enter_plate:'வாகன எண் உள்ளிடுங்கள்',
     elig_plate_ph:   'உதா: CAR-1234 அல்லது ABC-1234',
-    elig_check_btn:  'தகுதி சரிபார்',
+    elig_check_btn:  'இப்போது சரிபார்',
+    elig_official_h: 'அதிகாரப்பூர்வ எரிபொருள் பாஸ் தளம்',
+    elig_official_p: 'உங்கள் வாகனத்தை பதிவு செய்து உங்கள் QR குறியீட்டை பெற்றுக்கொள்ளுங்கள்',
+    elig_check_h:    'இன்று நான் எரிபொருள் நிரப்பலாமா?',
+    elig_check_p:    'உங்கள் வாகன எண்ணை உள்ளிட்டு உடனடி தகுதி அறிக்கையை பெறுங்கள்',
+    elig_instruction:'உங்கள் வாகன எண்ணை உள்ளிட்டு "இப்போது சரிபார்" என்பதை அழுத்தவும்.',
+    elig_sim_h:      '⚖️ எரிபொருள் அளவு கணக்கீடு',
+    elig_cal_h:      '📅 7 நாள் ஒற்றை / இரட்டை நாட்காட்டி',
+    elig_week_h:     '📊 இந்த வார தகவல்',
 
     // --- Report Page ---
     page_report_h1:  'எரிபொருள் நிலையை அறிக்கையிடுங்கள்',
@@ -376,6 +422,11 @@ const TRANSLATIONS = {
     last_updated:    'கடைசி புதுப்பிப்பு',
     directions:      'வழிகாட்டுதல்கள்',
     report_update:   '📋 புதுப்பிப்பு அறிக்கை',
+    reported_by:     'அறிக்கையிட்டவர்',
+    verified:        'உறுதிப்படுத்தப்பட்டது',
+    unverified:      'உறுதிப்படுத்தப்படவில்லை',
+    next_delivery:   'அடுத்தது',
+    queue_text:      'வரிசை',
 
     // --- Footer ---
     footer_providers:  'வழங்குநர்கள்',
