@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const { verifyToken } = require('../middleware/auth');
+const { verifyToken, requireAdmin } = require('../middleware/auth');
 
 // GET /api/reports  – query: ?verified=true&limit=20
 router.get('/', async (req, res) => {
