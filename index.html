@@ -97,35 +97,49 @@
             <span class="hero-badge" data-i18n="hero_badge">Sri Lanka Fuel Service</span>
             <h1 data-i18n-html="hero_title" data-i18n="hero_title">Live Fuel &<br/>Gas Tracking</h1>
             <p data-i18n="hero_subtitle">Check fuel availability, verify national fuel quota, and find nearest station updates from verified owners and community reports across the island.</p>
-            <div class="hero-search-wrap">
-              <input type="text" id="heroSearch" placeholder="Search town, district or vehicle number..." data-i18n="hero_search_ph" oninput="handleHeroSearch()" />
-              <button onclick="handleHeroSearch()" data-i18n="hero_search_btn">Search</button>
-              <div id="searchSuggestions" class="search-suggestions glassmorphic hidden"></div>
+            <div class="hero-search">
+              <div class="search-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="heroSearch" placeholder="Search town, district or vehicle number..." data-i18n="hero_search_ph" oninput="showSuggestions(this.value, 'hero')" />
+                <button class="search-btn" onclick="handleHeroSearch()" data-i18n="hero_search_btn">Search</button>
+              </div>
+              <div id="heroSuggestions" class="search-suggestions glassmorphic hidden"></div>
             </div>
+            
             <div class="hero-stats">
-              <div class="h-stat">
-                <span id="statStationsCount" class="h-val">0</span>
-                <span class="h-label" data-i18n="stat_stations">Stations</span>
+              <div class="hstat">
+                <span id="statStations" class="hstat-val">0</span>
+                <span class="hstat-label" data-i18n="stat_stations">Stations</span>
               </div>
-              <div class="h-stat">
-                <span id="statAvailableCount" class="h-val" style="color:var(--green)">0</span>
-                <span class="h-label" data-i18n="stat_available">Available</span>
+              <div class="hstat">
+                <span id="statAvail" class="hstat-val" style="color:var(--green)">0</span>
+                <span class="hstat-label" data-i18n="stat_available">Available</span>
               </div>
-              <div class="h-stat">
-                <span id="statGasCount" class="h-val">0</span>
-                <span class="h-label" data-i18n="stat_gas_shops">Gas Shops</span>
+              <div class="hstat">
+                <span id="statGas" class="hstat-val">0</span>
+                <span class="hstat-label" data-i18n="stat_gas_shops">Gas Shops</span>
               </div>
-              <div class="h-stat">
-                <span class="h-val">LIVE</span>
-                <span class="h-label" data-i18n="stat_last_upd">Last Update</span>
+              <div class="hstat">
+                <span id="statUpdated" class="hstat-val" style="font-size:1.2rem; align-self:center;">LIVE</span>
+                <span class="hstat-label" data-i18n="stat_last_upd">Last Update</span>
               </div>
             </div>
           </div>
-          <div class="hero-map-wrap glassmorphic">
-            <div id="heroMap" class="hero-map"></div>
-            <div class="map-overlay">
-              <button class="map-action-btn" onclick="locateUser()" title="Find My Location">📍</button>
+          <div class="hero-visual">
+            <div class="hv-ring hv-ring-1"></div>
+            <div class="hv-ring hv-ring-2"></div>
+            <div class="hv-halo hv-halo-1"></div>
+            <div class="hv-halo hv-halo-2"></div>
+            <div class="hv-logo-wrap">
+              <img src="logo.png" alt="Logo" class="hv-logo-img" />
             </div>
+            <div class="hv-orbit hv-orbit-1"><div class="hv-orb-icon">⛽</div></div>
+            <div class="hv-orbit hv-orbit-2"><div class="hv-orb-icon">🔥</div></div>
+            <div class="hv-orbit hv-orbit-3"><div class="hv-orb-icon">📍</div></div>
+            <div class="hv-orbit hv-orbit-4"><div class="hv-orb-icon">🎫</div></div>
+            <div class="hv-chip hv-chip-1" data-i18n="status_available">Available</div>
+            <div class="hv-chip hv-chip-2" data-i18n="nav_live">LIVE Updates</div>
+            <div class="hv-chip hv-chip-3" data-i18n="verified">Verified</div>
           </div>
         </div>
       </header>
@@ -140,83 +154,75 @@
         <!-- Ticker -->
         <div class="ticker-wrap glassmorphic">
           <div class="ticker-label" data-i18n="nav_live">LIVE</div>
-          <div class="ticker" id="ticker">
-            <div class="ticker-item" data-i18n="ticker_connecting">Connecting to real-time regional fuel & gas reports...</div>
+          <div class="ticker-track">
+            <div id="tickerItems" class="ticker-items">
+              <div class="ticker-item" data-i18n="ticker_connecting">Connecting to real-time regional fuel & gas reports...</div>
+            </div>
           </div>
         </div>
 
         <div class="overview-grid">
-          <div class="overview-left">
-            <div class="quick-stats">
-              <div class="stat-item glassmorphic">
-                <span class="si-title" data-i18n="card_petrol92">Petrol 92</span>
-                <div class="si-val-wrap">
-                  <span id="sumPetrol92" class="si-val">52%</span>
-                  <span class="si-label" data-i18n="stat_available">available</span>
-                </div>
-              </div>
-              <div class="stat-item glassmorphic">
-                <span class="si-title" data-i18n="card_petrol95">Petrol 95</span>
-                <div class="si-val-wrap">
-                  <span id="sumPetrol95" class="si-val">38%</span>
-                  <span class="si-label" data-i18n="stat_available">available</span>
-                </div>
-              </div>
-              <div class="stat-item glassmorphic">
-                <span class="si-title" data-i18n="card_diesel">Diesel</span>
-                <div class="si-val-wrap">
-                  <span id="sumDiesel" class="si-val">64%</span>
-                  <span class="si-label" data-i18n="stat_available">available</span>
-                </div>
-              </div>
-              <div class="stat-item glassmorphic">
-                <span class="si-title" data-i18n="card_superDiesel">Super Diesel</span>
-                <div class="si-val-wrap">
-                  <span id="sumSuperDiesel" class="si-val">41%</span>
-                  <span class="si-label" data-i18n="stat_available">available</span>
-                </div>
-              </div>
+          <div class="overview-card glassmorphic card-petrol" onclick="navigateTo('stations')">
+            <div class="oc-icon">⛽</div>
+            <div class="oc-info">
+              <h3 data-i18n="card_petrol92">Petrol 92</h3>
+              <div class="oc-price" id="ocPrice92">LKR 355</div>
+              <span class="oc-status status-available" data-i18n="status_available">Available</span>
             </div>
-
-            <div class="stations-preview">
-              <div class="sp-header">
-                <h3 data-i18n="nav_stations">Nearest Fuel Stations</h3>
-                <div class="filter-row" style="margin-top:10px;">
-                  <select id="distFilter" class="filter-select" onchange="filterStations()" data-i18n="dist_all">
-                    <option value="" data-i18n="dist_all">All Districts</option>
-                  </select>
-                  <button class="sp-btn" onclick="navigateTo('stations')" data-i18n="view_all">View All</button>
-                </div>
-              </div>
-              <div id="stationsList" class="stations-grid"></div>
-            </div>
+            <div class="oc-chart"><canvas id="chart92" width="70" height="35"></canvas></div>
           </div>
-
-          <div class="overview-right">
-            <div class="eligibility-quick glassmorphic">
-              <h3 data-i18n="nav_eligibility">Quick Eligibility Check</h3>
-              <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px;" data-i18n="elig_quick_p">Check if your vehicle is eligible for fuel today based on NFP rules.</p>
-              <div class="elig-form">
-                <select id="eqVehicle" class="elig-input">
-                  <option value="Motorcycle" data-i18n="v_motorcycle">Motorcycle / Scooters</option>
-                  <option value="Three Wheeler" data-i18n="v_three_wheeler">Three Wheeler</option>
-                  <option value="Car" data-i18n="v_car">Car / Jeep / Van</option>
-                  <option value="Bus" data-i18n="v_bus">Bus</option>
-                  <option value="Lorry" data-i18n="v_lorry">Lorry / Truck</option>
-                </select>
-                <input type="text" id="eqPlate" class="elig-input" placeholder="Plate No (e.g. WP ABC-1234)" data-i18n="v_plate_ph" />
-                <button class="elig-btn" onclick="handleQuickEligCheck()" data-i18n="elig_check_now">Check Now</button>
-                <div id="eqResult" class="elig-result hidden"></div>
-              </div>
+          <div class="overview-card glassmorphic card-diesel" onclick="navigateTo('stations')">
+            <div class="oc-icon">🚚</div>
+            <div class="oc-info">
+              <h3 data-i18n="card_diesel">Auto Diesel</h3>
+              <div class="oc-price" id="ocPriceDsl">LKR 317</div>
+              <span class="oc-status status-limited" data-i18n="status_limited">Limited</span>
             </div>
-
-            <div class="reports-feed glassmorphic">
-              <h3 data-i18n="recent_reports">Recent Reports</h3>
-              <div id="recentReports" class="reports-list"></div>
-              <button class="action-btn" style="width:100%;margin-top:12px;" onclick="navigateTo('report')" data-i18n="report_update">Report Availability</button>
+            <div class="oc-chart"><canvas id="chartDsl" width="70" height="35"></canvas></div>
+          </div>
+          <div class="overview-card glassmorphic card-gas" onclick="navigateTo('gas')">
+            <div class="oc-icon">🔥</div>
+            <div class="oc-info">
+              <h3 data-i18n="card_gas">LP Gas 12.5kg</h3>
+              <div class="oc-price" id="ocPriceGas">LKR 3,745</div>
+              <span class="oc-status status-out" data-i18n="status_out">Out of Stock</span>
+            </div>
+            <div class="oc-chart"><canvas id="chartGas" width="70" height="35"></canvas></div>
+          </div>
+          <div class="overview-card glassmorphic card-quota" onclick="navigateTo('eligibility')">
+            <div class="oc-icon">🎫</div>
+            <div class="oc-info">
+              <h3 data-i18n="nav_eligibility">Your Quota</h3>
+              <div class="oc-price">20L / week</div>
+              <span class="oc-status status-info">Check Eligibility</span>
             </div>
           </div>
         </div>
+
+          </div>
+        </div>
+
+        <div class="section-header" style="margin-top:48px;">
+          <h2 data-i18n="nav_stations">Nearest Stations</h2>
+          <div class="map-controls">
+            <button class="mc-btn active" data-i18n="map_all_btn">All</button>
+            <button class="mc-btn" data-i18n="map_fuel_btn">Fuel</button>
+            <button class="mc-btn" data-i18n="map_gas_btn">Gas</button>
+            <button class="mc-btn locate-btn" id="locateBtn" onclick="locateUser()">📍 My Location</button>
+          </div>
+        </div>
+
+        <div class="map-wrapper glassmorphic">
+          <div id="mainMap"></div>
+          <div class="map-legend">
+            <div class="ml-item"><span class="ml-dot dot-available"></span> <span data-i18n="status_available">Available</span></div>
+            <div class="ml-item"><span class="ml-dot dot-limited"></span> <span data-i18n="status_limited">Limited</span></div>
+            <div class="ml-item"><span class="ml-dot dot-out"></span> <span data-i18n="status_out">Out of Stock</span></div>
+            <div class="ml-item"><span class="ml-dot dot-gas"></span> <span data-i18n="nav_gas">LPG Gas</span></div>
+          </div>
+        </div>
+
+        <div id="stationsList" class="stations-grid" style="margin-top:24px;"></div>
       </div>
     </section>
 
@@ -228,7 +234,8 @@
       </div>
       <div class="container">
         <div class="filter-bar glassmorphic">
-          <input type="text" id="stationSearch" placeholder="Search by name, town or district..." data-i18n="stations_search_ph" oninput="searchStations()" />
+          <input type="text" id="stationSearch" placeholder="Search by name, town or district..." data-i18n="stations_search_ph" oninput="showSuggestions(this.value, 'stations')" />
+          <div id="stationsSuggestions" class="search-suggestions glassmorphic hidden" style="top:50px;"></div>
           <div class="filter-row">
             <select id="pDistFilter" class="filter-select" onchange="searchStations()">
               <option value="" data-i18n="dist_all">All Districts</option>
