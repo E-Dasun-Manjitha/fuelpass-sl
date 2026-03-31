@@ -122,6 +122,7 @@ const TRANSLATIONS = {
     // --- Footer ---
     footer_providers:  'Providers',
     footer_feedback:   'Feedback & Contact',
+    footer_email_prefix: 'Email:',
     fc_name_ph:        'Your Name',
     fc_email_ph:       'Your Email (optional)',
     fc_msg_ph:         'Your Feedback or Inquiry...',
@@ -250,6 +251,7 @@ const TRANSLATIONS = {
     // --- Footer ---
     footer_providers:  'සේවා සපයන්නන්',
     footer_feedback:   'ප්‍රතිචාර සහ සම්බන්ධතාව',
+    footer_email_prefix: 'විද්‍යුත් තැපෑල:',
     fc_name_ph:        'ඔබේ නම',
     fc_email_ph:       'ඔබේ විද්‍යුත් තැපෑල (අත්‍යවශ්‍ය නොවේ)',
     fc_msg_ph:         'ඔබේ ප්‍රතිචාරය හෝ ප්‍රශ්නය...',
@@ -378,6 +380,7 @@ const TRANSLATIONS = {
     // --- Footer ---
     footer_providers:  'வழங்குநர்கள்',
     footer_feedback:   'கருத்து மற்றும் தொடர்பு',
+    footer_email_prefix: 'மின்னஞ்சல்:',
     fc_name_ph:        'உங்கள் பெயர்',
     fc_email_ph:       'உங்கள் மின்னஞ்சல் (விரும்பினால்)',
     fc_msg_ph:         'உங்கள் கருத்து அல்லது விசாரணை...',
