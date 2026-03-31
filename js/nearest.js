@@ -106,7 +106,7 @@ function renderNearestResults(type = 'fuel') {
     const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}`;
 
     return `
-    <div class="nearest-card" style="
+    <div class="nearest-card" onclick="window.open('${mapsUrl}','_blank')" style="
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 14px;
@@ -116,7 +116,8 @@ function renderNearestResults(type = 'fuel') {
       align-items: flex-start;
       gap: 14px;
       transition: all 0.2s;
-    " onmouseover="this.style.background='rgba(255,255,255,0.07)';this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.06)'">
+      cursor: pointer;
+    " onmouseover="this.style.background='rgba(255,255,255,0.07)';this.style.borderColor='rgba(16,185,129,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.06)'">
       <div style="
         min-width: 42px; height: 42px;
         background: ${statusColor}15;
@@ -138,15 +139,16 @@ function renderNearestResults(type = 'fuel') {
           <span style="font-size:0.72rem;color:var(--text-muted);">${isGas ? (item.provider || 'Gas') : (item.company || 'Fuel')} • ${item.district}</span>
         </div>
       </div>
-      <a href="${mapsUrl}" target="_blank" style="
+      <a href="${mapsUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="
         display: flex; align-items: center; gap: 5px;
-        background: #10B981; color: white;
+        background: linear-gradient(135deg,#10B981,#059669); color: white;
         font-size: 0.7rem; font-weight: 700;
-        padding: 7px 10px; border-radius: 8px;
+        padding: 7px 12px; border-radius: 8px;
         text-decoration: none; white-space: nowrap;
-        transition: transform 0.2s;
-      " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        🧭 Info
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+      " onmouseover="this.style.transform='scale(1.05)';this.style.boxShadow='0 4px 16px rgba(16,185,129,0.5)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 2px 8px rgba(16,185,129,0.3)'">
+        🧭 Navigate
       </a>
     </div>`;
   }).join('');
