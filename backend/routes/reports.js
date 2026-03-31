@@ -62,4 +62,19 @@ router.post('/verified', verifyToken, async (req, res) => {
   }
 });
 
+// DELETE /api/reports/:id – Admin removes a report (requires admin token)
+router.delete('/:id', verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query('DELETE FROM reports WHERE id = $1 RETURNING id', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, error: 'Report not found' });
+    }
+    res.json({ success: true, message: `Report ${id} deleted` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
 module.exports = router;

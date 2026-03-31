@@ -374,7 +374,7 @@
 <div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
 
 
-<script src="js/api.js?v=5"></script>
+<script src="js/api.js?v=24"></script>
 <script src="js/auth.js"></script>
 <script>
   let approveTargetId = null;
@@ -746,23 +746,46 @@
         return;
       }
       el.innerHTML = `<table class="admin-table">
-        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Queue</th><th>Submitter</th><th>Time</th></tr></thead>
+        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Queue</th><th>Submitter</th><th>Time</th><th>Actions</th></tr></thead>
         <tbody>` +
         reports.map(r => {
           const sc = r.status==='available'?'status-available':r.status==='limited'?'status-limited':'status-out';
           const sl = r.status==='available'?'✅ Available':r.status==='limited'?'⚠️ Limited':'❌ Out of Stock';
-          return `<tr>
+          return `<tr id="report-row-${r.id}">
             <td><strong style="color:var(--text-primary);">${r.station_name || '-'}</strong></td>
             <td>${r.product || '—'}</td>
             <td><span class="oc-status ${sc}">${sl}</span></td>
             <td>${r.queue || '—'}</td>
             <td>${r.reporter}</td>
             <td style="font-size:0.72rem;">${new Date(r.created_at).toLocaleString()}</td>
+            <td><button class="action-btn btn-reject" style="padding:5px 12px;font-size:0.75rem;" onclick="deleteReport(${r.id})">🗑️ Delete</button></td>
           </tr>`;
         }).join('') +
         '</tbody></table>';
     } catch(err) {
       el.innerHTML = '<div style="padding:20px;color:red;text-align:center;">Error loading reports.</div>';
+    }
+  }
+
+  window.deleteReport = async function(id) {
+    if (!confirm('Delete this verified report? This action cannot be undone.')) return;
+    try {
+      const res = await apiDeleteReport(id);
+      if (res && res.success) {
+        // Remove row from DOM immediately
+        const row = document.getElementById(`report-row-${id}`);
+        if (row) row.remove();
+        showAdminToast('✅ Report deleted successfully.');
+        // If table body is now empty, show empty state
+        const tbody = document.querySelector('#reportsList table tbody');
+        if (tbody && tbody.children.length === 0) {
+          document.getElementById('reportsList').innerHTML = '<div class="empty-state"><span>📋</span><p>No verified reports yet.</p></div>';
+        }
+      } else {
+        showAdminToast('❌ Failed to delete report: ' + (res?.error || 'Unknown error'), 'error');
+      }
+    } catch(err) {
+      showAdminToast('❌ Network error. Please try again.', 'error');
     }
   }
 
@@ -791,4 +814,4 @@
 </script>
 </body>
 </html>
-<!-- cache bust 6 -->
+<!-- cache bust 7 -->

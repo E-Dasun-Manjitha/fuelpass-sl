@@ -58,6 +58,10 @@ async function apiGetReports(verified) {
   return apiFetch(`/api/reports${q}`);
 }
 
+async function apiDeleteReport(id) {
+  return apiFetch(`/api/reports/${id}`, { method: 'DELETE' });
+}
+
 async function apiSubmitReport(payload) {
   return apiFetch('/api/reports', {
     method: 'POST',

@@ -2191,3 +2191,82 @@ table { min-width: 400px; }
   font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
 }
 
+/* =========================================================
+   OFFICIAL FUELPASS GOV BANNER (Eligibility Page)
+   ========================================================= */
+.fuelpass-gov-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  text-decoration: none;
+  color: var(--text-primary);
+  border: 1px solid rgba(245,158,11,0.35);
+  background: linear-gradient(135deg,
+    rgba(245,158,11,0.08) 0%,
+    rgba(255,255,255,0.04) 100%);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.fuelpass-gov-banner:hover {
+  border-color: rgba(245,158,11,0.7);
+  background: linear-gradient(135deg,
+    rgba(245,158,11,0.14) 0%,
+    rgba(255,255,255,0.06) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(245,158,11,0.15);
+}
+.fpb-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.fpb-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+}
+.fpb-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fpb-text strong {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #F59E0B;
+}
+.fpb-text span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.fpb-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.fpb-domain {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #F59E0B;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+.fpb-arrow {
+  font-size: 1.3rem;
+  color: #F59E0B;
+  transition: transform 0.2s;
+}
+.fuelpass-gov-banner:hover .fpb-arrow {
+  transform: translateX(4px);
+}
+@media (max-width: 540px) {
+  .fuelpass-gov-banner { flex-direction: column; align-items: flex-start; }
+  .fpb-right { align-self: flex-end; }
+}
+
