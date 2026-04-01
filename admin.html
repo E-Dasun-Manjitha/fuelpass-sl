@@ -89,7 +89,27 @@
       .admin-main { margin-left:0; padding:16px; }
       .admin-layout { flex-direction:column; }
     }
-  </style>
+    .st-filter-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .st-filter-btn:hover {
+    color: white;
+    background: rgba(255,255,255,0.05);
+  }
+  .st-filter-btn.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+</style>
 </head>
 <body>
 
@@ -369,8 +389,13 @@
     <div id="panel-managestations" class="admin-panel">
       <div class="admin-topbar">
         <h1>🚉 Master Station Management</h1>
-        <div class="admin-actions">
-           <input type="text" placeholder="Search stations..." oninput="renderManageStations(this.value)" style="padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:white;min-width:250px;">
+        <div class="admin-actions" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+           <div class="filter-group-container" style="display:flex;background:rgba(255,255,255,0.04);padding:4px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
+              <button class="st-filter-btn active" data-filter="all" onclick="setStationCategoryFilter('all')" data-i18n="admin_filter_all">All</button>
+              <button class="st-filter-btn" data-filter="fuel" onclick="setStationCategoryFilter('fuel')" data-i18n="admin_filter_fuel">⛽ Fuel</button>
+              <button class="st-filter-btn" data-filter="gas" onclick="setStationCategoryFilter('gas')" data-i18n="admin_filter_gas">🔥 Gas</button>
+           </div>
+           <input type="text" id="stationSearchInput" placeholder="Search by name, district, or address..." data-i18n="admin_search_stations" oninput="renderManageStations(this.value)" style="padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:white;min-width:300px;font-size:0.85rem;outline:none;transition:border 0.2s;" onfocus="this.style.border='1px solid var(--accent)'" onblur="this.style.border='1px solid rgba(255,255,255,0.1)'">
         </div>
       </div>
       <div class="admin-card">
@@ -872,6 +897,15 @@
   // ── VERIFIED REPORTS ──────────────────────────────────────
   // ── MANAGE STATIONS ──────────────────────────────────────
   let ALL_ADMIN_STATIONS = [];
+  let STATION_CATEGORY_FILTER = 'all';
+
+  window.setStationCategoryFilter = function(category) {
+    STATION_CATEGORY_FILTER = category;
+    document.querySelectorAll('.st-filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === category);
+    });
+    renderManageStations(document.getElementById('stationSearchInput').value);
+  }
 
   window.renderManageStations = async function(search = '') {
     const el = document.getElementById('manageStationsList');
@@ -885,18 +919,31 @@
         ALL_ADMIN_STATIONS = res?.data || [];
       }
       
-      const filtered = ALL_ADMIN_STATIONS.filter(s => 
-        (s.name || '').toLowerCase().includes(search.toLowerCase()) || 
-        (s.district || '').toLowerCase().includes(search.toLowerCase()) || 
-        (s.address || '').toLowerCase().includes(search.toLowerCase())
-      );
+      const filtered = ALL_ADMIN_STATIONS.filter(s => {
+        const matchesSearch = (s.name || '').toLowerCase().includes(search.toLowerCase()) || 
+                             (s.district || '').toLowerCase().includes(search.toLowerCase()) || 
+                             (s.address || '').toLowerCase().includes(search.toLowerCase());
+        
+        let matchesCategory = true;
+        if (STATION_CATEGORY_FILTER === 'fuel') {
+           matchesCategory = !s.id.startsWith('rg'); // Fuel stations IDs: r001, etc. Gas: rg001
+        } else if (STATION_CATEGORY_FILTER === 'gas') {
+           matchesCategory = s.id.startsWith('rg');
+        }
+        
+        return matchesSearch && matchesCategory;
+      });
 
       if (!filtered.length) {
         el.innerHTML = '<div class="empty-state"><span>🚉</span><p>No stations found.</p></div>';
         return;
       }
 
-      el.innerHTML = `<table class="admin-table">
+      el.innerHTML = `
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;padding:4px;">
+           Showing ${filtered.length} of ${ALL_ADMIN_STATIONS.length} locations
+        </div>
+        <table class="admin-table">
         <thead><tr><th>Station</th><th>Dist</th><th>Fuel Status</th><th>Queue</th><th>Actions</th></tr></thead>
         <tbody>` +
         filtered.map(s => {

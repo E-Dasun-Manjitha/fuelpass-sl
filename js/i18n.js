@@ -303,6 +303,10 @@ const TRANSLATIONS = {
     no_stations_found: 'No stations found matching filters.',
     no_gas_found:      'No gas shops found matching filters.',
     no_suggestions:    'No suggestions found.',
+    admin_filter_all:  'All',
+    admin_filter_fuel: '⛽ Fuel',
+    admin_filter_gas:  '🔥 Gas',
+    admin_search_stations: 'Search by name, district, or address...',
   },
 
   si: {
@@ -562,6 +566,10 @@ const TRANSLATIONS = {
     rStation_ph:     'උදා: CPC පිරවුම්හල – නුගේගොඩ',
     rStation_ph_gas: 'උදා: ලිට්රෝ අලෙවිකරු – ගම්පහ',
     rNotes_ph:       'උදා: පෝලිම වේගයෙන් ඉදිරියට යයි...',
+    admin_filter_all:  'සියල්ල',
+    admin_filter_fuel: '⛽ ඉන්ධන',
+    admin_filter_gas:  '🔥 ගෑස්',
+    admin_search_stations: 'නම, දිස්ත්‍රික්කය හෝ ලිපිනය අනුව සොයන්න...',
   },
 
   ta: {
