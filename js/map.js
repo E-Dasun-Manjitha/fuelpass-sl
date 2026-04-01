@@ -50,24 +50,24 @@ function createStationIcon(status, isGas = false) {
   const html = `
     <div style="
       background: ${color};
-      width: 36px; height: 36px;
+      width: 24px; height: 24px;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid rgba(255,255,255,0.8);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      border: 1.5px solid rgba(255,255,255,0.8);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     ">
-      <span style="transform: rotate(45deg); font-size: 14px;">${emoji}</span>
+      <span style="transform: rotate(45deg); font-size: 10px;">${emoji}</span>
     </div>
   `;
   return L.divIcon({
     html,
     className: '',
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -36]
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -24]
   });
 }
 
