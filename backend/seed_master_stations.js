@@ -11,7 +11,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 const client = new Client({
-  connectionString: 'postgresql://fuelpass_user:ZkFums1VYMffEH5GaCFY2aiCKtc7NMJv@dpg-d736jtffte5s73esnep0-a.singapore-postgres.render.com/fuelpass_fs60',
+  connectionString: 'postgres://fuelpass_db_8l08_user:uW2pREI5uE7K2u1Q6K9vH4Wz0I8I0I9@dpg-cuse830gph6c73e0q0eg-a.oregon-postgres.render.com/fuelpass_db_8l08',
   ssl: { rejectUnauthorized: false }
 });
 
@@ -22,7 +22,7 @@ async function seed() {
   await client.connect();
   try {
     await client.query('BEGIN');
-    console.log("Cleaning existing data...");
+    console.log("Cleaning existing data from Oregon DB...");
     await client.query('DELETE FROM station_fuel_status');
     await client.query('DELETE FROM stations');
     
@@ -45,6 +45,7 @@ async function seed() {
         INSERT INTO stations (id, name, company, district, address, lat, lng, phone, created_at)
         VALUES ${stationRows.join(', ')}
       `, stationValues);
+      console.log(`✅ Seeded stations ${i+1} to ${Math.min(i+STATION_CHUNK_SIZE, allLocations.length)}`);
     }
 
     // Prepare Fuel Statuses
@@ -56,13 +57,13 @@ async function seed() {
       });
     });
 
-    console.log(`Seeding ${statusData.length} fuel status records in chunks...`);
-    const STATUS_CHUNK_SIZE = 500;
+    console.log(`Seeding ${statusData.length} fuel status records in chunks of 50...`);
+    const STATUS_CHUNK_SIZE = 50;
     for (let i = 0; i < statusData.length; i += STATUS_CHUNK_SIZE) {
       const chunk = statusData.slice(i, i + STATUS_CHUNK_SIZE);
       const statusValues = [];
       const statusRows = chunk.map((st, idx) => {
-        const offset = idx * 5;
+        const offset = idx * 4;
         statusValues.push(st.id, st.type, st.status, st.queue);
         return `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, NOW(), 'system')`;
       });
@@ -71,10 +72,12 @@ async function seed() {
         INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
         VALUES ${statusRows.join(', ')}
       `, statusValues);
+      console.log(`✅ Seeded statuses ${i+1} to ${Math.min(i+STATUS_CHUNK_SIZE, statusData.length)}`);
     }
 
     await client.query('COMMIT');
     console.log(`✅ Seeding Complete! ${allLocations.length} locations and ${statusData.length} status records added to the national infrastructure.`);
+    console.log("READY FOR NATIONAL DEPLOYMENT.");
   } catch (err) {
     if (client) await client.query('ROLLBACK');
     console.error("❌ Seeding Failed. Rolled back changes.", err);
