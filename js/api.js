@@ -169,12 +169,15 @@ async function loadLiveData() {
 
   if (stationsResp?.data?.length) {
     // Normalise API response to match existing DB shape
-    const liveStations = stationsResp.data.map(s => ({
-      ...s,
-      fuels: s.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
-      queue: Object.values(s.queues || {})[0] || 'none',
-      lastUpdated: s.last_updated ? new Date(s.last_updated).toLocaleTimeString() : '--',
-    }));
+    // FILTER: Only merge real fuel stations into DB.stations (id starts with r, not rg)
+    const liveStations = stationsResp.data
+      .filter(s => (s.id || '').startsWith('r') && !(s.id || '').startsWith('rg'))
+      .map(s => ({
+        ...s,
+        fuels: s.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
+        queue: Object.values(s.queues || {})[0] || 'none',
+        lastUpdated: s.last_updated ? new Date(s.last_updated).toLocaleTimeString() : '--',
+      }));
 
     // Merge: upsert live stations into the static list (by id)
     const existingIds = new Set(DB.stations.map(s => s.id));
