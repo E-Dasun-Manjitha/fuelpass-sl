@@ -104,9 +104,14 @@ function renderNearestResults(type = 'fuel') {
       : `${item.distanceKm.toFixed(1)} km`;
     const badge = i === 0 ? `<span style="background:#3B82F6;color:white;font-size:0.65rem;padding:2px 7px;border-radius:20px;margin-left:6px;">CLOSEST</span>` : '';
     const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}`;
+    
+    // MODAL CALL LOGIC
+    const modalCall = isGas 
+      ? `openGasShopModal(DB.gasShops.find(g=>g.id==='${item.id}'))` 
+      : `openStationModal(DB.stations.find(s=>s.id==='${item.id}'))`;
 
     return `
-    <div class="nearest-card" onclick="window.open('${mapsUrl}','_blank')" style="
+    <div class="nearest-card" onclick="${modalCall}" style="
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 14px;
