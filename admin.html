@@ -85,9 +85,16 @@
     .ao-check { display:flex; align-items:center; gap:5px; font-size:0.8rem; color:var(--text-secondary); cursor:pointer; padding:5px 10px; border-radius:6px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.03); }
     .ao-check input { accent-color:var(--blue); width:14px; height:14px; }
     @media(max-width:768px) {
-      .admin-sidebar { width:100%; position:relative; height:auto; } 
-      .admin-main { margin-left:0; padding:16px; }
+      .admin-sidebar { width:100%; position:static; height:auto; border-right:none; border-bottom:1px solid var(--glass-border); padding:12px 0; }
+      .sb-brand { padding: 0 16px 12px; margin-bottom:10px; border-bottom:none; }
+      .sb-nav { display:flex; overflow-x:auto; padding:0 16px; gap:8px; white-space:nowrap; -webkit-overflow-scrolling:touch; }
+      .sb-nav a { padding:8px 16px; border-radius:99px; border:1px solid var(--glass-border); border-right:none !important; min-width:max-content; }
+      .sb-nav a.active { border-color:var(--blue); background:rgba(59,130,246,0.1); }
+      .sb-section-label { display:none; }
+      .admin-main { margin-left:0; padding:20px; }
       .admin-layout { flex-direction:column; }
+      .admin-topbar h1 { font-size:1.3rem; }
+      .stat-cards { grid-template-columns: 1fr 1fr; }
     }
     .st-filter-btn {
     background: transparent;
