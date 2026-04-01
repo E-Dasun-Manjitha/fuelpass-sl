@@ -512,7 +512,7 @@
     </div>
 
     <div style="display:flex;gap:10px;margin-top:24px;">
-      <button class="action-btn btn-approve" style="flex:1;padding:12px;" onclick="saveStationEdit()">💾 Save Changes</button>
+      <button class="action-btn btn-approve" style="flex:1;padding:12px;" onclick="saveStationEdit(event)">💾 Save Changes</button>
       <button class="action-btn btn-reject" style="padding:12px 20px;" onclick="closeStationEdit()">Cancel</button>
     </div>
   </div>
@@ -522,7 +522,7 @@
 
 
 <script src="js/i18n.js"></script>
-<script src="js/api.js?v=1000"></script>
+<script src="js/api.js?v=2000"></script>
 <script src="js/auth.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -1110,8 +1110,10 @@
 
   window.closeStationEdit = () => { document.getElementById('stationEditModal').style.display = 'none'; };
 
-  window.saveStationEdit = async function() {
-    const btn = event.target.closest('button');
+  window.saveStationEdit = async function(event) {
+    // Prevent event if not provided
+    if (!event) return;
+    const btn = event.currentTarget || event.target.closest('button');
     const oldText = btn.innerHTML;
     btn.innerHTML = 'Saving...';
     btn.disabled = true;
