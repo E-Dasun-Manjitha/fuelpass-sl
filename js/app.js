@@ -2,6 +2,7 @@
 // ============================================================
 
 let currentReportType = 'fuel'; // Default report type
+window.currentReportType = currentReportType;
 
 // ---- SPA NAVIGATION ----
 function navigateTo(page) {
@@ -15,15 +16,7 @@ function navigateTo(page) {
   }
   // Update nav links
   document.querySelectorAll('.nav-link').forEach(l => {
-    let isActive = false;
-    if (l.dataset.page === page) {
-      if (page === 'report') {
-        isActive = (l.dataset.reportType === currentReportType);
-      } else {
-        isActive = true;
-      }
-    }
-    l.classList.toggle('active', isActive);
+    l.classList.toggle('active', l.dataset.page === page);
   });
   // Close mobile menu
   document.getElementById('navLinks')?.classList.remove('open');
@@ -43,6 +36,7 @@ function navigateTo(page) {
 // ---- REPORT TYPE TOGGLE ----
 function setReportType(type) {
   currentReportType = type;
+  window.currentReportType = type;
   // If we're already on report page, update it instantly
   const activePage = document.querySelector('.page.active')?.id;
   if (activePage === 'page-report') {
