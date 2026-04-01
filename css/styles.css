@@ -655,8 +655,27 @@ select option { background: #0f1629; color: #f1f5f9; }
 
 /* Responsive – hide visual on mobile */
 @media (max-width: 900px) {
-  .hero-content { grid-template-columns: 1fr; }
+  .hero-content { grid-template-columns: 1fr; padding: 40px 20px; }
   .hero-visual  { display: none; }
+  .hero-left { text-align: center; align-items: center; }
+  .hero-stats { justify-content: center; }
+  .search-box { width: 100%; max-width: 480px; }
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: rgba(10,14,26,0.95);
+    backdrop-filter: blur(25px);
+    flex-direction: column;
+    padding: 24px;
+    border-bottom: 1px solid var(--glass-border);
+    gap: 16px;
+    z-index: 1000;
+  }
+  .nav-links.active { display: flex; }
+  .nav-toggle { display: flex; }
 }
 
 .hero-badge {
