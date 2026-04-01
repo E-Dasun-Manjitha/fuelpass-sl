@@ -1009,6 +1009,9 @@
 
       document.getElementById('stCountDisplay').textContent = `${filtered.length} locations found`;
       
+      // SURGICAL FILTER LOCK: Always ensure company filter is synced before rendering
+      syncCompanyFilter();
+
       el.innerHTML = `<table class="admin-table">
         <thead><tr><th>Station</th><th>Dist</th><th>Fuel Status</th><th>Queue</th><th>Actions</th></tr></thead>
         <tbody>` +
