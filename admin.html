@@ -1064,7 +1064,10 @@
             <td><div style="display:flex;gap:4px;">${fuels || '<span style="color:var(--text-muted);font-size:0.7rem;">No data</span>'}</div></td>
             <td><span style="font-size:0.8rem;text-transform:capitalize;">${firstQueue}</span></td>
             <td>
-              <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
+              <div style="display:flex;gap:6px;">
+                <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
+                <button class="action-btn btn-reject" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteStation('${s.id}')">🗑️</button>
+              </div>
             </td>
           </tr>`;
         }).join('') +
@@ -1136,6 +1139,18 @@
        btn.innerHTML = oldText;
        btn.disabled = false;
     }
+  }
+
+  window.deleteStation = async function(id) {
+    if (!confirm('Permanently delete this location from the national network? This cannot be undone.')) return;
+    try {
+      const res = await apiDeleteStation(id);
+      if (res && res.success) {
+        showAdminToast('🗑️ Station deleted successfully.');
+        document.getElementById(`manage-row-${id}`).remove();
+        ALL_ADMIN_STATIONS = ALL_ADMIN_STATIONS.filter(x => x.id !== id);
+      }
+    } catch(err) { showAdminToast('❌ Deletion failed.', 'error'); }
   }
 
   // ── REPORTS ──────────────────────────────────────────────

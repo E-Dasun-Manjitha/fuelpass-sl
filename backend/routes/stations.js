@@ -112,4 +112,19 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
+// DELETE /api/stations/:id – Admin remove station
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    // Delete from related tables first
+    await db.query('DELETE FROM station_fuel_status WHERE station_id = $1', [req.params.id]);
+    const result = await db.query('DELETE FROM stations WHERE id = $1', [req.params.id]);
+    
+    if (result.rowCount === 0) return res.status(404).json({ success: false, error: 'Station not found' });
+    res.json({ success: true, message: 'Station permanently removed from national network' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
 module.exports = router;
