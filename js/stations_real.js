@@ -73,7 +73,7 @@ const REAL_STATIONS = [
   { id:'r042', name:'CPC – Mannar Town',                   company:'CPC',  district:'Mannar', address:'Main St, Mannar',                              lat:8.9774, lng:79.9100, fuels:{petrol92:'limited',petrol95:'out',diesel:'available',superDiesel:'out'}, queue:'short', lastUpdated:'--', phone:'023-222-1122' },
 
   // ===================== MULLAITIVU DISTRICT =====================
-  { id:'r043', name:'CPC – Mullaitivu',                    company:'CPC',  district:'Mullaitivu', address:'Main Rd, Mullaitivu',                      lat:9.2662, lng:80.8129, fuels:{petrol92:'available',petrol95:'out',diesel:'available',superDiesel:'out'}, queue:'short', lastUpdated:'--', phone:'021-229-0055' },
+  { id:'r043', name:'CPC – Mullaitivu',                    company:'CPC',  district:'Mullaitivu', address:'Main Rd, Mullaitivu',                      lat:9.2662, lng:81.3129, fuels:{petrol92:'available',petrol95:'out',diesel:'available',superDiesel:'out'}, queue:'short', lastUpdated:'--', phone:'021-229-0055' },
 
   // ===================== VAVUNIYA DISTRICT =====================
   { id:'r044', name:'CPC – Vavuniya Town',                 company:'CPC',  district:'Vavuniya', address:'Kandy Rd, Vavuniya',                         lat:8.7516, lng:80.4952, fuels:{petrol92:'available',petrol95:'limited',diesel:'available',superDiesel:'out'}, queue:'medium', lastUpdated:'--', phone:'024-222-1034' },
@@ -362,7 +362,7 @@ const REAL_GAS_SHOPS = [
   { id:'rg048', name:'Litro Gas – Badulla Center', provider:'Litro', district:'Badulla', address:'Main St', lat:6.985, lng:81.047, stock:{'12.5kg':'available'}, phone:'055-222-4400' },
   { id:'rg049', name:'LAUGFS – Vavuniya Center', provider:'LAUGFS', district:'Vavuniya', address:'Main St', lat:8.751, lng:80.495, stock:{'12.5kg':'available'}, phone:'024-222-3344' },
   { id:'rg050', name:'Litro Gas – Kilinochchi Center', provider:'Litro', district:'Kilinochchi', address:'Main Rd', lat:9.383, lng:80.408, stock:{'12.5kg':'available'}, phone:'021-228-4400' },
-  { id:'rg051', name:'LAUGFS – Mullaitivu Center', provider:'LAUGFS', district:'Mullaitivu', address:'Beach Rd', lat:9.266, lng:80.812, stock:{'12.5kg':'limited'}, phone:'021-229-1100' },
+  { id:'rg051', name:'LAUGFS – Mullaitivu Center', provider:'LAUGFS', district:'Mullaitivu', address:'Beach Rd', lat:9.266, lng:81.312, stock:{'12.5kg':'limited'}, phone:'021-229-1100' },
   { id:'rg052', name:'Litro Gas – Mannar Center', provider:'Litro', district:'Mannar', address:'Station Rd', lat:8.977, lng:79.910, stock:{'12.5kg':'available'}, phone:'023-222-2244' },
   { id:'rg053', name:'LAUGFS – Puttalam Center', provider:'LAUGFS', district:'Puttalam', address:'Main Rd', lat:8.024, lng:79.834, stock:{'12.5kg':'available'}, phone:'032-222-1144' },
   { id:'rg054', name:'Litro Gas – Chilaw Center', provider:'Litro', district:'Puttalam', address:'Colombo Rd', lat:7.576, lng:79.803, stock:{'12.5kg':'available'}, phone:'032-222-4455' },

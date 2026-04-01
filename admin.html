@@ -494,6 +494,21 @@
       </select>
     </div>
 
+    <div class="am-row" style="margin-top:20px;">
+      <label>📍 Geographical Location</label>
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <div style="flex:1;">
+          <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px;">Latitude</label>
+          <input type="number" step="0.000001" id="esLat" class="am-input" style="background:#0f172a;" placeholder="e.g. 6.92">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px;">Longitude</label>
+          <input type="number" step="0.000001" id="esLng" class="am-input" style="background:#0f172a;" placeholder="e.g. 79.86">
+        </div>
+      </div>
+      <p style="font-size:0.65rem; color:var(--text-muted); margin-top:6px;">💡 Use 5-6 decimal places for high precision mapping.</p>
+    </div>
+
     <div style="display:flex;gap:10px;margin-top:24px;">
       <button class="action-btn btn-approve" style="flex:1;padding:12px;" onclick="saveStationEdit()">💾 Save Changes</button>
       <button class="action-btn btn-reject" style="padding:12px 20px;" onclick="closeStationEdit()">Cancel</button>
@@ -1074,6 +1089,11 @@
 
     const firstQueue = Object.values(s.queues || {})[0] || 'none';
     document.getElementById('esQueue').value = firstQueue;
+    
+    // Populate Lat/Lng fields
+    document.getElementById('esLat').value = s.lat || '';
+    document.getElementById('esLng').value = s.lng || '';
+    
     document.getElementById('stationEditModal').style.display = 'flex';
   }
 
@@ -1086,9 +1106,11 @@
       fuels[el.dataset.fkey] = el.value;
     });
     const queue = document.getElementById('esQueue').value;
+    const lat = parseFloat(document.getElementById('esLat').value);
+    const lng = parseFloat(document.getElementById('esLng').value);
 
     try {
-      const res = await apiUpdateStationStatus(id, { fuels, queue });
+      const res = await apiUpdateStationStatus(id, { fuels, queue, lat, lng });
       if (res && res.success) {
         showAdminToast('✅ Data saved successfully!');
         closeStationEdit();
