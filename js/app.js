@@ -146,14 +146,22 @@ function simulateRealTimeUpdates() {
         station.lastUpdated    = 'Just now';
       }
 
-      // Update stats
-      const availFuel = DB.stations.filter(s => Object.values(s.fuels || {}).some(v => v === 'available')).length;
-      const availGas  = DB.gasShops.filter(g => Object.values(g.stock || {}).some(v => v === 'available')).length;
+      // Update stats (Surgically aligned with 501-location national network)
+      const availFuel = DB.stations.filter(s => s.id.startsWith('r') && !s.id.startsWith('rg') && Object.values(s.fuels || {}).some(v => v === 'available')).length;
+      const availGas  = DB.gasShops.filter(g => g.id.startsWith('rg') && Object.values(g.stock || {}).some(v => v === 'available')).length;
+      
+      DB.stats.totalStations     = 201;
+      DB.stats.totalGasShops     = 300;
       DB.stats.availableStations = availFuel + availGas;
       
       DB.stats.lastUpdated = 'Just now';
-      document.getElementById('statAvail').textContent = DB.stats.availableStations;
-      document.getElementById('statUpdated').textContent = 'Just now';
+      // CORRECTED IDs: statStations and statGas (matching index.html)
+      document.getElementById('statStations').textContent = DB.stats.totalStations;
+      document.getElementById('statGas').textContent      = DB.stats.totalGasShops;
+      document.getElementById('statAvail').textContent    = DB.stats.availableStations;
+      document.getElementById('statUpdated').textContent  = 'Just now';
+
+
 
       // Refresh visible lists
       const activePage = document.querySelector('.page.active')?.id;
