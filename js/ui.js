@@ -537,7 +537,6 @@ function openDirections(lat, lng) {
 
 // ---- REPORT FORM ----
 let selectedStatus = 'available';
-let currentReportCategory = 'fuel';
 
 function selectStatus(val) {
   selectedStatus = val;
@@ -545,56 +544,7 @@ function selectStatus(val) {
   document.querySelector(`#statusPicker .sp-${val}`)?.classList.add('active');
 }
 
-window.setReportCategory = function(cat) {
-  currentReportCategory = cat;
-  
-  // UI update buttons
-  const fuelBtn = document.getElementById('catFuelBtn');
-  const gasBtn  = document.getElementById('catGasBtn');
-  if (fuelBtn) fuelBtn.classList.toggle('active', cat === 'fuel');
-  if (gasBtn)  gasBtn.classList.toggle('active', cat === 'gas');
-  
-  const lblName  = document.getElementById('lblStationName');
-  const inpStation = document.getElementById('rStation');
-  const rProduct = document.getElementById('rProduct');
-  const optShort = document.getElementById('optQueueShort');
-  const optMed   = document.getElementById('optQueueMed');
-  const optLong  = document.getElementById('optQueueLong');
-
-  if (cat === 'fuel') {
-    if (lblName) lblName.textContent = t('report_station_name');
-    if (inpStation) inpStation.placeholder = t('rStation_ph');
-    if (optShort) optShort.textContent = `${t('status_limited').split(' ')[0]} (< 10 ${t('v_vehicles')})`;
-    if (optMed)   optMed.textContent   = `Medium (10–30 ${t('v_vehicles')})`;
-    if (optLong)  optLong.textContent  = `Long (30+ ${t('v_vehicles')})`;
-    
-    if (rProduct) {
-      rProduct.innerHTML = `
-        <option value="">${t('report_product_ph')}</option>
-        <option value="Petrol 92">Petrol 92</option>
-        <option value="Petrol 95">Petrol 95</option>
-        <option value="Auto Diesel">Auto Diesel</option>
-        <option value="Super Diesel">Super Diesel</option>
-      `;
-    }
-  } else {
-    if (lblName) lblName.textContent = t('report_shop_name');
-    if (inpStation) inpStation.placeholder = t('rStation_ph_gas') || 'e.g. Litro Dealer – Gampaha';
-    if (optShort) optShort.textContent = `${t('status_limited').split(' ')[0]} (< 10 ${t('p_people')})`;
-    if (optMed)   optMed.textContent   = `Medium (10–30 ${t('p_people')})`;
-    if (optLong)  optLong.textContent  = `Long (30+ ${t('p_people')})`;
-
-    if (rProduct) {
-      rProduct.innerHTML = `
-        <option value="">${t('report_product_ph')}</option>
-        <option value="Litro 12.5kg">Litro 12.5kg</option>
-        <option value="Litro 5kg">Litro 5kg</option>
-        <option value="LAUGFS 12.5kg">LAUGFS 12.5kg</option>
-        <option value="LAUGFS 5kg">LAUGFS 5kg</option>
-      `;
-    }
-  }
-};
+// (Moved to app.js as setReportType)
 
 function submitReport(e) {
   e.preventDefault();
@@ -612,7 +562,7 @@ function submitReport(e) {
   DB.recentReports.unshift({
     station, 
     product: product,
-    category: currentReportCategory,
+    category: window.currentReportType || 'fuel',
     status: selectedStatus, 
     queue, 
     time: 'Just now',
