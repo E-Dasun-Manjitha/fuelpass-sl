@@ -155,11 +155,18 @@ function openGasShopModal(shop) {
   const stockItems = Object.entries(shop.stock).map(([size, v]) => {
     const chipC   = v==='available'?'chip-available':v==='limited'?'chip-limited':'chip-out';
     const stLabel = t('status_' + v);
-    const price   = DB.gasPrices[shop.provider.toLowerCase()]?.find(p => p.size === size)?.price || '—';
+    
+    // SURGICAL PRICE MATCH: Find price by normalizing size (removing spaces)
+    const normalizedSize = size.toLowerCase().replace(/\s+/g, '');
+    const priceData = DB.gasPrices[shop.provider.toLowerCase()]?.find(p => 
+      p.size.toLowerCase().replace(/\s+/g, '') === normalizedSize
+    );
+    const price = priceData?.price || '—';
+
     return `
       <div class="mf-item">
-        <h5>🫙 ${size} Cylinder</h5>
-        <div class="mf-price">LKR ${price ? price.toLocaleString() : '—'}</div>
+        <h5>🫙 ${size.toUpperCase()} CYLINDER</h5>
+        <div class="mf-price">LKR ${typeof price === 'number' ? price.toLocaleString() : price}</div>
         <div class="fuel-chip ${chipC}" style="display:inline-flex"><span class="chip-dot"></span>${stLabel}</div>
       </div>
     `;
