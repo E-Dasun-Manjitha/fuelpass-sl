@@ -1996,15 +1996,28 @@ select option { background: #0f1629; color: #f1f5f9; }
     position: fixed;
     top: 70px; left: 0; right: 0;
     background: rgba(10,14,26,0.98);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-bottom: 2px solid var(--blue);
     flex-direction: column;
-    padding: 16px 0;
+    padding: 20px 0;
     z-index: 999;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    animation: slideDownNav 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  @keyframes slideDownNav { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .nav-links.open { display: flex; }
-  .nav-link { padding: 12px 24px; border-radius: 0; font-size: 1rem; }
-  .owner-login-btn, .admin-nav-btn { display: none; }
+  .nav-link { padding: 14px 24px; border-radius: 0; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  
+  /* Show Login/Admin buttons inside the menu for mobile */
+  .nav-links .owner-login-btn, .nav-links .admin-nav-btn {
+    display: block !important;
+    margin: 10px 24px;
+    text-align: center;
+    width: auto;
+  }
+  .nav-actions .owner-login-btn, .nav-actions .admin-nav-btn { display: none; }
+  
   .nav-toggle { display: flex; }
 
   /* Hero */
@@ -2085,7 +2098,10 @@ select option { background: #0f1629; color: #f1f5f9; }
   .ticker-label { display: none; }
 
   /* Container padding */
-  .container { padding: 0 16px 40px; }
+  .container { padding: 0 16px 60px; overflow-x: hidden; }
+  .hero-stats { grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; width: 100%; }
+  .hstat { padding: 12px; }
+  .hstat-val { font-size: 1.5rem; }
 }
 
 /* ---- Extra small (phones < 400px) ---- */
