@@ -1991,6 +1991,13 @@ select option { background: #0f1629; color: #f1f5f9; }
 
 /* ---- Navbar mobile ---- */
 @media (max-width: 768px) {
+  .nav-toggle { 
+    display: flex; 
+    order: -1; /* Move to the far left */
+    margin-right: 12px;
+  }
+  .nav-brand { margin-right: auto; } /* Push actions to the right */
+  
   .nav-links {
     display: none;
     position: fixed;
@@ -2000,25 +2007,25 @@ select option { background: #0f1629; color: #f1f5f9; }
     -webkit-backdrop-filter: blur(25px);
     border-bottom: 2px solid var(--blue);
     flex-direction: column;
-    padding: 20px 0;
+    padding: 24px 0;
     z-index: 999;
     box-shadow: 0 15px 40px rgba(0,0,0,0.8);
     animation: slideDownNav 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  @keyframes slideDownNav { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes slideDownNav { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .nav-links.open { display: flex; }
-  .nav-link { padding: 14px 24px; border-radius: 0; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .nav-link { padding: 16px 32px; border-radius: 0; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.03); font-weight: 600; }
   
   /* Show Login/Admin buttons inside the menu for mobile */
   .nav-links .owner-login-btn, .nav-links .admin-nav-btn {
     display: block !important;
-    margin: 10px 24px;
+    margin: 12px 32px;
     text-align: center;
     width: auto;
+    font-size: 1rem;
+    padding: 14px;
   }
   .nav-actions .owner-login-btn, .nav-actions .admin-nav-btn { display: none; }
-  
-  .nav-toggle { display: flex; }
 
   /* Hero */
   .hero-content {
