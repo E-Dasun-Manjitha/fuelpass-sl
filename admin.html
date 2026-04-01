@@ -404,7 +404,7 @@
               <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
               <option>Galle</option><option>Matara</option><option>Hambantota</option>
               <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
-              <option>Vavuniya</option><option>Batticaloa</option><option>Ampara</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option><option>Ampara</option>
               <option>Trincomalee</option><option>Kurunegala</option><option>Puttalam</option>
               <option>Anuradhapura</option><option>Polonnaruwa</option><option>Badulla</option>
               <option>Monaragala</option><option>Ratnapura</option><option>Kegalle</option>
@@ -430,6 +430,8 @@
 
            <!-- Global Search -->
            <input type="text" id="stationSearchInput" placeholder="Search by name, address or ID..." data-i18n="admin_search_stations" oninput="renderManageStations(this.value)" style="padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:white;min-width:260px;height:40px;font-size:0.82rem;outline:none;transition:border 0.2s;" onfocus="this.style.border='1px solid var(--accent)'" onblur="this.style.border='1px solid rgba(255,255,255,0.1)'">
+
+           <button class="action-btn btn-reject" onclick="resetStationFilters()" style="padding:10px 16px;height:40px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;">🔄 Reset Filters</button>
         </div>
         <div id="stCountDisplay" style="font-size:0.85rem;color:white;margin-top:12px;font-weight:600;background:rgba(99,102,241,0.1);display:inline-block;padding:4px 12px;border-radius:99px;"></div>
       </div>
@@ -972,6 +974,16 @@
     
     // Restore value if it still exists in the new list
     companyFilter.value = Array.from(companyFilter.options).some(o => o.value === currentVal) ? currentVal : 'all';
+  }
+
+  window.resetStationFilters = function() {
+    document.getElementById('stTypeFilter').value = 'all';
+    document.getElementById('stDistrictFilter').value = 'all';
+    document.getElementById('stStatusFilter').value = 'all';
+    document.getElementById('stCompanyFilter').value = 'all';
+    document.getElementById('stationSearchInput').value = '';
+    syncCompanyFilter();
+    renderManageStations();
   }
 
   // ── VERIFIED REPORTS ──────────────────────────────────────
