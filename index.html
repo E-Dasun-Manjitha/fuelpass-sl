@@ -42,7 +42,8 @@
         <a href="#gas" class="nav-link" data-page="gas" data-i18n="nav_gas">LPG Gas</a>
         <a href="#prices" class="nav-link" data-page="prices" data-i18n="nav_prices">Prices</a>
         <a href="#eligibility" class="nav-link" data-page="eligibility" data-i18n="nav_eligibility">Eligibility</a>
-        <a href="#report" class="nav-link" data-page="report" data-i18n="nav_report">Report</a>
+        <a href="#report" class="nav-link" data-page="report" data-report-type="fuel" onclick="setReportType('fuel')" data-i18n="nav_report_fuel">Report Fuel</a>
+        <a href="#report" class="nav-link" data-page="report" data-report-type="gas" onclick="setReportType('gas')" data-i18n="nav_report_gas">Report Gas</a>
       </div>
       <div class="nav-actions">
         <!-- Language Switcher -->
@@ -625,6 +626,23 @@
           </div>
         </div>
 
+        <div class="report-type-toggle">
+          <button class="rt-btn active" id="btnReportFuel" onclick="setReportType('fuel')">
+            <span class="rt-icon">⛽</span>
+            <div class="rt-text">
+              <strong>Fuel Station</strong>
+              <span>Report for Petrol / Diesel</span>
+            </div>
+          </button>
+          <button class="rt-btn" id="btnReportGas" onclick="setReportType('gas')">
+            <span class="rt-icon">🔥</span>
+            <div class="rt-text">
+              <strong>Gas Shop</strong>
+              <span>Report for LPG Cylinders</span>
+            </div>
+          </button>
+        </div>
+
         <div class="report-grid">
           <!-- VERIFIED OWNER REPORT FORM -->
           <div id="ownerReportForm" class="report-card glassmorphic" style="display:none;">
@@ -719,10 +737,7 @@
               <div class="form-group">
                 <label>Queue Length (approx.)</label>
                 <select id="rQueue" class="form-input">
-                  <option value="none">No Queue</option>
-                  <option value="short">Short (&lt; 10 vehicles)</option>
-                  <option value="medium">Medium (10–30)</option>
-                  <option value="long">Long (30+ vehicles)</option>
+                  <!-- Options populated via JS -->
                 </select>
               </div>
               <div class="form-group">

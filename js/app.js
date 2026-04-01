@@ -1,6 +1,7 @@
-// ============================================================
 // app.js – Main application controller, SPA routing, init
 // ============================================================
+
+let currentReportType = 'fuel'; // Default report type
 
 // ---- SPA NAVIGATION ----
 function navigateTo(page) {
@@ -14,7 +15,15 @@ function navigateTo(page) {
   }
   // Update nav links
   document.querySelectorAll('.nav-link').forEach(l => {
-    l.classList.toggle('active', l.dataset.page === page);
+    let isActive = false;
+    if (l.dataset.page === page) {
+      if (page === 'report') {
+        isActive = (l.dataset.reportType === currentReportType);
+      } else {
+        isActive = true;
+      }
+    }
+    l.classList.toggle('active', isActive);
   });
   // Close mobile menu
   document.getElementById('navLinks')?.classList.remove('open');
@@ -25,8 +34,89 @@ function navigateTo(page) {
   if (page === 'gas')        try { renderGasPage(); }          catch(e) {}
   if (page === 'prices')     try { renderPricesPage(); }       catch(e) {}
   if (page === 'eligibility')try { initOddEvenFromToday(); }   catch(e) {}
-  if (page === 'report')     try { renderRecentReports(); }    catch(e) {}
+  if (page === 'report')     try { 
+    renderRecentReports(); 
+    updateQueueOptions();
+  } catch(e) {}
 }
+
+// ---- REPORT TYPE TOGGLE ----
+function setReportType(type) {
+  currentReportType = type;
+  // If we're already on report page, update it instantly
+  const activePage = document.querySelector('.page.active')?.id;
+  if (activePage === 'page-report') {
+    updateQueueOptions();
+    // Pre-populate report type dropdown
+    const rType = document.getElementById('rType');
+    if (rType) rType.value = type;
+    
+    // Update labels and placeholders
+    const rLabel = document.querySelector('label[for="rStation"]') || document.querySelector('label[data-i18n="report_station_name"]');
+    const rInput = document.getElementById('rStation');
+    if (type === 'fuel') {
+      if (rLabel) rLabel.textContent = t('report_station_name');
+      if (rInput) rInput.placeholder = t('rStation_ph');
+      updateProductOptions('fuel');
+    } else {
+      if (rLabel) rLabel.textContent = t('report_shop_name');
+      if (rInput) rInput.placeholder = t('rStation_ph_gas');
+      updateProductOptions('gas');
+    }
+    
+    // Highlight correct nav link
+    document.querySelectorAll('.nav-link[data-page="report"]').forEach(l => {
+      l.classList.toggle('active', l.dataset.reportType === type);
+    });
+
+    // Highlight correct UI toggle buttons
+    const btnFuel = document.getElementById('btnReportFuel');
+    const btnGas = document.getElementById('btnReportGas');
+    if (btnFuel) btnFuel.classList.toggle('active', type === 'fuel');
+    if (btnGas) btnGas.classList.toggle('active', type === 'gas');
+  }
+}
+
+function updateQueueOptions() {
+  const select = document.getElementById('rQueue');
+  if (!select) return;
+  
+  const unit = (currentReportType === 'fuel') ? t('v_vehicles') : t('p_people');
+  
+  select.innerHTML = `
+    <option value="none">${t('queue_none')}</option>
+    <option value="short">${t('queue_short')} (< 10 ${unit})</option>
+    <option value="medium">${t('queue_medium')} (10-30 ${unit})</option>
+    <option value="long">${t('queue_long')} (30+ ${unit})</option>
+  `;
+}
+
+function updateProductOptions(type) {
+  const select = document.getElementById('rProduct');
+  if (!select) return;
+  
+  let options = `<option value="">${t('report_product_ph')}</option>`;
+  
+  if (type === 'fuel') {
+    options += `
+      <option value="Petrol 92">Petrol 92</option>
+      <option value="Petrol 95">Petrol 95</option>
+      <option value="Auto Diesel">Auto Diesel</option>
+      <option value="Super Diesel">Super Diesel</option>
+    `;
+  } else {
+    options += `
+      <option value="LPG 12.5 kg">LPG 12.5 kg</option>
+      <option value="LPG 5 kg">LPG 5 kg</option>
+      <option value="LPG 37.5 kg">LPG 37.5 kg</option>
+    `;
+  }
+  
+  select.innerHTML = options;
+}
+
+// Make globally available
+window.setReportType = setReportType;
 
 // ---- NAVBAR ----
 function initNavbar() {
