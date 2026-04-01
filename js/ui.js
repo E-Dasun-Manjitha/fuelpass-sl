@@ -146,7 +146,7 @@ function renderGasShopCard(shop) {
 }
 
 // ---- GAS SHOP MODAL ----
-function openGasShopModal(shop) {
+window.openGasShopModal = function(shop) {
   if (!shop) return;
   const status = getGasShopOverallStatus(shop);
   const sc     = status==='available'?'status-available':status==='limited'?'status-limited':'status-out';
