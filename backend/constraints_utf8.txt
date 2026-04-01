@@ -1,0 +1,18 @@
+﻿--- station_fuel_status_fuel_type_check ---
+CHECK (((fuel_type)::text = ANY ((ARRAY['petrol92'::character varying, 'petrol95'::character varying, 'diesel'::character varying, 'superDiesel'::character varying])::text[])))
+--- station_fuel_status_fuel_type_not_null ---
+NOT NULL fuel_type
+--- station_fuel_status_pkey ---
+PRIMARY KEY (station_id, fuel_type)
+--- station_fuel_status_queue_check ---
+CHECK (((queue)::text = ANY ((ARRAY['none'::character varying, 'short'::character varying, 'medium'::character varying, 'long'::character varying])::text[])))
+--- station_fuel_status_queue_not_null ---
+NOT NULL queue
+--- station_fuel_status_station_id_fkey ---
+FOREIGN KEY (station_id) REFERENCES stations(id) ON DELETE CASCADE
+--- station_fuel_status_station_id_not_null ---
+NOT NULL station_id
+--- station_fuel_status_status_check ---
+CHECK (((status)::text = ANY ((ARRAY['available'::character varying, 'limited'::character varying, 'out'::character varying])::text[])))
+--- station_fuel_status_status_not_null ---
+NOT NULL status

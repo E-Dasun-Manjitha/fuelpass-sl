@@ -932,14 +932,17 @@
     document.getElementById('esStationId').value = id;
     document.getElementById('esStationInfo').textContent = `${s.name} (${s.company}) - ${s.district}`;
     
-    const fuelTypes = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+    // Dynamically detect fuel types from the station's existing fuel data
+    const fuelTypes = s.fuels ? Object.keys(s.fuels) : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
     const list = document.getElementById('esFuelStatusList');
     list.innerHTML = fuelTypes.map(f => {
       const current = s.fuels ? s.fuels[f] : 'out';
+      // Beautify fuel type labels
+      const label = f.replace('petrol', 'Petrol ').replace('superDiesel', 'Super Diesel').replace('kg', ' kg');
       return `
-        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);">
-          <strong style="text-transform:capitalize;font-size:0.85rem;">${f.replace('petrol', 'Petrol ')}</strong>
-          <select class="fuel-select-${f}" style="background:#0f172a;color:white;border:1px solid #334155;padding:4px 8px;border-radius:4px;font-size:0.82rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
+          <strong style="text-transform:capitalize;font-size:0.85rem;">${label}</strong>
+          <select class="fuel-select-field" data-fkey="${f}" style="background:#0f172a;color:white;border:1px solid #334155;padding:4px 8px;border-radius:4px;font-size:0.82rem;">
             <option value="available" ${current==='available'?'selected':''}>🟢 Available</option>
             <option value="limited" ${current==='limited'?'selected':''}>🟠 Limited</option>
             <option value="out" ${current==='out'?'selected':''}>🔴 Out of Stock</option>
@@ -958,15 +961,15 @@
   window.saveStationEdit = async function() {
     const id = document.getElementById('esStationId').value;
     const fuels = {};
-    ['petrol92', 'petrol95', 'diesel', 'superDiesel'].forEach(f => {
-      fuels[f] = document.querySelector(`.fuel-select-${f}`).value;
+    document.querySelectorAll('.fuel-select-field').forEach(el => {
+      fuels[el.dataset.fkey] = el.value;
     });
     const queue = document.getElementById('esQueue').value;
 
     try {
       const res = await apiUpdateStationStatus(id, { fuels, queue });
       if (res && res.success) {
-        showAdminToast('✅ Station updated successfully!');
+        showAdminToast('✅ Data saved successfully!');
         closeStationEdit();
         ALL_ADMIN_STATIONS = []; // Force refresh
         renderManageStations();
