@@ -99,16 +99,16 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
       `, [req.params.id, type, status, queue || 'none']);
     });
 
-    // Update location if provided
-    if (lat && lng) {
+    // Update location if valid coordinates provided
+    if (!isNaN(lat) && !isNaN(lng)) {
       fuelQueries.push(db.query(`UPDATE stations SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
     }
     
     await Promise.all(fuelQueries);
     res.json({ success: true, message: 'Station status and location updated' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: 'Server error' });
+    console.error('❌ Station Status Update Error:', err);
+    res.status(500).json({ success: false, error: 'Database update failed' });
   }
 });
 
