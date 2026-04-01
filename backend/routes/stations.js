@@ -87,8 +87,10 @@ router.post('/:id/status', verifyToken, async (req, res) => {
 // PATCH /api/stations/:id/status – Bulk admin update
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { fuels, queue } = req.body; // fuels = { petrol92: 'available', petrol95: 'out', ... }
-    const queries = Object.entries(fuels).map(([type, status]) => {
+    const { fuels, queue, lat, lng } = req.body;
+    
+    // Update fuels & queue
+    const fuelQueries = Object.entries(fuels).map(([type, status]) => {
       return db.query(`
         INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
         VALUES ($1,$2,$3,$4,NOW(),'admin')
@@ -96,8 +98,14 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
         DO UPDATE SET status=$3, queue=$4, last_updated=NOW(), updated_by='admin'
       `, [req.params.id, type, status, queue || 'none']);
     });
-    await Promise.all(queries);
-    res.json({ success: true, message: 'Station status bulk updated' });
+
+    // Update location if provided
+    if (lat && lng) {
+      fuelQueries.push(db.query(`UPDATE stations SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
+    }
+    
+    await Promise.all(fuelQueries);
+    res.json({ success: true, message: 'Station status and location updated' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: 'Server error' });
