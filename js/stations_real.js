@@ -362,7 +362,6 @@ const REAL_GAS_SHOPS = [
   { id:'rg048', name:'Litro Gas – Badulla Center', provider:'Litro', district:'Badulla', address:'Main St', lat:6.985, lng:81.047, stock:{'12.5kg':'available'}, phone:'055-222-4400' },
   { id:'rg049', name:'LAUGFS – Vavuniya Center', provider:'LAUGFS', district:'Vavuniya', address:'Main St', lat:8.751, lng:80.495, stock:{'12.5kg':'available'}, phone:'024-222-3344' },
   { id:'rg050', name:'Litro Gas – Kilinochchi Center', provider:'Litro', district:'Kilinochchi', address:'Main Rd', lat:9.383, lng:80.408, stock:{'12.5kg':'available'}, phone:'021-228-4400' },
-  { id:'rg051', name:'LAUGFS – Mullaitivu Center', provider:'LAUGFS', district:'Mullaitivu', address:'Beach Rd', lat:9.266, lng:81.312, stock:{'12.5kg':'limited'}, phone:'021-229-1100' },
   { id:'rg052', name:'Litro Gas – Mannar Center', provider:'Litro', district:'Mannar', address:'Station Rd', lat:8.977, lng:79.910, stock:{'12.5kg':'available'}, phone:'023-222-2244' },
   { id:'rg053', name:'LAUGFS – Puttalam Center', provider:'LAUGFS', district:'Puttalam', address:'Main Rd', lat:8.024, lng:79.834, stock:{'12.5kg':'available'}, phone:'032-222-1144' },
   { id:'rg054', name:'Litro Gas – Chilaw Center', provider:'Litro', district:'Puttalam', address:'Colombo Rd', lat:7.576, lng:79.803, stock:{'12.5kg':'available'}, phone:'032-222-4455' },
