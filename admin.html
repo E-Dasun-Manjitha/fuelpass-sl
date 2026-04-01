@@ -391,7 +391,7 @@
         <h1>🚉 Master Station Management</h1>
         <div class="admin-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;">
             <!-- Type Filter -->
-           <select id="stTypeFilter" class="pf-input" style="width:auto;min-width:140px;height:40px;font-size:0.82rem;" onchange="renderManageStations(document.getElementById('stationSearchInput').value)">
+           <select id="stTypeFilter" class="pf-input" style="width:auto;min-width:140px;height:40px;font-size:0.82rem;" onchange="syncCompanyFilter(); renderManageStations(document.getElementById('stationSearchInput').value)">
               <option value="all">Any Type</option>
               <option value="fuel">⛽ Fuel Stations</option>
               <option value="gas">🔥 Gas Shops</option>
@@ -556,7 +556,7 @@
     if (name === 'prices')   renderPrices();
     if (name === 'reports')  renderVerifiedReports();
     if (name === 'feedback') renderFeedback();
-    if (name === 'managestations') renderManageStations();
+    if (name === 'managestations') { renderManageStations(); syncCompanyFilter(); }
     if (name === 'addowner') { 
       document.getElementById('aoCredBox').style.display='none'; 
       // Ensure type toggle is always visible for manual entries
@@ -927,6 +927,38 @@
         showAdminToast('✅ Message deleted.');
       }
     } catch(err) { showAdminToast('❌ Failed to delete.', 'error'); }
+  }
+
+  // ── CASCADING FILTERS ────────────────────────────────────
+  window.syncCompanyFilter = function() {
+    const type = document.getElementById('stTypeFilter').value;
+    const companyFilter = document.getElementById('stCompanyFilter');
+    const options = companyFilter.options;
+
+    for (let i = 0; i < options.length; i++) {
+      const val = options[i].value;
+      if (val === 'all') {
+        options[i].style.display = 'block';
+        continue;
+      }
+
+      const isFuel = ['CPC', 'IOC', 'SINOPEC'].includes(val);
+      const isGas  = ['Litro', 'LAUGFS'].includes(val);
+
+      if (type === 'fuel') {
+        options[i].style.display = isFuel ? 'block' : 'none';
+      } else if (type === 'gas') {
+        options[i].style.display = isGas ? 'block' : 'none';
+      } else {
+        options[i].style.display = 'block';
+      }
+    }
+    
+    // Reset company filter if current selection becomes hidden
+    const currentOption = options[companyFilter.selectedIndex];
+    if (currentOption.style.display === 'none') {
+      companyFilter.value = 'all';
+    }
   }
 
   // ── VERIFIED REPORTS ──────────────────────────────────────
