@@ -126,7 +126,7 @@ function renderGasShopCard(shop) {
   }
 
   return `
-    <div class="station-card" id="gcard-${shop.id}">
+    <div class="station-card" id="gcard-${shop.id}" onclick="openGasShopModal(DB.gasShops.find(g=>g.id==='${shop.id}'))">
       <div class="station-card-header">
         <div class="station-card-title">
           <h4>${shop.name}</h4>
@@ -143,6 +143,49 @@ function renderGasShopCard(shop) {
       </div>
     </div>
   `;
+}
+
+// ---- GAS SHOP MODAL ----
+function openGasShopModal(shop) {
+  if (!shop) return;
+  const status = getGasShopOverallStatus(shop);
+  const sc     = status==='available'?'status-available':status==='limited'?'status-limited':'status-out';
+  const sl     = status.charAt(0).toUpperCase()+status.slice(1);
+
+  const stockItems = Object.entries(shop.stock).map(([size, v]) => {
+    const chipC   = v==='available'?'chip-available':v==='limited'?'chip-limited':'chip-out';
+    const stLabel = t('status_' + v);
+    const price   = DB.gasPrices[shop.provider.toLowerCase()]?.find(p => p.size === size)?.price || '—';
+    return `
+      <div class="mf-item">
+        <h5>🫙 ${size} Cylinder</h5>
+        <div class="mf-price">LKR ${price ? price.toLocaleString() : '—'}</div>
+        <div class="fuel-chip ${chipC}" style="display:inline-flex"><span class="chip-dot"></span>${stLabel}</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-station-name">${shop.name}</div>
+    <div class="modal-info-row">
+      <span>📍 ${shop.address}</span>
+      <span>•</span>
+      <span>${shop.provider} Gas</span>
+      <span>•</span>
+      <span class="oc-status ${sc}">${sl}</span>
+    </div>
+    <div class="modal-fuels-grid">${stockItems}</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">
+      <span>📦 Last: ${shop.lastDelivery}</span>
+      <span>🚚 Next: ${shop.nextDelivery}</span>
+      <span>🕐 ${t('last_updated')}: ${shop.lastUpdated || 'Just now'}</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-directions" onclick="openDirections(${shop.lat},${shop.lng})">🗺️ ${t('directions')}</button>
+      <button class="btn-report-this" onclick="closeModal();navigateTo('report');setReportType('gas')">📝 ${t('report_update')}</button>
+    </div>
+  `;
+  document.getElementById('stationModal').classList.remove('hidden');
 }
 
 // ---- FILTER & RENDER STATIONS LIST ----
