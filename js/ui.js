@@ -80,6 +80,13 @@ function renderStationCard(station, clickFn) {
 
   const queueLabel = station.queue === 'none' ? `✅ ${t('queue_none')}` : station.queue === 'short' ? `⏱️ ${t('queue_short')}` : station.queue === 'medium' ? `⚠️ ${t('queue_medium')}` : `🚗 ${t('queue_long')}`;
 
+  let distanceHtml = '';
+  if (typeof userLat !== 'undefined' && userLat !== null && userLng !== null) {
+     const d = haversineKm(userLat, userLng, station.lat, station.lng);
+     const distStr = d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1)} km`;
+     distanceHtml = `<span style="color:#60A5FA;font-weight:700;margin-right:8px;">📍 ${distStr}</span>`;
+  }
+
   return `
     <div class="station-card" onclick="${clickFn || `openStationModal(DB.stations.find(s=>s.id==='${station.id}'))`}" id="card-${station.id}">
       <div class="station-card-header">
@@ -92,6 +99,7 @@ function renderStationCard(station, clickFn) {
       <div class="station-fuels">${fuelsHtml}</div>
       <div class="station-card-footer">
         <span class="${statusClass} oc-status">${t('status_' + status)}</span>
+        ${distanceHtml}
         <span>${queueLabel}</span>
         <span class="station-updated">🕐 ${station.lastUpdated}</span>
       </div>
@@ -110,6 +118,13 @@ function renderGasShopCard(shop) {
     return `<div class="fuel-chip ${chipClass}"><span class="chip-dot"></span>${size}</div>`;
   }).join('');
 
+  let distanceHtml = '';
+  if (typeof userLat !== 'undefined' && userLat !== null && userLng !== null) {
+     const d = haversineKm(userLat, userLng, shop.lat, shop.lng);
+     const distStr = d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1)} km`;
+     distanceHtml = `<span style="color:#60A5FA;font-weight:700;margin-right:8px;">📍 ${distStr}</span>`;
+  }
+
   return `
     <div class="station-card" id="gcard-${shop.id}">
       <div class="station-card-header">
@@ -122,6 +137,7 @@ function renderGasShopCard(shop) {
       <div class="station-fuels">${stockHtml}</div>
       <div class="station-card-footer">
         <span class="${statusClass} oc-status">${t('status_' + status)}</span>
+        ${distanceHtml}
         <span>📦 ${shop.lastDelivery}</span>
         <span>🚚 ${t('nav_live')}: ${shop.nextDelivery}</span>
       </div>
@@ -273,6 +289,15 @@ function searchStations() {
     return qOk && dOk && cOk && sOk;
   });
 
+  // Sort by distance if location available
+  if (typeof userLat !== 'undefined' && userLat !== null && userLng !== null) {
+    results.sort((a, b) => {
+      const dA = haversineKm(userLat, userLng, a.lat, a.lng);
+      const dB = haversineKm(userLat, userLng, b.lat, b.lng);
+      return dA - dB;
+    });
+  }
+
   const countEl = document.getElementById('sResultsCount');
   if (countEl) countEl.textContent = `${results.length} station${results.length !== 1 ? 's' : ''} found`;
 
@@ -352,6 +377,15 @@ function filterGasShops() {
     const cOk = !cylinder || s.stock[cylinder] !== undefined;
     return pOk && dOk && cOk;
   });
+
+  // Sort by distance if location available
+  if (typeof userLat !== 'undefined' && userLat !== null && userLng !== null) {
+    results.sort((a, b) => {
+      const dA = haversineKm(userLat, userLng, a.lat, a.lng);
+      const dB = haversineKm(userLat, userLng, b.lat, b.lng);
+      return dA - dB;
+    });
+  }
 
   document.getElementById('gasShopsList').innerHTML =
     results.map(s => renderGasShopCard(s)).join('') ||

@@ -238,9 +238,11 @@ async function loadLiveData() {
   // Recompute stats
   DB.stats.totalStations     = DB.stations.length;
   DB.stats.totalGasShops     = DB.gasShops.length;
-  DB.stats.availableStations = DB.stations.filter(s =>
-    Object.values(s.fuels || {}).some(v => v === 'available')
-  ).length;
+  
+  const availFuel = DB.stations.filter(s => Object.values(s.fuels || {}).some(v => v === 'available')).length;
+  const availGas  = DB.gasShops.filter(g => Object.values(g.stock || {}).some(v => v === 'available')).length;
+  
+  DB.stats.availableStations = availFuel + availGas;
   DB.stats.lastUpdated = 'Just now';
 }
 

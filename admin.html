@@ -390,6 +390,13 @@
       <div class="admin-topbar">
         <h1>🚉 Master Station Management</h1>
         <div class="admin-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;">
+            <!-- Type Filter -->
+           <select id="stTypeFilter" class="pf-input" style="width:auto;min-width:140px;height:40px;font-size:0.82rem;" onchange="renderManageStations(document.getElementById('stationSearchInput').value)">
+              <option value="all">Any Type</option>
+              <option value="fuel">⛽ Fuel Stations</option>
+              <option value="gas">🔥 Gas Shops</option>
+           </select>
+
            <!-- District Filter -->
            <select id="stDistrictFilter" class="pf-input" style="width:auto;min-width:140px;height:40px;font-size:0.82rem;" onchange="renderManageStations(document.getElementById('stationSearchInput').value)">
               <option value="all" data-i18n="all_districts">All Districts</option>
@@ -422,9 +429,9 @@
            </select>
 
            <!-- Global Search -->
-           <input type="text" id="stationSearchInput" placeholder="Search by name or address..." data-i18n="admin_search_stations" oninput="renderManageStations(this.value)" style="padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:white;min-width:260px;height:40px;font-size:0.82rem;outline:none;transition:border 0.2s;" onfocus="this.style.border='1px solid var(--accent)'" onblur="this.style.border='1px solid rgba(255,255,255,0.1)'">
+           <input type="text" id="stationSearchInput" placeholder="Search by name, address or ID..." data-i18n="admin_search_stations" oninput="renderManageStations(this.value)" style="padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:white;min-width:260px;height:40px;font-size:0.82rem;outline:none;transition:border 0.2s;" onfocus="this.style.border='1px solid var(--accent)'" onblur="this.style.border='1px solid rgba(255,255,255,0.1)'">
         </div>
-        <div id="stCountDisplay" style="font-size:0.85rem;color:var(--text-muted);margin-top:8px;font-weight:500;"></div>
+        <div id="stCountDisplay" style="font-size:0.85rem;color:white;margin-top:12px;font-weight:600;background:rgba(99,102,241,0.1);display:inline-block;padding:4px 12px;border-radius:99px;"></div>
       </div>
       <div class="admin-card">
         <div id="manageStationsList"></div>
@@ -940,20 +947,28 @@
       const dF = document.getElementById('stDistrictFilter').value;
       const sF = document.getElementById('stStatusFilter').value;
       const cF = document.getElementById('stCompanyFilter').value;
+      const tF = document.getElementById('stTypeFilter').value;
 
       const filtered = ALL_ADMIN_STATIONS.filter(s => {
         const matchesSearch = (s.name || '').toLowerCase().includes(search.toLowerCase()) || 
-                             (s.address || '').toLowerCase().includes(search.toLowerCase());
+                             (s.address || '').toLowerCase().includes(search.toLowerCase()) ||
+                             (s.id || '').toLowerCase().includes(search.toLowerCase());
         
         const matchesDist = (dF === 'all') || (s.district === dF);
         const matchesComp = (cF === 'all') || (s.company === cF);
         
+        let matchesType = (tF === 'all');
+        if (!matchesType) {
+           const isGas = (s.id || '').startsWith('rg');
+           matchesType = (tF === 'gas' && isGas) || (tF === 'fuel' && !isGas);
+        }
+
         let matchesStat = (sF === 'all');
         if (!matchesStat && s.fuels) {
            matchesStat = Object.values(s.fuels).some(v => v === sF);
         }
         
-        return matchesSearch && matchesDist && matchesComp && matchesStat;
+        return matchesSearch && matchesDist && matchesComp && matchesStat && matchesType;
       });
 
       if (!filtered.length) {

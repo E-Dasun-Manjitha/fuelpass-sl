@@ -312,9 +312,11 @@ const DB = {
 // Stats
 DB.stats = {
   totalStations: DB.stations.length,
-  availableStations: DB.stations.filter(s => Object.values(s.fuels).some(v => v === 'available')).length,
   totalGasShops: DB.gasShops.length,
-  lastUpdated: '2 min ago'
+  availableStations: 
+    DB.stations.filter(s => Object.values(s.fuels).some(v => v === 'available')).length +
+    DB.gasShops.filter(g => Object.values(g.stock).some(v => v === 'available')).length,
+  lastUpdated: 'Just now'
 };
 
 // Helper to get overall station status
