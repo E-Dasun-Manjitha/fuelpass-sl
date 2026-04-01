@@ -1080,12 +1080,10 @@
     document.getElementById('esStationId').value = id;
     document.getElementById('esStationInfo').textContent = `${s.name} (${s.company}) - ${s.district}`;
     
-    // Dynamically detect fuel types from the station's existing fuel data
     const fuelTypes = s.fuels ? Object.keys(s.fuels) : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
     const list = document.getElementById('esFuelStatusList');
     list.innerHTML = fuelTypes.map(f => {
       const current = s.fuels ? s.fuels[f] : 'out';
-      // Beautify fuel type labels
       const label = f.replace('petrol', 'Petrol ').replace('superDiesel', 'Super Diesel').replace('kg', ' kg');
       return `
         <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
@@ -1101,8 +1099,6 @@
 
     const firstQueue = Object.values(s.queues || {})[0] || 'none';
     document.getElementById('esQueue').value = firstQueue;
-    
-    // Populate Lat/Lng fields
     document.getElementById('esLat').value = s.lat || '';
     document.getElementById('esLng').value = s.lng || '';
     
@@ -1112,16 +1108,21 @@
   window.closeStationEdit = () => { document.getElementById('stationEditModal').style.display = 'none'; };
 
   window.saveStationEdit = async function() {
-    const id = document.getElementById('esStationId').value;
-    const fuels = {};
-    document.querySelectorAll('.fuel-select-field').forEach(el => {
-      fuels[el.dataset.fkey] = el.value;
-    });
-    const queue = document.getElementById('esQueue').value;
-    const lat = parseFloat(document.getElementById('esLat').value);
-    const lng = parseFloat(document.getElementById('esLng').value);
+    const btn = event.target.closest('button');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = 'Saving...';
+    btn.disabled = true;
 
     try {
+      const id = document.getElementById('esStationId').value;
+      const fuels = {};
+      document.querySelectorAll('.fuel-select-field').forEach(el => {
+        fuels[el.dataset.fkey] = el.value;
+      });
+      const queue = document.getElementById('esQueue').value;
+      const lat = parseFloat(document.getElementById('esLat').value);
+      const lng = parseFloat(document.getElementById('esLng').value);
+
       const res = await apiUpdateStationStatus(id, { fuels, queue, lat, lng });
       if (res && res.success) {
         showAdminToast('✅ Data saved successfully!');
@@ -1129,7 +1130,12 @@
         ALL_ADMIN_STATIONS = []; // Force refresh
         renderManageStations();
       }
-    } catch(err) { showAdminToast('❌ Update failed.', 'error'); }
+    } catch(err) { 
+       showAdminToast('❌ Update failed.', 'error'); 
+    } finally {
+       btn.innerHTML = oldText;
+       btn.disabled = false;
+    }
   }
 
   // ── REPORTS ──────────────────────────────────────────────
