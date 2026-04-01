@@ -933,32 +933,30 @@
   window.syncCompanyFilter = function() {
     const type = document.getElementById('stTypeFilter').value;
     const companyFilter = document.getElementById('stCompanyFilter');
-    const options = companyFilter.options;
-
-    for (let i = 0; i < options.length; i++) {
-      const val = options[i].value;
-      if (val === 'all') {
-        options[i].style.display = 'block';
-        continue;
-      }
-
-      const isFuel = ['CPC', 'IOC', 'SINOPEC'].includes(val);
-      const isGas  = ['Litro', 'LAUGFS'].includes(val);
-
-      if (type === 'fuel') {
-        options[i].style.display = isFuel ? 'block' : 'none';
-      } else if (type === 'gas') {
-        options[i].style.display = isGas ? 'block' : 'none';
-      } else {
-        options[i].style.display = 'block';
-      }
+    const currentVal = companyFilter.value;
+    
+    // Clear and rebuild based on type
+    let options = `<option value="all">${t('all_companies')}</option>`;
+    
+    if (type === 'fuel' || type === 'all') {
+      options += `
+        <option value="CPC">CPC</option>
+        <option value="IOC">Lanka IOC</option>
+        <option value="SINOPEC">SINOPEC</option>
+      `;
     }
     
-    // Reset company filter if current selection becomes hidden
-    const currentOption = options[companyFilter.selectedIndex];
-    if (currentOption.style.display === 'none') {
-      companyFilter.value = 'all';
+    if (type === 'gas' || type === 'all') {
+      options += `
+        <option value="Litro">Litro Gas</option>
+        <option value="LAUGFS">LAUGFS Gas</option>
+      `;
     }
+    
+    companyFilter.innerHTML = options;
+    
+    // Restore value if it still exists in the new list
+    companyFilter.value = Array.from(companyFilter.options).some(o => o.value === currentVal) ? currentVal : 'all';
   }
 
   // ── VERIFIED REPORTS ──────────────────────────────────────
@@ -1022,10 +1020,15 @@
           
           const firstQueue = Object.values(s.queues || {})[0] || '—';
           
-          return `<tr id="manage-row-${s.id}">
+          // HIGHLIGHT LOGIC: Apply emphasis if company matches exactly the selected filter
+          const isHighlighted = (cF !== 'all' && s.company === cF);
+          const trStyle = isHighlighted ? 'background:rgba(59,130,246,0.1); border-left:4px solid var(--blue);' : '';
+          const compColor = isHighlighted ? 'var(--blue)' : 'var(--text-muted)';
+          
+          return `<tr id="manage-row-${s.id}" style="${trStyle}">
             <td>
               <strong style="color:var(--text-primary);">${s.name}</strong><br/>
-              <span style="font-size:0.75rem;color:var(--text-muted);">${s.company} · ${s.address}</span>
+              <span style="font-size:0.75rem;color:${compColor};">${s.company} · ${s.address}</span>
             </td>
             <td>${s.district}</td>
             <td><div style="display:flex;gap:4px;">${fuels || '<span style="color:var(--text-muted);font-size:0.7rem;">No data</span>'}</div></td>
