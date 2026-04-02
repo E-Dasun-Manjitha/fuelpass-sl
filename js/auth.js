@@ -4,7 +4,6 @@
 // ============================================================
 
 const AUTH = {
-  ADMIN_PASSWORD: 'FuelPassAdmin@2026',   // Change this in production
   SESSION_KEY:    'fuelpass_session',
   OWNERS_KEY:     'fuelpass_owners',
   PENDING_KEY:    'fuelpass_pending',
@@ -108,10 +107,13 @@ const AUTH = {
     return { success: false, error: 'Invalid station code or password.' };
   },
 
-  // ── Admin Login ────────────────────────────────────────────
-  adminLogin(password) {
-    if (password === this.ADMIN_PASSWORD) {
+  // ── Admin Login (Cloud Authority v=37K) ──────────────────
+  async adminLogin(password) {
+    // Pure Backend Authentication – allows custom credentials from Render
+    const result = await apiAdminLogin(password);
+    if (result.success) {
       this.setSession({ role: 'admin' });
+      Auth.setToken(result.token); // Store JWT globally for future fetch calls
       return true;
     }
     return false;
