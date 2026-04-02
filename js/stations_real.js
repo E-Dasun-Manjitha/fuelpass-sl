@@ -72,9 +72,6 @@ const REAL_STATIONS = [
   // ===================== MANNAR DISTRICT =====================
   { id:'r042', name:'CPC – Mannar Town',                   company:'CPC',  district:'Mannar', address:'Main St, Mannar',                              lat:8.9774, lng:79.9100, fuels:{petrol92:'limited',petrol95:'out',diesel:'available',superDiesel:'out'}, queue:'short', lastUpdated:'--', phone:'023-222-1122' },
 
-  // ===================== MULLAITIVU DISTRICT =====================
-  { id:'r043', name:'CPC – Mullaitivu',                    company:'CPC',  district:'Mullaitivu', address:'Main Rd, Mullaitivu',                      lat:9.2662, lng:81.3129, fuels:{petrol92:'available',petrol95:'out',diesel:'available',superDiesel:'out'}, queue:'short', lastUpdated:'--', phone:'021-229-0055' },
-
   // ===================== VAVUNIYA DISTRICT =====================
   { id:'r044', name:'CPC – Vavuniya Town',                 company:'CPC',  district:'Vavuniya', address:'Kandy Rd, Vavuniya',                         lat:8.7516, lng:80.4952, fuels:{petrol92:'available',petrol95:'limited',diesel:'available',superDiesel:'out'}, queue:'medium', lastUpdated:'--', phone:'024-222-1034' },
   { id:'r045', name:'Lanka IOC – Vavuniya',                company:'IOC',  district:'Vavuniya', address:'Hospital Rd, Vavuniya',                      lat:8.7554, lng:80.4981, fuels:{petrol92:'available',petrol95:'out',diesel:'available',superDiesel:'out'}, queue:'short', lastUpdated:'--', phone:'024-222-3344' },

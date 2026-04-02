@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel – FuelPass SL</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=42K-ADMIN-FIX" />
   <style>
     /* Admin-specific overrides */
     body { background: var(--bg-base); }
@@ -448,7 +448,17 @@
     </div>
 
     <!-- ── VERIFIED REPORTS ── -->
-
+    <div id="panel-reports" class="admin-panel animate-fade-in">
+      <div class="admin-topbar">
+        <h1 data-i18n="admin_reports">📋 Verified Reports</h1>
+        <div style="display:flex;gap:12px;align-items:center;">
+           <button class="action-btn btn-view" onclick="renderVerifiedReports()">🔄 Refresh Grid</button>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div id="verifiedReportsList"></div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -528,9 +538,9 @@
 <div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
 
 
-<script src="js/i18n.js?v=10K"></script>
-<script src="js/api.js?v=10K"></script>
-<script src="js/auth.js?v=10K"></script>
+<script src="js/i18n.js?v=42K-ADMIN-FIX"></script>
+<script src="js/api.js?v=42K-ADMIN-FIX"></script>
+<script src="js/auth.js?v=42K-ADMIN-FIX"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(localStorage.getItem('fp_lang') || 'en');
@@ -855,7 +865,7 @@
       { key:'petrol92', type:'Petrol 92 Octane',    label:'Petrol 92 Octane (LKR/L)'         },
       { key:'petrol95', type:'Petrol 95 Octane',    label:'Petrol 95 Octane (LKR/L)'         },
       { key:'autoDiesel', type:'Auto Diesel',  label:'Auto Diesel (LKR/L)'              },
-      { key:'superDiesel', type:'Super Diesel Euro4', label:'Super Diesel Euro4 (LKR/L)'       },
+      { key:'superDiesel', type:'Super Diesel (Euro4)', label:'Super Diesel (Euro 4) (LKR/L)'       },
       { key:'kerosene', type:'Kerosene',    label:'Kerosene (LKR/L)'                 },
     ];
     const gasFields = [
@@ -885,16 +895,15 @@
 
     try {
       const res = await apiFetch('/api/prices/bulk', {
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getToken() },
         method: 'PUT',
         body: JSON.stringify({ updates })
       });
       if (res && res.success) {
         document.getElementById('priceSaveMsg').style.display = 'inline';
         setTimeout(() => document.getElementById('priceSaveMsg').style.display = 'none', 3000);
-        showAdminToast('💰 Prices saved and published!', 'success');
+        showAdminToast('💰 National prices updated and published!', 'success');
       } else {
-        showAdminToast('❌ Failed to update prices.', 'error');
+        showAdminToast('❌ Failed to update prices. Error: ' + (res.error || 'Check schema'), 'error');
       }
     } catch(err) {
       showAdminToast('❌ Network error.', 'error');
@@ -994,6 +1003,55 @@
   }
 
   // ── VERIFIED REPORTS ──────────────────────────────────────
+  window.renderVerifiedReports = async function() {
+    const el = document.getElementById('verifiedReportsList');
+    el.innerHTML = '<div style="padding:24px;text-align:center;">⌛ Syncing national reports...</div>';
+    try {
+      // 1. Fetch ALL reports from cloud (Admin needs internal access)
+      const res = await apiGetReports(true); // true = verified filter
+      const reports = res?.data || [];
+      
+      if (!reports.length) {
+        el.innerHTML = '<div class="empty-state"><span>📋</span><p>No verified reports in the national grid yet.</p></div>';
+        return;
+      }
+
+      el.innerHTML = `<table class="admin-table">
+        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Time</th><th>Actions</th></tr></thead>
+        <tbody>` +
+        reports.map(r => `
+          <tr id="report-row-${r.id}">
+            <td>
+              <strong style="color:var(--text-primary);">${r.station_name}</strong><br/>
+              <span style="font-size:0.75rem;color:var(--blue);">${r.reporter || 'Verified Source'}</span>
+            </td>
+            <td><span class="tag-verified" style="text-transform:capitalize;">${r.product || 'Fuel'}</span></td>
+            <td><span class="tag-approved" style="background:${r.status==='available'?'rgba(16,185,129,0.1)':'rgba(239,68,68,0.1)'}; color:${r.status==='available'?'var(--green)':'var(--red)'};">${r.status}</span></td>
+            <td style="font-size:0.72rem;">${new Date(r.created_at).toLocaleString()}</td>
+            <td>
+              <button class="action-btn btn-reject" onclick="deleteReport('${r.id}')">🗑️ Remove</button>
+            </td>
+          </tr>
+        `).join('') +
+        '</tbody></table>';
+    } catch(err) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--red);">❌ Fail to sync with cloud reports.</div>';
+    }
+  }
+
+  window.deleteReport = async function(id) {
+    if (!confirm('Permanently remove this verified report?')) return;
+    try {
+      const res = await apiFetch(`/api/reports/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + Auth.getToken() }
+      });
+      if (res && res.success) {
+        document.getElementById(`report-row-${id}`).remove();
+        showAdminToast('🗑️ Report removed from grid.');
+      }
+    } catch(err) { showAdminToast('❌ Failed to delete.', 'error'); }
+  }
   // ── MANAGE STATIONS ──────────────────────────────────────
   let ALL_ADMIN_STATIONS = [];
   window.renderManageStations = async function(search = '') {

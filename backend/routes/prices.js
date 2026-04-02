@@ -53,7 +53,7 @@ router.put('/bulk', verifyToken, requireAdmin, async (req, res) => {
       // Our frontend bulk updates pass `type` and `price`.
       // We can update fuel and gas based on type matching.
       await db.query(
-        "UPDATE fuel_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE type = $2",
+        "UPDATE fuel_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE fuel_type = $2",
         [u.price, u.type]
       );
       await db.query(

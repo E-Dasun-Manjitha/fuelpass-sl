@@ -175,7 +175,7 @@ async function loadLiveData() {
     // Normalise API response to match existing DB shape
     // FILTER: Only merge real fuel stations into DB.stations (id starts with r, not rg)
     const liveStations = stationsResp.data
-      .filter(s => (s.id || '').startsWith('r') && !(s.id || '').startsWith('rg'))
+      .filter(s => !(s.id || '').startsWith('rg')) // allow 'r' and custom company IDs like 'cpcgal'
       .map(s => ({
         ...s,
         fuels: s.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
