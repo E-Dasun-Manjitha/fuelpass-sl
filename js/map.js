@@ -229,11 +229,11 @@ function setMapFilter(filter) {
   document.getElementById(mapping[filter])?.classList.add('active');
   renderMapMarkers();
   
-  // v=24K-ULTRA: Fit island with breathing room [80, 80]
+  // v=26K-MASTER: Fit island with panoramic breathing room [150, 150]
   if (allMarkers.length > 0) {
     const group = L.featureGroup(allMarkers);
     map.fitBounds(group.getBounds(), { 
-      padding: [80, 80],
+      padding: [150, 150],
       maxZoom: 14,
       animate: true
     });
