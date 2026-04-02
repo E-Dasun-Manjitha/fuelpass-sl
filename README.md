@@ -25,6 +25,15 @@ I’ve added two new layers of security to the backend to protect the system fro
 - **Helmet.js**: This adds security headers to prevent common web vulnerabilities like clickjacking and cross-site scripting.
 - **Rate-Limiting**: I’ve added a shield to the login and report forms so that automated bots cannot spam or try to guess passwords multiple times.
 
+### ⛽ Universal Station Discovery (v=48K)
+I have overhauled the "Discovery Protocol" to ensure all fuel stations—including those with custom IDs like **USG Filling & Service Station**—are visible in our national statistics and map markers. This fixes a legacy issue where only standard `r00x` type IDs were appearing, making the dashboard 100% authoritative for all districts including Galle, Mannar, and Mullaitivu.
+
+### 💰 Price Sync Recovery (v=49K)
+The Admin Dashboard now has high-precision control over national fuel and gas prices. I have updated the backend CORS policy and semantic string mapping to resolve "Failed to fetch" errors and ensure Super Diesel (Euro 4) and other products are synchronized with zero data loss across the National Grid.
+
+### 🚀 Zero-Cache Architecture
+Implemented a global versioning signature for all CSS and JS assets. This forces all user browsers to automatically invalidate their cache and load the latest universal discovery logic instantly without requiring manual refreshes.
+
 ---
 
 ## Features
