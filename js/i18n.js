@@ -17,6 +17,10 @@ const TRANSLATIONS = {
     nav_owner_login: 'Owner Login',
     nav_admin:       'Admin',
     nav_live:        'LIVE',
+    nav_theme_switched_to: 'Theme switched to %mode% mode',
+    nav_theme_switch_btn: 'Switch Appearance',
+    nav_theme_dark:  'Dark',
+    nav_theme_light: 'Light',
 
     // --- Hero ---
     hero_badge:      'Sri Lanka Fuel Intelligence',
@@ -322,6 +326,10 @@ const TRANSLATIONS = {
     nav_owner_login: 'හිමිකරු පිවිසුම',
     nav_admin:       'පරිපාලක',
     nav_live:        'සජීවී',
+    nav_theme_switched_to: 'තේමාව %mode% මාදිලියට මාරු කරන ලදී',
+    nav_theme_switch_btn: 'දර්ශනය මාරු කරන්න',
+    nav_theme_dark:  'අඳුරු (Dark)',
+    nav_theme_light: 'ආලෝක (Light)',
 
     // --- Hero ---
     hero_badge:      'ශ්‍රී ලංකා ඉන්ධන සේවාව',
@@ -585,6 +593,10 @@ const TRANSLATIONS = {
     nav_owner_login: 'உரிமையாளர் உள்நுழைவு',
     nav_admin:       'நிர்வாகி',
     nav_live:        'நேரலை',
+    nav_theme_switched_to: 'கருப்பொருள் %mode% முறைக்கு மாற்றப்பட்டது',
+    nav_theme_switch_btn: 'தோற்றத்தை மாற்றவும்',
+    nav_theme_dark:  'இருண்ட (Dark)',
+    nav_theme_light: 'ஒளி (Light)',
 
     // --- Hero ---
     hero_badge:      'இலங்கை எரிபொருள் சேவை',

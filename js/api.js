@@ -145,6 +145,10 @@ async function apiUpdateStationStatus(id, payload) {
   });
 }
 
+async function apiDeleteStation(id) {
+  return apiFetch(`/api/stations/${id}`, { method: 'DELETE' });
+}
+
 async function apiVerifyReport(id) {
   return apiFetch(`/api/reports/${id}/verify`, { method: 'PATCH' });
 }

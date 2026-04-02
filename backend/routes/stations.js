@@ -87,8 +87,10 @@ router.post('/:id/status', verifyToken, async (req, res) => {
 // PATCH /api/stations/:id/status – Bulk admin update
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { fuels, queue } = req.body; // fuels = { petrol92: 'available', petrol95: 'out', ... }
-    const queries = Object.entries(fuels).map(([type, status]) => {
+    const { fuels, queue, lat, lng } = req.body;
+    
+    // Update fuels & queue
+    const fuelQueries = Object.entries(fuels).map(([type, status]) => {
       return db.query(`
         INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
         VALUES ($1,$2,$3,$4,NOW(),'admin')
@@ -96,8 +98,29 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
         DO UPDATE SET status=$3, queue=$4, last_updated=NOW(), updated_by='admin'
       `, [req.params.id, type, status, queue || 'none']);
     });
-    await Promise.all(queries);
-    res.json({ success: true, message: 'Station status bulk updated' });
+
+    // Update location if valid coordinates provided
+    if (!isNaN(lat) && !isNaN(lng)) {
+      fuelQueries.push(db.query(`UPDATE stations SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
+    }
+    
+    await Promise.all(fuelQueries);
+    res.json({ success: true, message: 'Station status and location updated' });
+  } catch (err) {
+    console.error('❌ Station Status Update Error:', err);
+    res.status(500).json({ success: false, error: 'Database update failed' });
+  }
+});
+
+// DELETE /api/stations/:id – Admin remove station
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    // Delete from related tables first
+    await db.query('DELETE FROM station_fuel_status WHERE station_id = $1', [req.params.id]);
+    const result = await db.query('DELETE FROM stations WHERE id = $1', [req.params.id]);
+    
+    if (result.rowCount === 0) return res.status(404).json({ success: false, error: 'Station not found' });
+    res.json({ success: true, message: 'Station permanently removed from national network' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: 'Server error' });

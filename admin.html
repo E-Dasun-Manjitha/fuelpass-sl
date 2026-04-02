@@ -85,9 +85,16 @@
     .ao-check { display:flex; align-items:center; gap:5px; font-size:0.8rem; color:var(--text-secondary); cursor:pointer; padding:5px 10px; border-radius:6px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.03); }
     .ao-check input { accent-color:var(--blue); width:14px; height:14px; }
     @media(max-width:768px) {
-      .admin-sidebar { width:100%; position:relative; height:auto; } 
-      .admin-main { margin-left:0; padding:16px; }
+      .admin-sidebar { width:100%; position:static; height:auto; border-right:none; border-bottom:1px solid var(--glass-border); padding:12px 0; }
+      .sb-brand { padding: 0 16px 12px; margin-bottom:10px; border-bottom:none; }
+      .sb-nav { display:flex; overflow-x:auto; padding:0 16px; gap:8px; white-space:nowrap; -webkit-overflow-scrolling:touch; }
+      .sb-nav a { padding:8px 16px; border-radius:99px; border:1px solid var(--glass-border); border-right:none !important; min-width:max-content; }
+      .sb-nav a.active { border-color:var(--blue); background:rgba(59,130,246,0.1); }
+      .sb-section-label { display:none; }
+      .admin-main { margin-left:0; padding:20px; }
       .admin-layout { flex-direction:column; }
+      .admin-topbar h1 { font-size:1.3rem; }
+      .stat-cards { grid-template-columns: 1fr 1fr; }
     }
     .st-filter-btn {
     background: transparent;
@@ -251,7 +258,7 @@
               <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
               <option>Galle</option><option>Matara</option><option>Hambantota</option>
               <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
-              <option>Vavuniya</option><option>Batticaloa</option><option>Ampara</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option><option>Ampara</option>
               <option>Trincomalee</option><option>Kurunegala</option><option>Puttalam</option>
               <option>Anuradhapura</option><option>Polonnaruwa</option><option>Badulla</option>
               <option>Monaragala</option><option>Ratnapura</option><option>Kegalle</option>
@@ -404,7 +411,7 @@
               <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
               <option>Galle</option><option>Matara</option><option>Hambantota</option>
               <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
-              <option>Vavuniya</option><option>Batticaloa</option><option>Ampara</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option><option>Ampara</option>
               <option>Trincomalee</option><option>Kurunegala</option><option>Puttalam</option>
               <option>Anuradhapura</option><option>Polonnaruwa</option><option>Badulla</option>
               <option>Monaragala</option><option>Ratnapura</option><option>Kegalle</option>
@@ -430,6 +437,8 @@
 
            <!-- Global Search -->
            <input type="text" id="stationSearchInput" placeholder="Search by name, address or ID..." data-i18n="admin_search_stations" oninput="renderManageStations(this.value)" style="padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:white;min-width:260px;height:40px;font-size:0.82rem;outline:none;transition:border 0.2s;" onfocus="this.style.border='1px solid var(--accent)'" onblur="this.style.border='1px solid rgba(255,255,255,0.1)'">
+
+           <button class="action-btn btn-reject" onclick="resetStationFilters()" style="padding:10px 16px;height:40px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;">🔄 Reset Filters</button>
         </div>
         <div id="stCountDisplay" style="font-size:0.85rem;color:white;margin-top:12px;font-weight:600;background:rgba(99,102,241,0.1);display:inline-block;padding:4px 12px;border-radius:99px;"></div>
       </div>
@@ -510,18 +519,18 @@
     </div>
 
     <div style="display:flex;gap:10px;margin-top:24px;">
-      <button class="action-btn btn-approve" style="flex:1;padding:12px;" onclick="saveStationEdit()">💾 Save Changes</button>
+      <button class="action-btn btn-approve" style="flex:1;padding:12px;" onclick="saveStationEdit(this)">💾 Save Changes</button>
       <button class="action-btn btn-reject" style="padding:12px 20px;" onclick="closeStationEdit()">Cancel</button>
     </div>
   </div>
 </div>
 
-<div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
+<div id="adminToast" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999999;padding:14px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;"></div>
 
 
-<script src="js/i18n.js"></script>
-<script src="js/api.js?v=25"></script>
-<script src="js/auth.js"></script>
+<script src="js/i18n.js?v=10K"></script>
+<script src="js/api.js?v=10K"></script>
+<script src="js/auth.js?v=10K"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(localStorage.getItem('fp_lang') || 'en');
@@ -974,6 +983,16 @@
     companyFilter.value = Array.from(companyFilter.options).some(o => o.value === currentVal) ? currentVal : 'all';
   }
 
+  window.resetStationFilters = function() {
+    document.getElementById('stTypeFilter').value = 'all';
+    document.getElementById('stDistrictFilter').value = 'all';
+    document.getElementById('stStatusFilter').value = 'all';
+    document.getElementById('stCompanyFilter').value = 'all';
+    document.getElementById('stationSearchInput').value = '';
+    syncCompanyFilter();
+    renderManageStations();
+  }
+
   // ── VERIFIED REPORTS ──────────────────────────────────────
   // ── MANAGE STATIONS ──────────────────────────────────────
   let ALL_ADMIN_STATIONS = [];
@@ -1052,7 +1071,10 @@
             <td><div style="display:flex;gap:4px;">${fuels || '<span style="color:var(--text-muted);font-size:0.7rem;">No data</span>'}</div></td>
             <td><span style="font-size:0.8rem;text-transform:capitalize;">${firstQueue}</span></td>
             <td>
-              <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
+              <div style="display:flex;gap:6px;">
+                <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
+                <button class="action-btn btn-reject" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteStation('${s.id}')">🗑️</button>
+              </div>
             </td>
           </tr>`;
         }).join('') +
@@ -1068,12 +1090,10 @@
     document.getElementById('esStationId').value = id;
     document.getElementById('esStationInfo').textContent = `${s.name} (${s.company}) - ${s.district}`;
     
-    // Dynamically detect fuel types from the station's existing fuel data
     const fuelTypes = s.fuels ? Object.keys(s.fuels) : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
     const list = document.getElementById('esFuelStatusList');
     list.innerHTML = fuelTypes.map(f => {
       const current = s.fuels ? s.fuels[f] : 'out';
-      // Beautify fuel type labels
       const label = f.replace('petrol', 'Petrol ').replace('superDiesel', 'Super Diesel').replace('kg', ' kg');
       return `
         <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
@@ -1089,8 +1109,6 @@
 
     const firstQueue = Object.values(s.queues || {})[0] || 'none';
     document.getElementById('esQueue').value = firstQueue;
-    
-    // Populate Lat/Lng fields
     document.getElementById('esLat').value = s.lat || '';
     document.getElementById('esLng').value = s.lng || '';
     
@@ -1099,25 +1117,49 @@
 
   window.closeStationEdit = () => { document.getElementById('stationEditModal').style.display = 'none'; };
 
-  window.saveStationEdit = async function() {
-    const id = document.getElementById('esStationId').value;
-    const fuels = {};
-    document.querySelectorAll('.fuel-select-field').forEach(el => {
-      fuels[el.dataset.fkey] = el.value;
-    });
-    const queue = document.getElementById('esQueue').value;
-    const lat = parseFloat(document.getElementById('esLat').value);
-    const lng = parseFloat(document.getElementById('esLng').value);
+  window.saveStationEdit = async function(btn) {
+    if (!btn) return;
+    const oldText = btn.innerHTML;
+    btn.innerHTML = 'Saving...';
+    btn.disabled = true;
 
     try {
+      const id = document.getElementById('esStationId').value;
+      const fuels = {};
+      document.querySelectorAll('.fuel-select-field').forEach(el => {
+        fuels[el.dataset.fkey] = el.value;
+      });
+      const queue = document.getElementById('esQueue').value;
+      const lat = parseFloat(document.getElementById('esLat').value) || null;
+      const lng = parseFloat(document.getElementById('esLng').value) || null;
+
       const res = await apiUpdateStationStatus(id, { fuels, queue, lat, lng });
       if (res && res.success) {
         showAdminToast('✅ Data saved successfully!');
         closeStationEdit();
         ALL_ADMIN_STATIONS = []; // Force refresh
-        renderManageStations();
+        await renderManageStations();
+      } else {
+        showAdminToast('❌ Failed to save data.', 'error');
       }
-    } catch(err) { showAdminToast('❌ Update failed.', 'error'); }
+    } catch(err) { 
+       showAdminToast('❌ Update failed. Check connection.', 'error'); 
+    } finally {
+       btn.innerHTML = oldText;
+       btn.disabled = false;
+    }
+  }
+
+  window.deleteStation = async function(id) {
+    if (!confirm('Permanently delete this location from the national network? This cannot be undone.')) return;
+    try {
+      const res = await apiDeleteStation(id);
+      if (res && res.success) {
+        showAdminToast('🗑️ Station deleted successfully.');
+        document.getElementById(`manage-row-${id}`).remove();
+        ALL_ADMIN_STATIONS = ALL_ADMIN_STATIONS.filter(x => x.id !== id);
+      }
+    } catch(err) { showAdminToast('❌ Deletion failed.', 'error'); }
   }
 
   // ── REPORTS ──────────────────────────────────────────────
