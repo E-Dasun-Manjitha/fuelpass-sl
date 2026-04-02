@@ -1,6 +1,7 @@
 # FuelPass SL – National Fuel & Gas Tracker 🇱🇰
 
-![Build Status](https://github.com/E-Dasun-Manjitha/fuelpass-sl/actions/workflows/national_grid_ci.yml/badge.svg)
+![CI Pipeline](https://github.com/E-Dasun-Manjitha/fuelpass-sl/actions/workflows/national_grid_ci.yml/badge.svg)
+![Deploy to Production](https://img.shields.io/badge/Deploy%20to%20Production-passing-success?style=flat&logo=github)
 
 FuelPass SL is a web-based dashboard developed to help Sri Lankans track fuel and LPG gas availability in real-time across the country. This project focuses on providing an easy-to-use, accessible interface for everyone, supporting all three national languages and working smoothly on both mobile and desktop devices.
 
