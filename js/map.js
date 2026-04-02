@@ -228,6 +228,16 @@ function setMapFilter(filter) {
   const mapping = { fuel:'mcFuel', gas:'mcGas', all:'mcAll' };
   document.getElementById(mapping[filter])?.classList.add('active');
   renderMapMarkers();
+  
+  // v=24K-ULTRA: Fit island with breathing room [80, 80]
+  if (allMarkers.length > 0) {
+    const group = L.featureGroup(allMarkers);
+    map.fitBounds(group.getBounds(), { 
+      padding: [80, 80],
+      maxZoom: 14,
+      animate: true
+    });
+  }
 }
 
 function locateUser() {

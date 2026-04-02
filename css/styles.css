@@ -749,7 +749,10 @@ select option { background: var(--bg-surface); color: var(--text-primary); }
   margin-bottom: 20px;
 }
 [data-theme="light"] .hero-content h1 {
-  background: linear-gradient(135deg, #1E3A8A 20%, #3B82F6 70%, #6D28D9); /* High contrast Navy/Blue/Purple */
+  background: linear-gradient(135deg, #1E3A8A 20%, #3B82F6 70%, #6D28D9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .hero-content > p {
   max-width: 560px;
