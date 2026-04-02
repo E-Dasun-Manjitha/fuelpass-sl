@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=21K" />
+  <link rel="stylesheet" href="css/styles.css?v=22K" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="icon" type="image/png" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
@@ -46,11 +46,26 @@
         <a href="#prices" class="nav-link" data-page="prices" data-i18n="nav_prices">Prices</a>
         <a href="#eligibility" class="nav-link" data-page="eligibility" data-i18n="nav_eligibility">Eligibility</a>
         <a href="#report" class="nav-link" data-page="report" data-i18n="nav_report">Report</a>
+        
+        <!-- Mobile Theme Toggle -->
+        <div class="mob-only" style="padding: 10px 32px;">
+          <button class="theme-toggle" onclick="toggleTheme()" style="width: 100%; gap: 12px; justify-content: center;">
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <span style="font-size: 0.9rem; font-weight: 600;">Switch Appearance</span>
+          </button>
+        </div>
         <!-- Mobile-only versions of Admin/Owner buttons -->
         <button class="owner-login-btn mob-only" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
         <a href="admin.html" class="admin-nav-btn mob-only" data-i18n="nav_admin">⚙️ Admin</a>
       </div>
       <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme mode" style="margin-right: 8px;">
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+
         <!-- Language Switcher -->
         <div class="lang-switcher" role="group" aria-label="Language">
           <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
@@ -864,18 +879,18 @@
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="js/data.js?v=21K"></script>
-  <script src="js/stations_real.js?v=21K"></script>
-  <script src="js/i18n.js?v=21K"></script>
-  <script src="js/api.js?v=21K"></script>
-  <script src="js/auth.js?v=21K"></script>
-  <script src="js/vehicles.js?v=21K"></script>
-  <script src="js/map.js?v=21K"></script>
-  <script src="js/nearest.js?v=21K"></script>
-  <script src="js/eligibility.js?v=21K"></script>
-  <script src="js/ui.js?v=21K"></script>
-  <script src="js/app.js?v=21K"></script>
-  <script src="js/owner.js?v=21K"></script>
+  <script src="js/data.js?v=22K"></script>
+  <script src="js/stations_real.js?v=22K"></script>
+  <script src="js/i18n.js?v=22K"></script>
+  <script src="js/api.js?v=22K"></script>
+  <script src="js/auth.js?v=22K"></script>
+  <script src="js/vehicles.js?v=22K"></script>
+  <script src="js/map.js?v=22K"></script>
+  <script src="js/nearest.js?v=22K"></script>
+  <script src="js/eligibility.js?v=22K"></script>
+  <script src="js/ui.js?v=22K"></script>
+  <script src="js/app.js?v=22K"></script>
+  <script src="js/owner.js?v=22K"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       // Mobile Toggle Initialization

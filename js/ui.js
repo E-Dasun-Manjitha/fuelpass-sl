@@ -2,6 +2,23 @@
 // ui.js – Render all UI components (stations, prices, gas, reports)
 // ============================================================
 
+// ---- THEME SELECTOR ----
+function initTheme() {
+  const saved = localStorage.getItem('fp_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+}
+
+window.toggleTheme = function() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('fp_theme', next);
+  showToast(`Theme switched to ${next.toUpperCase()} mode`, 'info');
+};
+
+// Initialize theme immediately
+initTheme();
+
 // ---- TICKER ----
 function buildTicker() {
   const all = [

@@ -37,6 +37,19 @@
   color-scheme: dark;
 }
 
+[data-theme="light"] {
+  --bg-base: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: rgba(0,0,0,0.03);
+  --bg-card-hover: rgba(0,0,0,0.05);
+  --glass-border: rgba(0,0,0,0.1);
+  --glass-shadow: 0 10px 40px rgba(0,0,0,0.12);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  color-scheme: light;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -49,8 +62,24 @@ body {
 
 a { color: inherit; text-decoration: none; cursor: pointer; }
 button { cursor: pointer; font-family: inherit; }
-select, option { background-color: #0f1629; color: #f1f5f9; }
-select option { background: #0f1629; color: #f1f5f9; }
+select, option { background-color: var(--bg-surface); color: var(--text-primary); }
+select option { background: var(--bg-surface); color: var(--text-primary); }
+
+.theme-toggle {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-primary);
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+[data-theme="light"] .theme-toggle { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.08); }
+.theme-toggle:hover { transform: translateY(-2px) rotate(15deg); background: rgba(255,255,255,0.1); }
+.theme-toggle svg { width: 20px; height: 20px; }
+.theme-toggle .sun-icon { display: none; }
+[data-theme="light"] .theme-toggle .moon-icon { display: none; }
+[data-theme="light"] .theme-toggle .sun-icon { display: block; }
 
 .container {
   max-width: 1280px;
