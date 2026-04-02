@@ -254,16 +254,16 @@ async function loadLiveData() {
     }));
   }
 
-  // ---- DYNAMIC STATISTICAL SYNC (v=36K-DYNAMIC-PULSE) ----
-  // Removed hard-coded counts to enable 100% real-time growth for new stations like 'Yamuna'
+  // ---- DYNAMIC STATISTICAL SYNC (v=47K-USG-DISCOVER) ----
+  // Expanding discovery for custom IDs like 'USG' (cpcgal)
   
-  const fuelCount = DB.stations.filter(s => s.id.startsWith('r') && !s.id.startsWith('rg')).length;
+  const fuelCount = DB.stations.filter(s => !s.id.startsWith('rg')).length;
   const gasCount  = DB.gasShops.filter(g => g.id.startsWith('rg')).length;
   
   DB.stats.totalStations = fuelCount; 
   DB.stats.totalGasShops = gasCount;
   
-  const availFuel = DB.stations.filter(s => s.id.startsWith('r') && !s.id.startsWith('rg') && Object.values(s.fuels || {}).some(v => v === 'available')).length;
+  const availFuel = DB.stations.filter(s => !s.id.startsWith('rg') && Object.values(s.fuels || {}).some(v => v === 'available')).length;
   const availGas  = DB.gasShops.filter(g => g.id.startsWith('rg') && Object.values(g.stock || {}).some(v => v === 'available')).length;
   
   DB.stats.availableStations = availFuel + availGas;
