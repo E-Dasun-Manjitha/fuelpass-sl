@@ -38,14 +38,14 @@
 }
 
 [data-theme="light"] {
-  --bg-base: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-card: rgba(0,0,0,0.03);
-  --bg-card-hover: rgba(0,0,0,0.05);
-  --glass-border: rgba(0,0,0,0.1);
-  --glass-shadow: 0 10px 40px rgba(0,0,0,0.12);
+  --bg-base: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+  --bg-surface: rgba(255, 255, 255, 0.7);
+  --bg-card: rgba(59, 130, 246, 0.03);
+  --bg-card-hover: rgba(59, 130, 246, 0.06);
+  --glass-border: rgba(59, 130, 246, 0.1);
+  --glass-shadow: 0 12px 48px rgba(30, 58, 138, 0.08); /* Soft Royal Blue Shadow */
   --text-primary: #0f172a;
-  --text-secondary: #475569;
+  --text-secondary: #334155;
   --text-muted: #64748b;
   color-scheme: light;
 }
