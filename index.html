@@ -59,14 +59,6 @@
         <button class="owner-login-btn mob-only" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
         <a href="admin.html" class="admin-nav-btn mob-only" data-i18n="nav_admin">⚙️ Admin</a>
       </div>
-      <div class="nav-actions">
-        <!-- Theme Toggle -->
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme mode" style="margin-right: 8px;">
-          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        </button>
-
-        <!-- Language Switcher -->
         <div class="lang-switcher" role="group" aria-label="Language">
           <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
           <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
@@ -75,6 +67,12 @@
         <div class="live-badge"><span class="live-dot"></span> <span data-i18n="nav_live">LIVE</span></div>
         <button class="owner-login-btn" id="ownerLoginBtn" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
         <a href="admin.html" class="admin-nav-btn" title="Admin Panel" data-i18n="nav_admin">⚙️ Admin</a>
+        
+        <!-- Theme Toggle (Far Right Anchor) -->
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme mode" style="margin-left: 8px;">
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
       </div>
     </div>
   </nav>
