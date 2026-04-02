@@ -25,10 +25,21 @@ app.use(cors(corsOptions));
 app.use(helmet()); // Fortress Header Security v28K
 app.use(express.json());
 
-// Targetted Brute-Force Protection for Auth & Reports
-const apiLimiter = rateLimit({
+// ---- Specialized Rate Limiters (v=33K-LIMITER-FIX) ----
+
+// 1. Strict Limiter: Neutralizing Brute-Force on Login/Register
+const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Limit each IP to 20 requests per window
+  max: 20, 
+  message: { success: false, error: 'Too many login attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// 2. Lenient Limiter: Allowing High-Performance Admin/User Management
+const managementLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 1,000,000% more headroom for national admin tasks
   message: { success: false, error: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -44,13 +55,13 @@ app.use('/api', (req, res, next) => {
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
 // ---- API Routes ----
-app.use('/api/auth',     apiLimiter, require('./routes/auth'));
+app.use('/api/auth',     authLimiter,       require('./routes/auth'));
 app.use('/api/stations', require('./routes/stations'));
 app.use('/api/gas-shops',require('./routes/gas'));
 app.use('/api/prices',   require('./routes/prices'));
-app.use('/api/reports',  apiLimiter, require('./routes/reports'));
-app.use('/api/owners',   apiLimiter, require('./routes/owners'));
-app.use('/api/contact',  apiLimiter, require('./routes/contact'));
+app.use('/api/reports',  managementLimiter, require('./routes/reports'));
+app.use('/api/owners',   managementLimiter, require('./routes/owners'));
+app.use('/api/contact',  managementLimiter, require('./routes/contact'));
 
 // ---- 404 ----
 app.use((req, res) => res.status(404).json({ success: false, error: 'Endpoint not found' }));
