@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=23K" />
+  <title data-i18n="app_title">FuelPass SL – National Fuel & Gas Tracker</title>
+  <link rel="stylesheet" href="css/styles.css?v=22K" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="icon" type="image/png" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
@@ -32,33 +33,27 @@
   <!-- ============ NAV ============ -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <!-- Hamburger Toggle (Left Attached) -->
+      <button class="hamburger-btn mob-only" id="menuToggle" onclick="toggleDrawer()" aria-label="Open Menu">
         <span></span><span></span><span></span>
       </button>
+
       <div class="nav-brand">
         <img src="logo.png" alt="FuelPass SL Logo" style="width:38px;height:38px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />
         <span>FuelPass <em>SL</em></span>
       </div>
-      <div class="nav-links" id="navLinks">
+
+      <div class="nav-links pc-only">
         <a href="#dashboard" class="nav-link active" data-page="dashboard" data-i18n="nav_dashboard">Dashboard</a>
         <a href="#stations" class="nav-link" data-page="stations" data-i18n="nav_stations">Stations</a>
         <a href="#gas" class="nav-link" data-page="gas" data-i18n="nav_gas">LPG Gas</a>
         <a href="#prices" class="nav-link" data-page="prices" data-i18n="nav_prices">Prices</a>
         <a href="#eligibility" class="nav-link" data-page="eligibility" data-i18n="nav_eligibility">Eligibility</a>
         <a href="#report" class="nav-link" data-page="report" data-i18n="nav_report">Report</a>
-        
-        <!-- Mobile Theme Toggle -->
-        <div class="mob-only" style="padding: 10px 32px;">
-          <button class="theme-toggle" onclick="toggleTheme()" style="width: 100%; gap: 12px; justify-content: center;">
-            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            <span style="font-size: 0.9rem; font-weight: 600;">Switch Appearance</span>
-          </button>
-        </div>
-        <!-- Mobile-only versions of Admin/Owner buttons -->
-        <button class="owner-login-btn mob-only" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
-        <a href="admin.html" class="admin-nav-btn mob-only" data-i18n="nav_admin">⚙️ Admin</a>
       </div>
+
+      <!-- Desktop Only Actions -->
+      <div class="nav-actions pc-only">
         <div class="lang-switcher" role="group" aria-label="Language">
           <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
           <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
@@ -68,14 +63,57 @@
         <button class="owner-login-btn" id="ownerLoginBtn" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
         <a href="admin.html" class="admin-nav-btn" title="Admin Panel" data-i18n="nav_admin">⚙️ Admin</a>
         
-        <!-- Theme Toggle (Far Right Anchor) -->
+        <!-- Theme Toggle -->
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme mode" style="margin-left: 8px;">
           <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </button>
       </div>
     </div>
-  </nav>
+    </div>
+  <!-- Mobile Side Drawer (v=22K) -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <img src="logo.png" alt="Logo" class="drawer-logo" style="width:50px;height:50px;object-fit:contain;" />
+      <h3 style="font-family:'Space Grotesk',sans-serif;font-weight:700;">FuelPass <em style="font-style:normal;color:var(--blue);">SL</em></h3>
+    </div>
+    <div class="drawer-links">
+      <a href="#dashboard" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">📊</span> <span data-i18n="nav_dashboard">Dashboard</span></a>
+      <a href="#stations" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">⛽</span> <span data-i18n="nav_stations">Stations</span></a>
+      <a href="#gas" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">🔥</span> <span data-i18n="nav_gas">LPG Gas</span></a>
+      <a href="#prices" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">💰</span> <span data-i18n="nav_prices">Prices</span></a>
+      <a href="#eligibility" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">⚖️</span> <span data-i18n="nav_eligibility">Eligibility</span></a>
+      <a href="#report" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">📝</span> <span data-i18n="nav_report">Report</span></a>
+    </div>
+
+    <!-- Appearance Section (Migrated from Navbar) -->
+    <div class="drawer-section">
+      <div class="drawer-section-h" data-i18n="nav_theme_switch_btn">Appearance Settings</div>
+      <div class="drawer-row">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme mode" style="width:100%; justify-content:center; gap:12px;">
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <span style="font-size: 0.85rem; font-weight: 600;" data-i18n="nav_theme_switch_btn">Switch Appearance</span>
+        </button>
+      </div>
+
+      <!-- Language switcher in Drawer -->
+      <div class="drawer-section-h" style="margin-top: 24px;">Language / භාෂාව / மொழி</div>
+      <div class="lang-switcher drawer-lang" role="group" style="width:100%; border-radius:12px; overflow:hidden;">
+        <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
+        <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
+        <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
+      </div>
+    </div>
+    
+    <div class="drawer-footer">
+      <button class="owner-login-btn" onclick="openOwnerLogin()" data-i18n="nav_owner_login" style="width:100%;">🔑 Owner Login</button>
+      <a href="admin.html" class="admin-nav-btn" data-i18n="nav_admin" style="margin-top: 10px; display: block; text-align: center; border-radius:99px; padding:10px;">⚙️ Admin</a>
+    </div>
+  </div>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 
   <!-- ============ MAIN APP ============ -->
   <main id="app">

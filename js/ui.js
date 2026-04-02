@@ -21,6 +21,23 @@ window.toggleTheme = function() {
 // Initialize theme immediately
 initTheme();
 
+// ---- MOBILE DRAWER (v=22K) ----
+window.toggleDrawer = function() {
+  const drawer  = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!drawer || !overlay) return;
+  
+  drawer.classList.toggle('active');
+  overlay.classList.toggle('active');
+  
+  // Prevent body scroll when menu is active
+  if (drawer.classList.contains('active')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+};
+
 // ---- TICKER ----
 function buildTicker() {
   const all = [
