@@ -174,8 +174,9 @@ function renderGasShopCard(shop) {
       <div class="station-card-footer">
         <span class="${statusClass} oc-status">${t('status_' + status)}</span>
         ${distanceHtml}
-        <span>📦 ${shop.lastDelivery}</span>
-        <span>🚚 ${t('nav_live')}: ${shop.nextDelivery}</span>
+        <span>📦 ${shop.lastRestock || 'Typical Stock'}</span>
+        <span>🚗 Queue: ${shop.queue || 'none'}</span>
+        <span>🚚 LIVE: ${shop.nextDelivery || 'In 2 days'}</span>
       </div>
     </div>
   `;
@@ -219,8 +220,9 @@ window.openGasShopModal = function(shop) {
     </div>
     <div class="modal-fuels-grid">${stockItems}</div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">
-      <span>📦 Last: ${shop.lastDelivery}</span>
-      <span>🚚 Next: ${shop.nextDelivery}</span>
+      <span>📦 Last Restock: ${shop.lastRestock || 'Typically Stocked'}</span>
+      <span>🚗 Queue: ${shop.queue || 'none'}</span>
+      <span>🚚 Next Delivery: ${shop.nextDelivery || 'Typical Cycle'}</span>
       <span>🕐 ${t('last_updated')}: ${shop.lastUpdated || 'Just now'}</span>
     </div>
     <div class="modal-actions">
