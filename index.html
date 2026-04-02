@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
   <title data-i18n="app_title">FuelPass SL – National Fuel & Gas Tracker</title>
-  <link rel="stylesheet" href="css/styles.css?v=22K" />
+  <link rel="stylesheet" href="css/styles.css?v=22K-MAXSTABLE" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="icon" type="image/png" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
@@ -37,6 +37,13 @@
       <button class="hamburger-btn mob-only" id="menuToggle" onclick="toggleDrawer()" aria-label="Open Menu">
         <span></span><span></span><span></span>
       </button>
+
+      <!-- Mobile Quick Lang (SS1 Fix) -->
+      <div class="lang-switcher mobile-nav-lang mob-only" role="group">
+        <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
+        <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
+        <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
+      </div>
 
       <div class="nav-brand">
         <img src="logo.png" alt="FuelPass SL Logo" style="width:38px;height:38px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />

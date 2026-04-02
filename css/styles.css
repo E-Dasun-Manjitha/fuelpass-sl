@@ -1144,6 +1144,26 @@ select option { background: var(--bg-surface); color: var(--text-primary); }
 .station-distance { color: var(--blue); font-weight: 500; }
 .station-updated { font-size: 0.7rem; }
 
+/* Mobile Navbar Lang Switcher (SS1 Fix) */
+.mobile-nav-lang {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 2px;
+  margin-right: -10px;
+}
+.mobile-nav-lang .lang-btn {
+  padding: 3px 6px;
+  font-size: 0.68rem;
+  border-radius: 5px;
+}
+@media (max-width: 900px) {
+  .mobile-nav-lang { display: flex !important; }
+}
+
 /* ============================================================
    FILTER ROW
    ============================================================ */
@@ -2130,9 +2150,10 @@ select option { background: var(--bg-surface); color: var(--text-primary); }
   .pc-only { display: none !important; }
   .mob-only { display: flex !important; }
   
-  .navbar { height: 60px; padding: 0 16px; }
-  .nav-brand { font-size: 1.1rem; }
-  .nav-brand img { width: 34px !important; height: 34px !important; }
+  .navbar { height: 62px; padding: 0 12px; }
+  .nav-container { gap: 8px; }
+  .nav-brand { font-size: 1rem; }
+  .nav-brand img { width: 32px !important; height: 32px !important; }
 
   /* Hamburger Toggle Style */
   .hamburger-btn {
@@ -2182,15 +2203,31 @@ select option { background: var(--bg-surface); color: var(--text-primary); }
   .hstat { padding: 12px; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); }
 }
 
-/* Landscape Normalization (v=22K) */
+/* Landscape Normalization (v=22K-MAXSTABLE) */
 @media (max-height: 500px) and (orientation: landscape) {
   .navbar { height: 52px !important; }
-  .nav-brand { font-size: 1rem !important; }
-  .nav-brand img { width: 30px !important; height: 30px !important; }
+  .nav-brand { font-size: 0.95rem !important; }
+  .nav-brand img { width: 28px !important; height: 28px !important; }
   .hero { padding: 80px 16px 40px; min-height: auto; }
   .hero-content h1 { font-size: 1.8rem; margin-bottom: 8px; }
   .hero-content p { display: none; }
   .hero-search { margin-top: 12px; }
+
+  /* SS3 Fix: Ensure drawer links are ALWAYS visible and scrollable in landscape */
+  .mobile-drawer {
+    padding-top: 20px !important;
+    padding-bottom: 10px !important;
+  }
+  .drawer-links {
+    flex: 1 1 auto !important;
+    min-height: 120px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .drawer-section {
+    padding: 12px 24px !important;
+  }
+  .drawer-section-h { margin-bottom: 8px !important; }
 }
 
 /* ---- Tablet adjustments (769–1024px) ---- */
