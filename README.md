@@ -1,72 +1,67 @@
-# ⛽ FuelPass SL – National Fuel & Gas Intelligence 🇱🇰
+# FuelPass SL – National Fuel & Gas Tracker 🇱🇰
 
-[![Status](https://img.shields.io/badge/Status-Production--Ready-success?style=for-the-badge&logo=vercel)](https://fuelpass-sl.vercel.app/)
-[![Version](https://img.shields.io/badge/Version-28K--FORTRESS-blue?style=for-the-badge)](https://github.com/E-Dasun-Manjitha/fuelpass-sl)
-[![SriLanka](https://img.shields.io/badge/Region-Sri%20Lanka-red?style=for-the-badge)](https://www.gov.lk)
+![Build Status](https://github.com/E-Dasun-Manjitha/fuelpass-sl/actions/workflows/national_grid_ci.yml/badge.svg)
 
-**FuelPass SL** is a world-class, high-performance national intelligence platform designed to provide Sri Lankan citizens with real-time tracking for Fuel and LPG Gas availability. Engineered for absolute mobile-responsiveness, trilingual accessibility, and fortress-grade security.
+FuelPass SL is a web-based dashboard developed to help Sri Lankans track fuel and LPG gas availability in real-time across the country. This project focuses on providing an easy-to-use, accessible interface for everyone, supporting all three national languages and working smoothly on both mobile and desktop devices.
 
 ---
 
-## 🎨 Elite Modern UI & UX Features
+## What’s New (Final Updates)
 
-### 📐 Orientation-Aware Narrative (Fixed SS3)
-Engineered with absolute **Landscape-Portrait Stability**. The side-drawer navigation and dashboard buttons feature interactive-safe padding and `overflow-y` normalization, ensuring a perfectly non-broken experience on any horizontal display.
+After several rounds of testing, I’ve implemented some important fixes to make the website production-ready:
 
-### 🗺️ Intelligent Panoramic Mapping
-Implemented deterministic **Map Bounds Detection** with an absolute 120px calculation buffer. Using `v=27K-ULTRA` logic, the map 100% guarantees "One Extra Step" of zoom-out, ensuring Sri Lanka's coastal borders never touch the screen edge.
+### 📱 Full Mobile & Orientation Support
+I noticed that the navigation menu and some dashboard buttons were getting cut off when rotating the phone to landscape (horizontal) mode. I have fixed this by updating the side-drawer’s CSS to be scrollable and properly adjusted for landscape views. Now, the dashboard fits perfectly on any screen size.
 
-### 🌐 National Trilingual Accessibility (EN/සිං/தமி)
-Featuring a high-performance **Mobile Navbar Language Switcher**. Toggle instantly between English, Sinhalese, and Tamil with 1,000% semantic parity across the entire Hero and Dashboard sections.
+### 🌐 Trilingual Navigation Switcher
+To make the site more accessible, I added a quick language switcher directly into the mobile navbar. You can now toggle between **English, සිංහල (Sinhala), and தமிழ் (Tamil)** with just one tap from any page.
 
-### 🌅 High-Contrast Visual Excellence
-A premium **Glassmorphic UI** featuring vibrant gradients and interactive micro-animations. Perfectly optimized for both High-Contrast Light and Sleek Dark modes with 0% text clipping.
+### 🗺️ Improved Map View
+The map was previously zooming in too far, cutting off the coastal areas. I’ve updated the map calculation logic to guarantee that the entire island of Sri Lanka is visible with enough "breathing room" around the borders, making it much easier to find stations in any district.
 
----
-
-## 🛡️ Fortress-Grade Security (v=28K-FORTRESS)
-
-Your data and the national grid are protected by an **Academy-Grade Defensive Layer**:
-
-- **Helmet.js Armor**: 🛰️ 15+ Defensive HTTP headers deployed to neutralize **Clickjacking**, **XSS**, and **MIME-Sniffing**.
-- **Brute-Force Shield**: 🛡️ Targeted **Rate-Limiting** (20 requests/15min) specifically on Authentication, Report, and Contact routes to stop automated bot-attacks instantly.
-- **SQL Injection Defense**: 📍 1,000% Parameterized Query anchoring across all PostgreSQL/Owner-Login layers.
-- **Cache-Busting Integrity**: 🚀 Global asset-versioning (`v=28k-FORTRESS`) to clear every stale production node island-wide.
+### 🛡️ Security Hardening
+I’ve added two new layers of security to the backend to protect the system from basic attacks:
+- **Helmet.js**: This adds security headers to prevent common web vulnerabilities like clickjacking and cross-site scripting.
+- **Rate-Limiting**: I’ve added a shield to the login and report forms so that automated bots cannot spam or try to guess passwords multiple times.
 
 ---
 
-## ⚙️ Technology Stack
-
-- **Frontend**: Vanilla JS (ES6+), Leaflet.js (Panoramic Mapping), CSS3 (Orientation-Aware Hooks).
-- **Backend**: Node.js, Express.js (Fortress-Hardened Middleware).
-- **Database**: PostgreSQL (National Master Grid), db-migrate logic.
-- **Deployment**: Vercel (Frontend), Render (High-Performance Backend).
+## Features
+- **Real-Time Tracking**: See current stock levels for Petrol, Diesel, and LPG Gas.
+- **Trilingual Support**: Full translations for English, Sinhala, and Tamil.
+- **Interactive Map**: View all stations on a responsive map (Leaflet.js).
+- **Mobile Responsive**: Fully optimized for mobile phones, tablets, and PCs.
+- **Admin & Owner Portals**: Secure areas for station owners to update their stock.
 
 ---
 
-## 🚀 Rapid Local Setup
+## Tech Stack
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+), Leaflet.js
+- **Backend**: Node.js, Express.js
+- **Database**: PostgreSQL
+- **Hosting**: Vercel (Frontend), Render (Backend)
 
-1. **Clone the National Repository**:
+---
+
+## How to Run Regionally
+
+1. **Clone the Repo**:
    ```bash
    git clone https://github.com/E-Dasun-Manjitha/fuelpass-sl.git
    ```
 
-2. **Backend Fortress Setup**:
-   ```bash
-   cd backend
-   npm install
-   # Create a .env with JWT_SECRET, ADMIN_PASSWORD, and DATABASE_URL
-   npm start
-   ```
+2. **Setup the Backend**:
+   - Go to the `backend` folder.
+   - Run `npm install`.
+   - Setup your `.env` with a `JWT_SECRET` and `DATABASE_URL`.
+   - Run `npm start`.
 
-3. **Frontend Sync**:
-   Open `index.html` in an Absolute-Path browser or deploy to a Vercel-Ready terminal.
+3. **Open the Frontend**:
+   - Simply open `index.html` in your browser.
 
 ---
 
-## 🤝 Community & Support
-This platform is a national-standard effort. If you encounter any display issues or have security suggestions:
-- **Report Issue**: [fuelpass-sl.vercel.app/#contact](https://fuelpass-sl.vercel.app/#contact)
-- **Developer**: E-Dasun-Manjitha
+## Live Demo
+You can visit the live website here: [https://fuelpass-sl.vercel.app/](https://fuelpass-sl.vercel.app/)
 
-**"Empowering Sri Lanka with Transparent Intelligence."** 🇱🇰🏆🏁🚀🎨🔥
+**"Helping Sri Lanka stay informed."** 🇱🇰🏆🏁🚀🎨🔥

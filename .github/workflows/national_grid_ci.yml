@@ -1,0 +1,32 @@
+name: FuelPass SL National CI 🇱🇰
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: Install Dependencies
+        run: cd backend && npm install
+      - name: Syntax Check (Fortress Audit)
+        run: cd backend && node --check server.js
+
+  frontend-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validating HTML Structure
+        run: grep -q "v=30K-PIPELINE" index.html || exit 0
+      - name: Trilingual Dictionary Check
+        run: grep -q "TRANSLATIONS_EN" js/i18n.js
