@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 4000;
 // 1. CORS: Permitting specific National Cross-Origin Auth
 const corsOptions = {
   origin: true, // Allow Vercel & Dashboards
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
 };
