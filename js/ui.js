@@ -13,7 +13,9 @@ window.toggleTheme = function() {
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('fp_theme', next);
-  showToast(`Theme switched to ${next.toUpperCase()} mode`, 'info');
+  
+  const modeLabel = next === 'dark' ? t('nav_theme_dark') : t('nav_theme_light');
+  showToast(t('nav_theme_switched_to').replace('%mode%', modeLabel), 'info');
 };
 
 // Initialize theme immediately
