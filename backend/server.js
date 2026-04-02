@@ -2,25 +2,44 @@
 require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
+const helmet  = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
 
 // ---- Middleware ----
+// ============ NATIONAL DEFENSIVE ARMOR (v=35K-FORTRESS-SYNC) ============
+
+// 1. CORS: Permitting specific National Cross-Origin Auth
 const corsOptions = {
-  origin: function(origin, callback) {
-    if (!origin || /localhost:\d+|127\.0\.0\.1:\d+|fuelpass-sl.*\.vercel\.app$/.test(origin)) {
-      callback(null, true);
-    } else if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow Vercel & Dashboards
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
 };
 app.use(cors(corsOptions));
+
+// 2. Helmet: Hardened Header Defense (Tuned for Cross-Origin Authority)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false, // Managed by Vercel for the frontend
+}));
+
 app.use(express.json());
+
+// 3. Dual-Limiter Shield Logic
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 20, 
+  message: { success: false, error: 'Too many login attempts, please try again later.' }
+});
+
+const managementLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 100, // Headroom for national admin tasks
+  message: { success: false, error: 'Too many requests, please try again later.' }
+});
 
 // Prevent browser caching for all API routes
 app.use('/api', (req, res, next) => {
@@ -32,13 +51,13 @@ app.use('/api', (req, res, next) => {
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
 // ---- API Routes ----
-app.use('/api/auth',     require('./routes/auth'));
+app.use('/api/auth',     authLimiter,       require('./routes/auth'));
 app.use('/api/stations', require('./routes/stations'));
 app.use('/api/gas-shops',require('./routes/gas'));
 app.use('/api/prices',   require('./routes/prices'));
-app.use('/api/reports',  require('./routes/reports'));
-app.use('/api/owners',   require('./routes/owners'));
-app.use('/api/contact',  require('./routes/contact'));
+app.use('/api/reports',  managementLimiter, require('./routes/reports'));
+app.use('/api/owners',   managementLimiter, require('./routes/owners'));
+app.use('/api/contact',  managementLimiter, require('./routes/contact'));
 
 // ---- 404 ----
 app.use((req, res) => res.status(404).json({ success: false, error: 'Endpoint not found' }));

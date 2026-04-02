@@ -9,12 +9,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
   <title data-i18n="app_title">FuelPass SL – National Fuel & Gas Tracker</title>
-<<<<<<< Updated upstream
-  <link rel="stylesheet" href="css/styles.css?v=22K" />
-=======
-  <link rel="stylesheet" href="css/styles.css?v=44K-PRICE-FIX" />
->>>>>>> Stashed changes
+  <link rel="stylesheet" href="css/styles.css?v=46K-PR-RESOLVE" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    /* ============ SPLASH LOADER LOGIC ============ */
+    #splash-loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #0b0f1a; display: flex; align-items: center; justify-content: center;
+      z-index: 999999; transition: opacity 0.8s ease, visibility 0.8s;
+      color: #fff; text-align: center; font-family: 'Space Grotesk', sans-serif;
+    }
+    #splash-loader.hidden { opacity: 0; visibility: hidden; }
+    .splash-inner h2 { margin-top: 15px; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; }
+    .splash-bar { width: 180px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 15px auto; overflow: hidden; }
+    .splash-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3B82F6, #7C3AED); animation: splashBarProgress 2s ease-out forwards; }
+    .splash-inner p { font-size: 0.85rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+
+    @keyframes splashLogoPulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+    @keyframes splashBarProgress { from { width: 0%; } to { width: 100%; } }
+  </style>
   <link rel="icon" type="image/png" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
 </head>
@@ -41,6 +54,13 @@
       <button class="hamburger-btn mob-only" id="menuToggle" onclick="toggleDrawer()" aria-label="Open Menu">
         <span></span><span></span><span></span>
       </button>
+
+      <!-- Mobile Quick Lang (SS1 Fix) -->
+      <div class="lang-switcher mobile-nav-lang mob-only" role="group">
+        <button class="lang-btn active" data-lang="en" onclick="applyLanguage('en')">EN</button>
+        <button class="lang-btn" data-lang="si" onclick="applyLanguage('si')">සිං</button>
+        <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
+      </div>
 
       <div class="nav-brand">
         <img src="logo.png" alt="FuelPass SL Logo" style="width:38px;height:38px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />
@@ -187,6 +207,7 @@
             <div class="hv-chip hv-chip-1">✅ Petrol Available</div>
             <div class="hv-chip hv-chip-2">📡 Live Updates</div>
             <div class="hv-chip hv-chip-3">🗺️ Find Nearest</div>
+            <div class="hv-chip hv-chip-4">🔥 Gas Available</div>
           </div>
         </div>
       </div>
@@ -933,6 +954,15 @@
   <script src="js/app.js?v=23K"></script>
   <script src="js/owner.js?v=23K"></script>
   <script>
+    window.addEventListener('load', () => {
+      const sp = document.getElementById('splash-loader');
+      setTimeout(() => {
+        if(sp) sp.classList.add('hidden');
+        // Fully remove after transition
+        setTimeout(() => { if(sp) sp.style.display = 'none'; }, 800);
+      }, 1500); // Guarantees a premium pulse feel
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
       // Mobile Toggle Initialization
       const nT = document.getElementById('navToggle');

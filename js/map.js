@@ -228,6 +228,14 @@ function setMapFilter(filter) {
   const mapping = { fuel:'mcFuel', gas:'mcGas', all:'mcAll' };
   document.getElementById(mapping[filter])?.classList.add('active');
   renderMapMarkers();
+  
+  // v=27K-ULTRA: Deterministic panoramic zoom (Guaranteed One Extra Step out)
+  if (allMarkers.length > 0) {
+    const group = L.featureGroup(allMarkers);
+    const bounds = group.getBounds();
+    const targetZoom = map.getBoundsZoom(bounds, false, [120, 120]) - 1;
+    map.setView(bounds.getCenter(), Math.max(targetZoom, 6), { animate: true });
+  }
 }
 
 function locateUser() {
