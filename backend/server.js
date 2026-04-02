@@ -2,6 +2,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
+const helmet  = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
@@ -20,7 +22,17 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
+app.use(helmet()); // Fortress Header Security v28K
 app.use(express.json());
+
+// Targetted Brute-Force Protection for Auth & Reports
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 requests per window
+  message: { success: false, error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Prevent browser caching for all API routes
 app.use('/api', (req, res, next) => {
@@ -32,13 +44,13 @@ app.use('/api', (req, res, next) => {
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
 // ---- API Routes ----
-app.use('/api/auth',     require('./routes/auth'));
+app.use('/api/auth',     apiLimiter, require('./routes/auth'));
 app.use('/api/stations', require('./routes/stations'));
 app.use('/api/gas-shops',require('./routes/gas'));
 app.use('/api/prices',   require('./routes/prices'));
-app.use('/api/reports',  require('./routes/reports'));
-app.use('/api/owners',   require('./routes/owners'));
-app.use('/api/contact',  require('./routes/contact'));
+app.use('/api/reports',  apiLimiter, require('./routes/reports'));
+app.use('/api/owners',   apiLimiter, require('./routes/owners'));
+app.use('/api/contact',  apiLimiter, require('./routes/contact'));
 
 // ---- 404 ----
 app.use((req, res) => res.status(404).json({ success: false, error: 'Endpoint not found' }));
