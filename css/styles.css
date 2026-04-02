@@ -48,14 +48,21 @@
   color-scheme: light;
 }
 
-html { scroll-behavior: smooth; }
+html { 
+  scroll-behavior: smooth; 
+  height: auto !important; 
+  overflow-y: scroll !important; /* ELITE FIX: Always allow scrolling */
+  overflow-x: hidden !important;
+}
 
 body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-base);
   color: var(--text-primary);
   min-height: 100vh;
-  overflow-x: hidden;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
 }
 
 a { color: inherit; text-decoration: none; cursor: pointer; }
@@ -111,11 +118,12 @@ select option { background: var(--bg-surface); color: var(--text-primary); }
   align-items: center;
   justify-content: center;
   transition: opacity 0.6s ease, visibility 0.6s ease;
-  /* CSS fallback: auto-hide after 2.5s even if JS fails */
-  animation: splashAutoHide 0.5s ease 2.5s forwards;
+  pointer-events: none; /* ELITE FIX: Prevent interaction blocking */
+  visibility: hidden;
 }
-@keyframes splashAutoHide {
-  to { opacity: 0; visibility: hidden; pointer-events: none; }
+#splash-loader.active {
+  pointer-events: all;
+  visibility: visible;
 }
 #splash-loader.hidden { opacity: 0; visibility: hidden; }
 .splash-inner {
@@ -2091,14 +2099,17 @@ select option { background: var(--bg-surface); color: var(--text-primary); }
   inset: 0;
   background: rgba(0,0,0,0.7);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 1099;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none; /* ELITE FIX: Eradicate invisible scroll blocks */
   transition: var(--transition);
 }
 .drawer-overlay.active {
   opacity: 1;
   visibility: visible;
+  pointer-events: all;
 }
 
 /* Visibility Control */
