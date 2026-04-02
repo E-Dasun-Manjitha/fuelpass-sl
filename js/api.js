@@ -23,9 +23,21 @@ async function apiFetch(path, options = {}) {
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       headers: Auth.getHeaders(),
-      cache: 'no-store', // Force bypass all browser disk caches natively
+      cache: 'no-store',
       ...options,
     });
+
+    // National Self-Healing Fix (v=34K-TOKEN-RECOVERY)
+    if (res.status === 401 || res.status === 403) {
+      console.warn('⚠️ Session expired or invalid. Redirecting to login...');
+      Auth.clearToken();
+      // Handle Admin-Panel vs Dashboard Login Portal
+      if (window.location.pathname.includes('admin.html')) {
+        window.location.href = 'admin.html#login-refresh';
+        location.reload(); // Force refresh to trigger login state
+      }
+    }
+
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'API error');
     return data;

@@ -9,40 +9,36 @@ const app  = express();
 const PORT = process.env.PORT || 4000;
 
 // ---- Middleware ----
+// ============ NATIONAL DEFENSIVE ARMOR (v=35K-FORTRESS-SYNC) ============
+
+// 1. CORS: Permitting specific National Cross-Origin Auth
 const corsOptions = {
-  origin: function(origin, callback) {
-    if (!origin || /localhost:\d+|127\.0\.0\.1:\d+|fuelpass-sl.*\.vercel\.app$/.test(origin)) {
-      callback(null, true);
-    } else if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow Vercel & Dashboards
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.use(helmet()); // Fortress Header Security v28K
+
+// 2. Helmet: Hardened Header Defense (Tuned for Cross-Origin Authority)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false, // Managed by Vercel for the frontend
+}));
+
 app.use(express.json());
 
-// ---- Specialized Rate Limiters (v=33K-LIMITER-FIX) ----
-
-// 1. Strict Limiter: Neutralizing Brute-Force on Login/Register
+// 3. Dual-Limiter Shield Logic
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000, 
   max: 20, 
-  message: { success: false, error: 'Too many login attempts, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: { success: false, error: 'Too many login attempts, please try again later.' }
 });
 
-// 2. Lenient Limiter: Allowing High-Performance Admin/User Management
 const managementLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 1,000,000% more headroom for national admin tasks
-  message: { success: false, error: 'Too many requests, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 15 * 60 * 1000, 
+  max: 100, // Headroom for national admin tasks
+  message: { success: false, error: 'Too many requests, please try again later.' }
 });
 
 // Prevent browser caching for all API routes
