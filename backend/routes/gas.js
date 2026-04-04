@@ -76,5 +76,31 @@ router.post('/:id/stock', verifyToken, async (req, res) => {
   }
 });
 
+// PATCH /api/gas-shops/:id/status – Bulk admin update (status + coordinates)
+router.patch('/:id/status', verifyToken, async (req, res) => {
+  try {
+    const { fuels, lat, lng } = req.body;
+    
+    const stockQueries = Object.entries(fuels).map(([size, status]) => {
+      return db.query(`
+        INSERT INTO gas_shop_stock (shop_id, cylinder_size, status, last_updated)
+        VALUES ($1, $2, $3, NOW())
+        ON CONFLICT (shop_id, cylinder_size)
+        DO UPDATE SET status = $3, last_updated = NOW()
+      `, [req.params.id, size, status]);
+    });
+
+    if (!isNaN(lat) && !isNaN(lng)) {
+      stockQueries.push(db.query(`UPDATE gas_shops SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
+    }
+    
+    await Promise.all(stockQueries);
+    res.json({ success: true, message: 'Gas shop updated' });
+  } catch (err) {
+    console.error('❌ Gas Shop Update Error:', err);
+    res.status(500).json({ success: false, error: 'Database update failed' });
+  }
+});
+
 module.exports = router;
 

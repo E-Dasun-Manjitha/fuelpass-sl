@@ -1200,7 +1200,8 @@
       const lat = parseFloat(document.getElementById('esLat').value) || null;
       const lng = parseFloat(document.getElementById('esLng').value) || null;
 
-      const res = await apiUpdateStationStatus(id, { fuels, queue, lat, lng });
+      const isGas = id.startsWith('rg');
+      const res = await apiUpdateStationStatus(id, { fuels, queue, lat, lng }, isGas);
       if (res && res.success) {
         showAdminToast('✅ Data saved successfully!');
         closeStationEdit();

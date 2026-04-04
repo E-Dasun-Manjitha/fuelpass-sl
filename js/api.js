@@ -150,8 +150,9 @@ async function apiDeleteContact(id) {
   return apiFetch(`/api/contact/${id}`, { method: 'DELETE' });
 }
 
-async function apiUpdateStationStatus(id, payload) {
-  return apiFetch(`/api/stations/${id}/status`, {
+async function apiUpdateStationStatus(id, payload, isGas = false) {
+  const ep = isGas ? `/api/gas-shops/${id}/status` : `/api/stations/${id}/status`;
+  return apiFetch(ep, {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
