@@ -88,14 +88,15 @@ async function apiSubmitVerifiedReport(payload) {
   });
 }
 
-async function apiUpdateStationStatus(stationId, payload) {
+// --- OWNER ACTIONS ---
+async function apiOwnerUpdateStation(stationId, payload) {
   return apiFetch(`/api/stations/${stationId}/status`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 }
 
-async function apiUpdateGasStockStatus(shopId, payload) {
+async function apiOwnerUpdateGas(shopId, payload) {
   return apiFetch(`/api/gas-shops/${shopId}/stock`, {
     method: 'POST',
     body: JSON.stringify(payload),
