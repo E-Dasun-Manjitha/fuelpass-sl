@@ -99,6 +99,19 @@ CREATE TABLE IF NOT EXISTS reports (
   created_at    TIMESTAMP DEFAULT NOW()
 );
 
+-- ---- CONTACT MESSAGES ----
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id            SERIAL PRIMARY KEY,
+  name          VARCHAR(100) NOT NULL,
+  email         VARCHAR(200),
+  subject       VARCHAR(200),
+  message       TEXT NOT NULL,
+  reply         TEXT,
+  replied_at    TIMESTAMP,
+  status        VARCHAR(50) DEFAULT 'pending',
+  created_at    TIMESTAMP DEFAULT NOW()
+);
+
 -- ============================================================
 -- SEED DATA
 -- ============================================================

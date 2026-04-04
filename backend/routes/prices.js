@@ -57,7 +57,7 @@ router.put('/bulk', verifyToken, requireAdmin, async (req, res) => {
         [u.price, u.type]
       );
       await db.query(
-        "UPDATE gas_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE provider || ' ' || size = $2",
+        "UPDATE gas_prices SET price = $1, updated_at = NOW() WHERE provider || ' ' || size = $2",
         [u.price, u.type]
       );
     }

@@ -869,8 +869,12 @@
       { key:'kerosene', type:'Kerosene',    label:'Kerosene (LKR/L)'                 },
     ];
     const gasFields = [
+      { key:'litroGas375',  type:'Litro 37.5 kg', label:'Litro Gas 37.5 kg (LKR)'  },
+      { key:'laugfsGas375', type:'LAUGFS 37.5 kg', label:'LAUGFS Gas 37.5 kg (LKR)' },
       { key:'litroGas125',  type:'Litro 12.5 kg', label:'Litro Gas 12.5 kg (LKR)'  },
       { key:'laugfsGas125', type:'LAUGFS 12.5 kg', label:'LAUGFS Gas 12.5 kg (LKR)' },
+      { key:'litroGas5',    type:'Litro 5 kg',    label:'Litro Gas 5 kg (LKR)'     },
+      { key:'laugfsGas5',   type:'LAUGFS 5 kg',   label:'LAUGFS Gas 5 kg (LKR)'    },
     ];
 
     const buildFields = arr => arr.map(f => `
@@ -1218,65 +1222,6 @@
         ALL_ADMIN_STATIONS = ALL_ADMIN_STATIONS.filter(x => x.id !== id);
       }
     } catch(err) { showAdminToast('❌ Deletion failed.', 'error'); }
-  }
-
-  // ── REPORTS ──────────────────────────────────────────────
-  window.renderVerifiedReports = async function() {
-    const el = document.getElementById('reportsList');
-    el.innerHTML = '<div style="padding:20px;text-align:center;">Loading reports...</div>';
-    try {
-      const res = await apiGetReports(); // Get all (pending + verified)
-      const reports = res?.data || [];
-      if (!reports.length) {
-        el.innerHTML = '<div class="empty-state"><span>📋</span><p>No reports found.</p></div>';
-        return;
-      }
-      el.innerHTML = `<table class="admin-table">
-        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Queue</th><th>Submitter</th><th>Flag</th><th>Actions</th></tr></thead>
-        <tbody>` +
-        reports.map(r => {
-          const sc = r.status==='available'?'status-available':r.status==='limited'?'status-limited':'status-out';
-          const sl = r.status==='available'?'✅ Avail':r.status==='limited'?'⚠️ Lim':'❌ Out';
-          return `<tr id="report-row-${r.id}">
-            <td><strong style="color:var(--text-primary);">${r.station_name || '-'}</strong></td>
-            <td>${r.product || '—'}</td>
-            <td><span class="oc-status ${sc}">${sl}</span></td>
-            <td>${r.queue || '—'}</td>
-            <td style="font-size:0.75rem;">${r.reporter}</td>
-            <td>${r.verified ? '✅ Verif' : '🕒 Pend'}</td>
-            <td>
-              <div style="display:flex;gap:4px;">
-                ${!r.verified ? `<button class="action-btn btn-approve" style="padding:4px 8px;font-size:0.7rem;" onclick="verifyReport(${r.id})">🛡️ Verify</button>` : ''}
-                <button class="action-btn btn-reject" style="padding:4px 8px;font-size:0.7rem;" onclick="deleteReport(${r.id})">🗑️</button>
-              </div>
-            </td>
-          </tr>`;
-        }).join('') +
-        '</tbody></table>';
-    } catch(err) { el.innerHTML = 'Error loading reports.'; }
-  }
-
-  window.verifyReport = async function(id) {
-    try {
-      const res = await apiVerifyReport(id);
-      if (res && res.success) {
-        showAdminToast('✅ Report verified and station synced!');
-        renderVerifiedReports();
-        ALL_ADMIN_STATIONS = []; // Force refresh
-      }
-    } catch(err) { showAdminToast('❌ Verification failed.', 'error'); }
-  }
-
-  window.deleteReport = async function(id) {
-    if (!confirm('Delete this report?')) return;
-    try {
-      const res = await apiDeleteReport(id);
-      if (res && res.success) {
-        const row = document.getElementById(`report-row-${id}`);
-        if (row) row.remove();
-        showAdminToast('✅ Report deleted successfully.');
-      }
-    } catch(err) { showAdminToast('❌ Error deleting.', 'error'); }
   }
 
   // ── TOAST ─────────────────────────────────────────────────
