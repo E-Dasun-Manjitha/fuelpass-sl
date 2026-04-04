@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS stations (
   id          VARCHAR(20) PRIMARY KEY,
   name        VARCHAR(200) NOT NULL,
-  company     VARCHAR(10)  NOT NULL CHECK (company IN ('CPC','IOC')),
+  company     VARCHAR(20)  NOT NULL,
   district    VARCHAR(50)  NOT NULL,
   address     TEXT         NOT NULL,
   lat         DECIMAL(9,6) NOT NULL,
