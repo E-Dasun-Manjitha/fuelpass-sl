@@ -63,7 +63,7 @@ router.post('/verified', verifyToken, async (req, res) => {
 });
 
 // DELETE /api/reports/:id – Admin removes a report (requires admin token)
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.query('DELETE FROM reports WHERE id = $1 RETURNING id', [id]);

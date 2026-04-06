@@ -2,7 +2,7 @@
 const express = require('express');
 const router  = express.Router();
 const db      = require('../db');
-const { verifyToken } = require('../middleware/auth');
+const { verifyToken, requireAdmin } = require('../middleware/auth');
 
 // POST /api/contact  – Public: user submits feedback
 router.post('/', async (req, res) => {
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/contact  – Admin only: list all messages
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', verifyToken, requireAdmin, async (req, res) => {
   try {
     const result = await db.query(
       'SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 100'
@@ -45,7 +45,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // PATCH /api/contact/:id/reply  – Admin saves a reply note
-router.patch('/:id/reply', verifyToken, async (req, res) => {
+router.patch('/:id/reply', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { reply } = req.body;
     if (!reply) return res.status(400).json({ success: false, error: 'Reply text required.' });
@@ -62,7 +62,7 @@ router.patch('/:id/reply', verifyToken, async (req, res) => {
 });
 
 // DELETE /api/contact/:id  – Admin deletes a message
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     const result = await db.query('DELETE FROM contact_messages WHERE id=$1 RETURNING id', [req.params.id]);
     if (!result.rowCount) return res.status(404).json({ success: false, error: 'Message not found.' });

@@ -2,7 +2,7 @@
 const express = require('express');
 const router  = express.Router();
 const db      = require('../db');
-const { verifyToken } = require('../middleware/auth');
+const { verifyToken, requireAdmin } = require('../middleware/auth');
 
 // GET /api/gas-shops  – query: ?district=Colombo&provider=Litro&cylinder=12.5kg
 router.get('/', async (req, res) => {
