@@ -30,20 +30,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// PUT /api/prices/:id  (admin only)
-router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
-  try {
-    const { price } = req.body;
-    await db.query(
-      'UPDATE fuel_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE id = $2',
-      [price, req.params.id]
-    );
-    res.json({ success: true, message: 'Price updated' });
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
-  }
-});
-
 // PUT /api/prices/bulk (admin only)
 router.put('/bulk', verifyToken, requireAdmin, async (req, res) => {
   try {
@@ -78,6 +64,20 @@ router.put('/bulk', verifyToken, requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
+// PUT /api/prices/:id  (admin only)
+router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { price } = req.body;
+    await db.query(
+      'UPDATE fuel_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE id = $2',
+      [price, req.params.id]
+    );
+    res.json({ success: true, message: 'Price updated' });
+  } catch (err) {
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });
