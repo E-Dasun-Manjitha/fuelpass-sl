@@ -76,26 +76,40 @@ router.post('/:id/stock', verifyToken, async (req, res) => {
   }
 });
 
-// PATCH /api/gas-shops/:id/status – Bulk admin update (status + coordinates)
-router.patch('/:id/status', verifyToken, async (req, res) => {
+// PATCH /api/gas-shops/:id/status – Bulk admin update (status + details + coordinates)
+router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { fuels, lat, lng } = req.body;
-    
-    const stockQueries = Object.entries(fuels).map(([size, status]) => {
-      return db.query(`
-        INSERT INTO gas_shop_stock (shop_id, cylinder_size, status, last_updated)
-        VALUES ($1, $2, $3, NOW())
-        ON CONFLICT (shop_id, cylinder_size)
-        DO UPDATE SET status = $3, last_updated = NOW()
-      `, [req.params.id, size, status]);
-    });
+    const { fuels, lat, lng, name, address, district } = req.body;
+    const queries = [];
 
-    if (lat !== null && lng !== null && typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
-      stockQueries.push(db.query(`UPDATE gas_shops SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
+    // 1. Update shop details
+    const updateFields = [];
+    const updateParams = [];
+    if (name) { updateFields.push(`name = $${updateParams.length + 1}`); updateParams.push(name); }
+    if (address) { updateFields.push(`address = $${updateParams.length + 1}`); updateParams.push(address); }
+    if (district) { updateFields.push(`district = $${updateParams.length + 1}`); updateParams.push(district); }
+    if (lat !== null && typeof lat === 'number') { updateFields.push(`lat = $${updateParams.length + 1}`); updateParams.push(lat); }
+    if (lng !== null && typeof lng === 'number') { updateFields.push(`lng = $${updateParams.length + 1}`); updateParams.push(lng); }
+
+    if (updateFields.length > 0) {
+      updateParams.push(req.params.id);
+      queries.push(db.query(`UPDATE gas_shops SET ${updateFields.join(', ')} WHERE id = $${updateParams.length}`, updateParams));
     }
-    
-    await Promise.all(stockQueries);
-    res.json({ success: true, message: 'Gas shop updated' });
+
+    // 2. Update stock
+    if (fuels) {
+      Object.entries(fuels).forEach(([size, status]) => {
+        queries.push(db.query(`
+          INSERT INTO gas_shop_stock (shop_id, cylinder_size, status, last_updated)
+          VALUES ($1, $2, $3, NOW())
+          ON CONFLICT (shop_id, cylinder_size)
+          DO UPDATE SET status = $3, last_updated = NOW()
+        `, [req.params.id, size, status]));
+      });
+    }
+
+    await Promise.all(queries);
+    res.json({ success: true, message: 'Gas shop details and stock updated' });
   } catch (err) {
     console.error('❌ Gas Shop Update Error:', err);
     res.status(500).json({ success: false, error: 'Database update failed' });

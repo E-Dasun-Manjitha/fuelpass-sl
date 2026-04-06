@@ -37,10 +37,10 @@ router.put('/bulk', verifyToken, requireAdmin, async (req, res) => {
     
     // Matrix routing frontend categories to all exact DB string variants
     const MAPPING = {
-      'Petrol 92 Octane': ['Petrol 92 Octane', 'Servo 92 Octane'],
-      'Petrol 95 Octane': ['Petrol 95 Octane', 'Servo 95 Octane', 'XP-95 Premium'],
-      'Auto Diesel': ['Auto Diesel'],
-      'Super Diesel (Euro 4)': ['Super Diesel (Euro4)', 'XP Super Diesel'],
+      'Petrol 92 Octane': ['Petrol 92 Octane', 'Servo 92 Octane', '92 Octane Petrol'],
+      'Petrol 95 Octane': ['Petrol 95 Octane', 'Servo 95 Octane', 'XP-95 Premium', '95 Octane Petrol'],
+      'Auto Diesel': ['Auto Diesel', 'Auto Diesel'],
+      'Super Diesel (Euro 4)': ['Super Diesel (Euro4)', 'XP Super Diesel', 'Euro 4 Super Diesel'],
       'Kerosene': ['Kerosene']
     };
 

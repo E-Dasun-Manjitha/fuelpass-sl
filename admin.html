@@ -492,9 +492,28 @@
 <!-- ── STATION EDIT MODAL ── -->
 <div id="stationEditModal" style="display:none;" class="modal-overlay">
   <div class="approve-modal" style="max-width:500px;">
-    <h3>🚉 Edit Station Status</h3>
-    <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:16px;" id="esStationInfo"></p>
-    <input type="hidden" id="esStationId">
+    <div class="am-row">
+      <label>Station Name</label>
+      <input type="text" id="esName" class="am-input" placeholder="Station Name">
+    </div>
+    <div class="am-row">
+      <label>Address</label>
+      <input type="text" id="esAddress" class="am-input" placeholder="Full Address">
+    </div>
+    <div class="am-row">
+      <label>District</label>
+      <select id="esDistrict" class="am-input" style="background:#0f172a;">
+        <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+        <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+        <option>Galle</option><option>Matara</option><option>Hambantota</option>
+        <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+        <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option><option>Ampara</option>
+        <option>Trincomalee</option><option>Kurunegala</option><option>Puttalam</option>
+        <option>Anuradhapura</option><option>Polonnaruwa</option><option>Badulla</option>
+        <option>Monaragala</option><option>Ratnapura</option><option>Kegalle</option>
+      </select>
+    </div>
+    
     
     <div class="am-row">
       <label>Product & Availability</label>
@@ -1166,7 +1185,9 @@
     const s = ALL_ADMIN_STATIONS.find(x => x.id === id);
     if (!s) return;
     document.getElementById('esStationId').value = id;
-    document.getElementById('esStationInfo').textContent = `${s.name} (${s.company}) - ${s.district}`;
+    document.getElementById('esName').value = s.name || '';
+    document.getElementById('esAddress').value = s.address || '';
+    document.getElementById('esDistrict').value = s.district || 'Colombo';
     
     const fuelTypes = s.fuels ? Object.keys(s.fuels) : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
     const list = document.getElementById('esFuelStatusList');
@@ -1203,6 +1224,10 @@
 
     try {
       const id = document.getElementById('esStationId').value;
+      const name = document.getElementById('esName').value.trim();
+      const address = document.getElementById('esAddress').value.trim();
+      const district = document.getElementById('esDistrict').value;
+      
       const fuels = {};
       document.querySelectorAll('.fuel-select-field').forEach(el => {
         fuels[el.dataset.fkey] = el.value;
@@ -1212,7 +1237,7 @@
       const lng = parseFloat(document.getElementById('esLng').value) || null;
 
       const isGas = id.startsWith('rg');
-      const res = await apiUpdateStationStatus(id, { fuels, queue, lat, lng }, isGas);
+      const res = await apiUpdateStationStatus(id, { name, address, district, fuels, queue, lat, lng }, isGas);
       if (res && res.success) {
         showAdminToast('✅ Data saved successfully!');
         closeStationEdit();

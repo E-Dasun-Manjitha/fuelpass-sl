@@ -84,28 +84,40 @@ router.post('/:id/status', verifyToken, async (req, res) => {
   }
 });
 
-// PATCH /api/stations/:id/status – Bulk admin update
+// PATCH /api/stations/:id/status – Bulk admin update (status + details + coordinates)
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { fuels, queue, lat, lng } = req.body;
+    const { fuels, queue, lat, lng, name, address, district } = req.body;
+    const queries = [];
     
-    // Update fuels & queue
-    const fuelQueries = Object.entries(fuels).map(([type, status]) => {
-      return db.query(`
-        INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
-        VALUES ($1,$2,$3,$4,NOW(),'admin')
-        ON CONFLICT (station_id, fuel_type)
-        DO UPDATE SET status=$3, queue=$4, last_updated=NOW(), updated_by='admin'
-      `, [req.params.id, type, status, queue || 'none']);
-    });
-
-    // Update location if valid coordinates provided
-    if (lat !== null && lng !== null && typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
-      fuelQueries.push(db.query(`UPDATE stations SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
+    // 1. Update station details (Name, Address, District, Location)
+    const updateStationsFields = [];
+    const updateStationsParams = [];
+    if (name) { updateStationsFields.push(`name = $${updateStationsParams.length + 1}`); updateStationsParams.push(name); }
+    if (address) { updateStationsFields.push(`address = $${updateStationsParams.length + 1}`); updateStationsParams.push(address); }
+    if (district) { updateStationsFields.push(`district = $${updateStationsParams.length + 1}`); updateStationsParams.push(district); }
+    if (lat !== null && typeof lat === 'number') { updateStationsFields.push(`lat = $${updateStationsParams.length + 1}`); updateStationsParams.push(lat); }
+    if (lng !== null && typeof lng === 'number') { updateStationsFields.push(`lng = $${updateStationsParams.length + 1}`); updateStationsParams.push(lng); }
+    
+    if (updateStationsFields.length > 0) {
+      updateStationsParams.push(req.params.id);
+      queries.push(db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams));
     }
-    
-    await Promise.all(fuelQueries);
-    res.json({ success: true, message: 'Station status and location updated' });
+
+    // 2. Update fuel availability
+    if (fuels) {
+      Object.entries(fuels).forEach(([type, status]) => {
+        queries.push(db.query(`
+          INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
+          VALUES ($1, $2, $3, $4, NOW(), 'admin')
+          ON CONFLICT (station_id, fuel_type)
+          DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'admin'
+        `, [req.params.id, type, status, queue || 'none']));
+      });
+    }
+
+    await Promise.all(queries);
+    res.json({ success: true, message: 'Station details and status updated' });
   } catch (err) {
     console.error('❌ Station Status Update Error:', err);
     res.status(500).json({ success: false, error: 'Database update failed' });
