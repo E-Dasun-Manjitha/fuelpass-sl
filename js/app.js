@@ -187,11 +187,14 @@ function hideSplash() {
 }
 
 // ---- MAIN INIT ----
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   // ⚠️ ALWAYS hide splash first — nothing should block this
   hideSplash();
 
   try { initNavbar(); }           catch(e) { console.warn(e); }
+
+  // FETCH REAL POSTGRES DATA
+  try { await loadLiveData(); } catch(e) { console.warn('Failed to load DB data', e); }
 
   // Ticker
   try { buildTicker(); }          catch(e) { console.warn(e); }
@@ -229,9 +232,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Eligibility
   try { initOddEvenFromToday(); } catch(e) { console.warn(e); }
-
-  // Simulate real-time updates
-  try { simulateRealTimeUpdates(); } catch(e) {}
 
   // Hash navigation
   try {
