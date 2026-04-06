@@ -114,13 +114,13 @@ function renderStationCard(station, clickFn) {
     return `<div class="fuel-chip ${chipClass}"><span class="chip-dot"></span>${labels[k]||k}</div>`;
   }).join('');
 
-  const queueLabel = station.queue === 'none' ? `✅ ${t('queue_none')}` : station.queue === 'short' ? `⏱️ ${t('queue_short')}` : station.queue === 'medium' ? `⚠️ ${t('queue_medium')}` : `🚗 ${t('queue_long')}`;
+  const queueLabel = station.queue === 'none' ? ` ${t('queue_none')}` : station.queue === 'short' ? ` ${t('queue_short')}` : station.queue === 'medium' ? ` ${t('queue_medium')}` : ` ${t('queue_long')}`;
 
   let distanceHtml = '';
   if (typeof userLat !== 'undefined' && userLat !== null && userLng !== null) {
      const d = haversineKm(userLat, userLng, station.lat, station.lng);
      const distStr = d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1)} km`;
-     distanceHtml = `<span style="color:#60A5FA;font-weight:700;margin-right:8px;">📍 ${distStr}</span>`;
+     distanceHtml = `<span style="color:#60A5FA;font-weight:700;margin-right:8px;"> ${distStr}</span>`;
   }
 
   return `
@@ -128,7 +128,7 @@ function renderStationCard(station, clickFn) {
       <div class="station-card-header">
         <div class="station-card-title">
           <h4>${station.name}</h4>
-          <p>📍 ${station.address}</p>
+          <p> ${station.address}</p>
         </div>
         <span class="station-badge ${badgeClass}">${station.company}</span>
       </div>
@@ -137,7 +137,7 @@ function renderStationCard(station, clickFn) {
         <span class="${statusClass} oc-status">${t('status_' + status)}</span>
         ${distanceHtml}
         <span>${queueLabel}</span>
-        <span class="station-updated">🕐 ${station.lastUpdated}</span>
+        <span class="station-updated"> ${station.lastUpdated}</span>
       </div>
     </div>
   `;
@@ -158,7 +158,7 @@ function renderGasShopCard(shop) {
   if (typeof userLat !== 'undefined' && userLat !== null && userLng !== null) {
      const d = haversineKm(userLat, userLng, shop.lat, shop.lng);
      const distStr = d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1)} km`;
-     distanceHtml = `<span style="color:#60A5FA;font-weight:700;margin-right:8px;">📍 ${distStr}</span>`;
+     distanceHtml = `<span style="color:#60A5FA;font-weight:700;margin-right:8px;"> ${distStr}</span>`;
   }
 
   return `
@@ -166,7 +166,7 @@ function renderGasShopCard(shop) {
       <div class="station-card-header">
         <div class="station-card-title">
           <h4>${shop.name}</h4>
-          <p>📍 ${shop.address}</p>
+          <p> ${shop.address}</p>
         </div>
         <span class="gas-shop-badge ${badgeClass}">${shop.provider}</span>
       </div>
@@ -175,8 +175,8 @@ function renderGasShopCard(shop) {
         <span class="${statusClass} oc-status">${t('status_' + status)}</span>
         ${distanceHtml}
         <span>📦 ${shop.lastRestock || 'Typical Stock'}</span>
-        <span>🚗 Queue: ${shop.queue || 'none'}</span>
-        <span>🚚 LIVE: ${shop.nextDelivery || 'In 2 days'}</span>
+        <span> Queue: ${shop.queue || 'none'}</span>
+        <span> LIVE: ${shop.nextDelivery || 'In 2 days'}</span>
       </div>
     </div>
   `;
@@ -212,7 +212,7 @@ window.openGasShopModal = function(shop) {
   document.getElementById('modalBody').innerHTML = `
     <div class="modal-station-name">${shop.name}</div>
     <div class="modal-info-row">
-      <span>📍 ${shop.address}</span>
+      <span> ${shop.address}</span>
       <span>•</span>
       <span>${shop.provider} Gas</span>
       <span>•</span>
@@ -221,13 +221,13 @@ window.openGasShopModal = function(shop) {
     <div class="modal-fuels-grid">${stockItems}</div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">
       <span>📦 Last Restock: ${shop.lastRestock || 'Typically Stocked'}</span>
-      <span>🚗 Queue: ${shop.queue || 'none'}</span>
-      <span>🚚 Next Delivery: ${shop.nextDelivery || 'Typical Cycle'}</span>
-      <span>🕐 ${t('last_updated')}: ${shop.lastUpdated || 'Just now'}</span>
+      <span> Queue: ${shop.queue || 'none'}</span>
+      <span> Next Delivery: ${shop.nextDelivery || 'Typical Cycle'}</span>
+      <span> ${t('last_updated')}: ${shop.lastUpdated || 'Just now'}</span>
     </div>
     <div class="modal-actions">
-      <button class="btn-directions" onclick="openDirections(${shop.lat},${shop.lng})">🗺️ ${t('directions')}</button>
-      <button class="btn-report-this" onclick="closeModal();navigateTo('report');setReportType('gas')">📝 ${t('report_update')}</button>
+      <button class="btn-directions" onclick="openDirections(${shop.lat},${shop.lng})"> ${t('directions')}</button>
+      <button class="btn-report-this" onclick="closeModal();navigateTo('report');setReportType('gas')"> ${t('report_update')}</button>
     </div>
   `;
   document.getElementById('stationModal').classList.remove('hidden');
@@ -298,11 +298,11 @@ window.showSuggestions = function(query, target) {
   SRI_LANKA_DISTRICTS.forEach(d => {
     const dLower = d.toLowerCase();
     if (dLower === q || dLower.includes(q)) {
-      matches.push({ type: 'District', icon: '📍', text: d, score: 0 });
+      matches.push({ type: 'District', icon: '', text: d, score: 0 });
     } else {
       const l = getLevenshteinDistance(q, dLower);
       if ((d.length <= 6 && l <= 1) || (d.length > 6 && l <= 2)) {
-        matches.push({ type: 'District', icon: '📍', text: d, score: l });
+        matches.push({ type: 'District', icon: '', text: d, score: l });
       }
     }
   });
@@ -311,7 +311,7 @@ window.showSuggestions = function(query, target) {
   let stCount = 0;
   DB.stations.forEach(s => {
     if (stCount < 5 && s.name && s.name.toLowerCase().includes(q)) {
-      matches.push({ type: 'Fuel', icon: '⛽', text: s.name });
+      matches.push({ type: 'Fuel', icon: '', text: s.name });
       stCount++;
     }
   });
@@ -319,7 +319,7 @@ window.showSuggestions = function(query, target) {
   let gasCount = 0;
   DB.gasShops.forEach(s => {
     if (gasCount < 3 && s.name && s.name.toLowerCase().includes(q)) {
-      matches.push({ type: 'Gas', icon: '🔥', text: s.name });
+      matches.push({ type: 'Gas', icon: '', text: s.name });
       gasCount++;
     }
   });
@@ -573,9 +573,9 @@ function renderGasPage() {
 function renderRecentReports() {
   const container = document.getElementById('recentReports');
   const statusHtml = s => {
-    if (s==='available') return '<span class="oc-status status-available">✅ Available</span>';
-    if (s==='limited')   return '<span class="oc-status status-limited">⚠️ Limited</span>';
-    return '<span class="oc-status status-out">❌ Out of Stock</span>';
+    if (s==='available') return '<span class="oc-status status-available"> Available</span>';
+    if (s==='limited')   return '<span class="oc-status status-limited"> Limited</span>';
+    return '<span class="oc-status status-out"> Out of Stock</span>';
   };
   container.innerHTML = DB.recentReports.map(r => `
     <div class="rr-item">
@@ -584,10 +584,10 @@ function renderRecentReports() {
         <span class="rr-time">${r.time}</span>
       </div>
       <div class="rr-body">
-        <span>⛽ ${r.product}</span>
+        <span> ${r.product}</span>
         ${statusHtml(r.status)}
-        <span>🚗 ${t('queue_' + r.queue)}</span>
-        ${r.verified ? `<span class="rr-verified">✅ ${t('verified')}</span>` : `<span style="color:var(--text-muted);font-size:0.7rem;">${t('unverified')}</span>`}
+        <span> ${t('queue_' + r.queue)}</span>
+        ${r.verified ? `<span class="rr-verified"> ${t('verified')}</span>` : `<span style="color:var(--text-muted);font-size:0.7rem;">${t('unverified')}</span>`}
       </div>
       <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">${t('reported_by')} ${r.user}</div>
     </div>
@@ -624,12 +624,12 @@ function openStationModal(station) {
     `;
   }).join('');
 
-  const queueLabel = station.queue === 'none' ? `✅ ${t('queue_none')}` : station.queue === 'short' ? `⏱️ ${t('queue_short')}` : station.queue === 'medium' ? `⚠️ ${t('queue_medium')}` : `🚗 ${t('queue_long')}`;
+  const queueLabel = station.queue === 'none' ? ` ${t('queue_none')}` : station.queue === 'short' ? ` ${t('queue_short')}` : station.queue === 'medium' ? ` ${t('queue_medium')}` : ` ${t('queue_long')}`;
 
   document.getElementById('modalBody').innerHTML = `
     <div class="modal-station-name">${station.name}</div>
     <div class="modal-info-row">
-      <span>📍 ${station.address}</span>
+      <span> ${station.address}</span>
       <span>•</span>
       <span>${station.company}</span>
       <span>•</span>
@@ -638,12 +638,12 @@ function openStationModal(station) {
     <div class="modal-fuels-grid">${fuelItems}</div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">
       <span>${queueLabel}</span>
-      <span>📞 ${station.phone}</span>
-      <span>🕐 ${t('last_updated')}: ${station.lastUpdated}</span>
+      <span> ${station.phone}</span>
+      <span> ${t('last_updated')}: ${station.lastUpdated}</span>
     </div>
     <div class="modal-actions">
-      <button class="btn-directions" onclick="openDirections(${station.lat},${station.lng})">🗺️ ${t('directions')}</button>
-      <button class="btn-report-this" onclick="closeModal();navigateTo('report')">📝 ${t('report_update')}</button>
+      <button class="btn-directions" onclick="openDirections(${station.lat},${station.lng})"> ${t('directions')}</button>
+      <button class="btn-report-this" onclick="closeModal();navigateTo('report')"> ${t('report_update')}</button>
     </div>
   `;
   document.getElementById('stationModal').classList.remove('hidden');
@@ -695,7 +695,7 @@ function submitReport(e) {
   renderRecentReports();
   e.target.reset();
   selectStatus('available');
-  showToast('✅ Report submitted successfully! Thank you.', 'success');
+  showToast(' Report submitted successfully! Thank you.', 'success');
 }
 
 // ---- TOAST ----

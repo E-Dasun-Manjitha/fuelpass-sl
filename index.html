@@ -30,6 +30,8 @@
   </style>
   <link rel="icon" type="image/png" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>.icon-lucide { width: 1.1em; height: 1.1em; vertical-align: middle; stroke-width: 2.5; }</style>
 </head>
 <body>
   <!-- ============ SPLASH LOADER ============ -->
@@ -84,8 +86,8 @@
           <button class="lang-btn" data-lang="ta" onclick="applyLanguage('ta')">தமி</button>
         </div>
         <div class="live-badge"><span class="live-dot"></span> <span data-i18n="nav_live">LIVE</span></div>
-        <button class="owner-login-btn" id="ownerLoginBtn" onclick="openOwnerLogin()" data-i18n="nav_owner_login">🔑 Owner Login</button>
-        <a href="admin.html" class="admin-nav-btn" title="Admin Panel" data-i18n="nav_admin">⚙️ Admin</a>
+        <button class="owner-login-btn" id="ownerLoginBtn" onclick="openOwnerLogin()" data-i18n="nav_owner_login"><i data-lucide="key" class="icon-lucide"></i> Owner Login</button>
+        <a href="admin.html" class="admin-nav-btn" title="Admin Panel" data-i18n="nav_admin"><i data-lucide="settings" class="icon-lucide"></i> Admin</a>
         
         <!-- Theme Toggle -->
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme mode" style="margin-left: 8px;">
@@ -103,12 +105,12 @@
       <h3 style="font-family:'Space Grotesk',sans-serif;font-weight:700;">FuelPass <em style="font-style:normal;color:var(--blue);">SL</em></h3>
     </div>
     <div class="drawer-links">
-      <a href="#dashboard" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">📊</span> <span data-i18n="nav_dashboard">Dashboard</span></a>
-      <a href="#stations" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">⛽</span> <span data-i18n="nav_stations">Stations</span></a>
-      <a href="#gas" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">🔥</span> <span data-i18n="nav_gas">LPG Gas</span></a>
-      <a href="#prices" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">💰</span> <span data-i18n="nav_prices">Prices</span></a>
-      <a href="#eligibility" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">⚖️</span> <span data-i18n="nav_eligibility">Eligibility</span></a>
-      <a href="#report" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon">📝</span> <span data-i18n="nav_report">Report</span></a>
+      <a href="#dashboard" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon"><i data-lucide="bar-chart-2" class="icon-lucide"></i></span> <span data-i18n="nav_dashboard">Dashboard</span></a>
+      <a href="#stations" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon"><i data-lucide="fuel" class="icon-lucide"></i></span> <span data-i18n="nav_stations">Stations</span></a>
+      <a href="#gas" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon"><i data-lucide="flame" class="icon-lucide"></i></span> <span data-i18n="nav_gas">LPG Gas</span></a>
+      <a href="#prices" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon"><i data-lucide="coins" class="icon-lucide"></i></span> <span data-i18n="nav_prices">Prices</span></a>
+      <a href="#eligibility" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon"><i data-lucide="scale" class="icon-lucide"></i></span> <span data-i18n="nav_eligibility">Eligibility</span></a>
+      <a href="#report" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon"><i data-lucide="file-edit" class="icon-lucide"></i></span> <span data-i18n="nav_report">Report</span></a>
     </div>
 
     <!-- Appearance Section (Migrated from Navbar) -->
@@ -132,8 +134,8 @@
     </div>
     
     <div class="drawer-footer">
-      <button class="owner-login-btn" onclick="openOwnerLogin()" data-i18n="nav_owner_login" style="width:100%;">🔑 Owner Login</button>
-      <a href="admin.html" class="admin-nav-btn" data-i18n="nav_admin" style="margin-top: 10px; display: block; text-align: center; border-radius:99px; padding:10px;">⚙️ Admin</a>
+      <button class="owner-login-btn" onclick="openOwnerLogin()" data-i18n="nav_owner_login" style="width:100%;"><i data-lucide="key" class="icon-lucide"></i> Owner Login</button>
+      <a href="admin.html" class="admin-nav-btn" data-i18n="nav_admin" style="margin-top: 10px; display: block; text-align: center; border-radius:99px; padding:10px;"><i data-lucide="settings" class="icon-lucide"></i> Admin</a>
     </div>
   </div>
 
@@ -147,15 +149,11 @@
     <section id="page-dashboard" class="page active">
       <!-- Hero -->
       <div class="hero">
-        <div class="hero-bg">
-          <div class="hero-orb orb-1"></div>
-          <div class="hero-orb orb-2"></div>
-          <div class="hero-orb orb-3"></div>
-        </div>
+        <div class="hero-bg"></div>
         <div class="hero-content">
           <!-- LEFT: text content -->
           <div class="hero-left">
-            <div class="hero-badge"><span>🇱🇰</span> <span data-i18n="hero_badge">Sri Lanka Fuel Intelligence</span></div>
+            <div class="hero-badge"><span><i data-lucide="shield-check" class="icon-lucide"></i></span> <span data-i18n="hero_badge">Sri Lanka Fuel Intelligence</span></div>
             <h1 data-i18n="hero_title" data-i18n-html>Real-Time Fuel &<br/>Gas Tracking</h1>
             <p data-i18n="hero_subtitle">Check fuel availability, verify your National Fuel Pass quota, find nearby stations, and stay informed during shortage situations.</p>
             <div class="hero-search" style="position:relative;">
@@ -174,47 +172,13 @@
             </div>
           </div>
 
-          <!-- RIGHT: animated logo visual -->
-          <div class="hero-visual" aria-hidden="true">
-            <!-- Outer slow-rotating ring -->
-            <div class="hv-ring hv-ring-1"></div>
-            <div class="hv-ring hv-ring-2"></div>
-            <!-- Pulse halos -->
-            <div class="hv-halo hv-halo-1"></div>
-            <div class="hv-halo hv-halo-2"></div>
-            <div class="hv-halo hv-halo-3"></div>
-            <!-- Center logo -->
-            <div class="hv-logo-wrap">
-              <img src="logo.png" alt="FuelPass SL" class="hv-logo-img" />
-            </div>
-            <!-- Orbiting icon: fuel -->
-            <div class="hv-orbit hv-orbit-1">
-              <div class="hv-orb-icon">⛽</div>
-            </div>
-            <!-- Orbiting icon: gas -->
-            <div class="hv-orbit hv-orbit-2">
-              <div class="hv-orb-icon">🔥</div>
-            </div>
-            <!-- Orbiting icon: location -->
-            <div class="hv-orbit hv-orbit-3">
-              <div class="hv-orb-icon">📍</div>
-            </div>
-            <!-- Orbiting icon: ID card -->
-            <div class="hv-orbit hv-orbit-4">
-              <div class="hv-orb-icon">🪪</div>
-            </div>
-            <!-- Floating stat chips -->
-            <div class="hv-chip hv-chip-1">✅ Petrol Available</div>
-            <div class="hv-chip hv-chip-2">📡 Live Updates</div>
-            <div class="hv-chip hv-chip-3">🗺️ Find Nearest</div>
-            <div class="hv-chip hv-chip-4">🔥 Gas Available</div>
-          </div>
+
         </div>
       </div>
 
       <!-- Fuel Price Ticker -->
       <div class="ticker-wrap">
-        <div class="ticker-label">⛽ LIVE PRICES</div>
+        <div class="ticker-label"><i data-lucide="fuel" class="icon-lucide"></i> LIVE PRICES</div>
         <div class="ticker-track" id="tickerTrack">
           <div class="ticker-items" id="tickerItems"></div>
         </div>
@@ -228,7 +192,7 @@
         </div>
         <div class="overview-grid">
           <div class="overview-card card-petrol glassmorphic">
-            <div class="oc-icon">⛽</div>
+            <div class="oc-icon"><i data-lucide="fuel" class="icon-lucide"></i></div>
             <div class="oc-info">
               <h3>Petrol 92</h3>
               <div class="oc-price" id="ocPrice92">—</div>
@@ -239,7 +203,7 @@
             </div>
           </div>
           <div class="overview-card card-diesel glassmorphic">
-            <div class="oc-icon">🚛</div>
+            <div class="oc-icon"><i data-lucide="truck" class="icon-lucide"></i></div>
             <div class="oc-info">
               <h3>Auto Diesel</h3>
               <div class="oc-price" id="ocPriceDsl">—</div>
@@ -250,7 +214,7 @@
             </div>
           </div>
           <div class="overview-card card-gas glassmorphic">
-            <div class="oc-icon">🔥</div>
+            <div class="oc-icon"><i data-lucide="flame" class="icon-lucide"></i></div>
             <div class="oc-info">
               <h3>LP Gas 12.5kg</h3>
               <div class="oc-price" id="ocPriceGas">—</div>
@@ -261,7 +225,7 @@
             </div>
           </div>
           <div class="overview-card card-quota glassmorphic" onclick="navigateTo('eligibility')">
-            <div class="oc-icon">🪪</div>
+            <div class="oc-icon"><i data-lucide="credit-card" class="icon-lucide"></i></div>
             <div class="oc-info">
               <h3>Check Quota</h3>
               <div class="oc-price">Fuel Pass</div>
@@ -274,10 +238,10 @@
         <div class="section-header mt-4">
           <h2 data-i18n="map_title">Nearby Stations & Gas Shops</h2>
           <div class="map-controls">
-            <button class="mc-btn active" id="mcFuel" onclick="setMapFilter('fuel')">⛽ <span data-i18n="fuel">Fuel</span></button>
-            <button class="mc-btn" id="mcGas" onclick="setMapFilter('gas')">🔥 <span data-i18n="gas">Gas</span></button>
-            <button class="mc-btn" id="mcAll" onclick="setMapFilter('all')">📍 <span data-i18n="all">All</span></button>
-            <button class="mc-btn locate-btn" onclick="locateUser()">📍 <span data-i18n="my_location">My Location</span></button>
+            <button class="mc-btn active" id="mcFuel" onclick="setMapFilter('fuel')"><i data-lucide="fuel" class="icon-lucide"></i> <span data-i18n="fuel">Fuel</span></button>
+            <button class="mc-btn" id="mcGas" onclick="setMapFilter('gas')"><i data-lucide="flame" class="icon-lucide"></i> <span data-i18n="gas">Gas</span></button>
+            <button class="mc-btn" id="mcAll" onclick="setMapFilter('all')"><i data-lucide="map-pin" class="icon-lucide"></i> <span data-i18n="all">All</span></button>
+            <button class="mc-btn locate-btn" onclick="locateUser()"><i data-lucide="map-pin" class="icon-lucide"></i> <span data-i18n="my_location">My Location</span></button>
           </div>
         </div>
         <div class="map-wrapper glassmorphic">
@@ -292,20 +256,20 @@
 
         <!-- ===== FIND NEAREST STATIONS ===== -->
         <div class="section-header mt-4">
-          <h2>📍 Find Nearest Station</h2>
+          <h2><i data-lucide="map-pin" class="icon-lucide"></i> Find Nearest Station</h2>
           <span class="updated-tag">Uses your GPS location</span>
         </div>
         <div class="glassmorphic" style="padding:20px 22px;border-radius:16px;margin-bottom:10px;">
           <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:14px;">Allow location access to instantly find the closest fuel stations and gas dealers, sorted by distance — with one-tap Google Maps directions.</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
             <button id="nearestBtn" class="elig-btn" style="padding:10px 22px;display:flex;align-items:center;gap:8px;" onclick="findNearestStations('fuel')">
-              ⛽ Find Nearest Fuel Station
+              <i data-lucide="fuel" class="icon-lucide"></i> Find Nearest Fuel Station
             </button>
             <button id="nearestGasBtn" class="elig-btn" style="padding:10px 22px;background:linear-gradient(135deg,#7C3AED,#5B21B6);display:flex;align-items:center;gap:8px;" onclick="findNearestStations('gas')">
-              🔥 Find Nearest Gas Shop
+              <i data-lucide="flame" class="icon-lucide"></i> Find Nearest Gas Shop
             </button>
             <button id="clearNearestBtn" class="elig-btn" style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);display:none;" onclick="clearNearestResults()">
-              🔙 Clear Results
+              <i data-lucide="arrow-left" class="icon-lucide"></i> Clear Results
             </button>
           </div>
           <div id="nearestResults"></div>
@@ -567,7 +531,7 @@
         <!-- ── OFFICIAL FUELPASS PORTAL BANNER ── -->
         <a href="https://fuelpass.gov.lk/" target="_blank" rel="noopener noreferrer" class="fuelpass-gov-banner glassmorphic" id="fuelpassGovBanner">
           <div class="fpb-left">
-            <div class="fpb-icon">🏛️</div>
+            <div class="fpb-icon"><i data-lucide="landmark" class="icon-lucide"></i></div>
             <div class="fpb-text">
               <strong data-i18n="elig_official_h">Official National Fuel Pass Portal</strong>
               <span data-i18n="elig_official_p">Register your vehicle, get your QR code &amp; manage your quota on the government site</span>
@@ -582,7 +546,7 @@
         <!-- ── COMBINED QUICK CHECK ── -->
         <div class="quick-check-wrapper glassmorphic">
           <div class="qc-header">
-            <span class="qc-icon">⛽</span>
+            <span class="qc-icon"><i data-lucide="fuel" class="icon-lucide"></i></span>
             <div>
               <h2 data-i18n="elig_check_h">Can I Fill Fuel Today?</h2>
               <p data-i18n="elig_check_p">Enter your vehicle number and type — get an instant full eligibility report</p>
@@ -591,25 +555,25 @@
           <div class="qc-form">
             <input type="text" id="qcPlate" placeholder="e.g. ABC-1234 · AB-5678 · WP CAR 1234 · CAB-5678" class="elig-input qc-input" maxlength="20" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')runCombinedCheck()" />
             <select id="qcVehicleType" class="elig-input qc-select" onchange="onVehicleTypeChange()">
-              <option value="car">🚗 Car / Taxi (20 L/week)</option>
-              <option value="motorcycle">🏍️ Motorcycle (4 L/week)</option>
-              <option value="threewheeler">🛺 Three-Wheeler (5 L/week)</option>
-              <option value="van">🚐 Van / Dual-Purpose (40 L/week)</option>
-              <option value="suv">🚙 SUV / Jeep (20 L/week)</option>
-              <option value="bus_private">🚌 Private Bus (100 L/week)</option>
-              <option value="bus_school">🏫 School Bus/Van (60 L/week)</option>
-              <option value="truck_small">🚚 Lorry ≤8 wheels (80 L/week)</option>
-              <option value="truck_large">🚛 Lorry >8 wheels (100 L/week)</option>
-              <option value="tractor">🚜 Tractor (20 L/week)</option>
-              <option value="other">🚘 Other (20 L/week)</option>
+              <option value="car"><i data-lucide="car" class="icon-lucide"></i> Car / Taxi (20 L/week)</option>
+              <option value="motorcycle"><i data-lucide="motorcycle" class="icon-lucide"></i> Motorcycle (4 L/week)</option>
+              <option value="threewheeler"><i data-lucide="car" class="icon-lucide"></i> Three-Wheeler (5 L/week)</option>
+              <option value="van"><i data-lucide="truck" class="icon-lucide"></i> Van / Dual-Purpose (40 L/week)</option>
+              <option value="suv"><i data-lucide="car" class="icon-lucide"></i> SUV / Jeep (20 L/week)</option>
+              <option value="bus_private"><i data-lucide="bus" class="icon-lucide"></i> Private Bus (100 L/week)</option>
+              <option value="bus_school"><i data-lucide="school" class="icon-lucide"></i> School Bus/Van (60 L/week)</option>
+              <option value="truck_small"><i data-lucide="truck" class="icon-lucide"></i> Lorry ≤8 wheels (80 L/week)</option>
+              <option value="truck_large"><i data-lucide="truck" class="icon-lucide"></i> Lorry >8 wheels (100 L/week)</option>
+              <option value="tractor"><i data-lucide="tractor" class="icon-lucide"></i> Tractor (20 L/week)</option>
+              <option value="other"><i data-lucide="car" class="icon-lucide"></i> Other (20 L/week)</option>
             </select>
-            <small style="color:var(--text-muted);font-size:0.72rem;margin-top:4px;display:block;">ℹ️ For new plates (AB-1234 or ABC-1234) select type manually. Old plates (WP CAR 1234) auto-detect.</small>
-            <button class="elig-btn qc-btn" onclick="runCombinedCheck()">🔍 Check Now</button>
+            <small style="color:var(--text-muted);font-size:0.72rem;margin-top:4px;display:block;"><i data-lucide="info" class="icon-lucide"></i> For new plates (AB-1234 or ABC-1234) select type manually. Old plates (WP CAR 1234) auto-detect.</small>
+            <button class="elig-btn qc-btn" onclick="runCombinedCheck()"><i data-lucide="search" class="icon-lucide"></i> Check Now</button>
           </div>
           <!-- Result panel — always visible, starts with placeholder -->
           <div id="combinedResult" class="combined-result">
             <div class="cr-placeholder">
-              <span>🇱🇰</span>
+              <span><i data-lucide="shield-check" class="icon-lucide"></i></span>
               <p data-i18n="elig_instruction">Enter your vehicle number above and click <strong>Check Now</strong> to see your full eligibility status.</p>
               <p class="cr-demo-hint">💡 Demo numbers: <strong>CAB-1234</strong> · <strong>WP-8742</strong> · <strong>NB-5612</strong> · <strong>SG-3301</strong></p>
             </div>
@@ -618,7 +582,7 @@
 
         <!-- ── QUOTA SIMULATOR ── -->
         <div class="section-header mt-4">
-          <h2 data-i18n="elig_sim_h">⚖️ Fuel Amount Simulator</h2>
+          <h2 data-i18n="elig_sim_h"><i data-lucide="scale" class="icon-lucide"></i> Fuel Amount Simulator</h2>
           <span class="updated-tag">Before &amp; After Filling</span>
         </div>
         <div class="simulator-wrapper glassmorphic">
@@ -626,17 +590,17 @@
             <div class="sim-field">
               <label>Vehicle Type</label>
               <select id="simVehicleType" class="elig-input" onchange="updateSimulator()">
-                <option value="car">🚗 Car (20 L/week)</option>
-                <option value="motorcycle">🏍️ Motorcycle (4 L/week)</option>
-                <option value="threewheeler">🛺 Three-Wheeler (5 L/week)</option>
-                <option value="van">🚐 Van / Dual-Purpose (40 L/week)</option>
-                <option value="suv">🚙 SUV / Jeep (20 L/week)</option>
-                <option value="bus_private">🚌 Private Bus (100 L/week)</option>
-                <option value="bus_school">🏫 School Bus/Van (60 L/week)</option>
-                <option value="truck_small">🚚 Lorry ≤8 wheels (80 L/week)</option>
-                <option value="truck_large">🚛 Lorry >8 wheels (100 L/week)</option>
-                <option value="tractor">🚜 Tractor (20 L/week)</option>
-                <option value="other">🚘 Other (20 L/week)</option>
+                <option value="car"><i data-lucide="car" class="icon-lucide"></i> Car (20 L/week)</option>
+                <option value="motorcycle"><i data-lucide="motorcycle" class="icon-lucide"></i> Motorcycle (4 L/week)</option>
+                <option value="threewheeler"><i data-lucide="car" class="icon-lucide"></i> Three-Wheeler (5 L/week)</option>
+                <option value="van"><i data-lucide="truck" class="icon-lucide"></i> Van / Dual-Purpose (40 L/week)</option>
+                <option value="suv"><i data-lucide="car" class="icon-lucide"></i> SUV / Jeep (20 L/week)</option>
+                <option value="bus_private"><i data-lucide="bus" class="icon-lucide"></i> Private Bus (100 L/week)</option>
+                <option value="bus_school"><i data-lucide="school" class="icon-lucide"></i> School Bus/Van (60 L/week)</option>
+                <option value="truck_small"><i data-lucide="truck" class="icon-lucide"></i> Lorry ≤8 wheels (80 L/week)</option>
+                <option value="truck_large"><i data-lucide="truck" class="icon-lucide"></i> Lorry >8 wheels (100 L/week)</option>
+                <option value="tractor"><i data-lucide="tractor" class="icon-lucide"></i> Tractor (20 L/week)</option>
+                <option value="other"><i data-lucide="car" class="icon-lucide"></i> Other (20 L/week)</option>
               </select>
             </div>
             <div class="sim-field">
@@ -649,13 +613,13 @@
             </div>
           </div>
           <div id="simResult" class="sim-result">
-            <div class="cr-placeholder"><span>⚖️</span><p>Select your vehicle type to start simulating.</p></div>
+            <div class="cr-placeholder"><span><i data-lucide="scale" class="icon-lucide"></i></span><p>Select your vehicle type to start simulating.</p></div>
           </div>
         </div>
 
         <!-- ── ODD / EVEN CALENDAR ── -->
         <div class="section-header mt-4">
-          <h2 data-i18n="elig_cal_h">📅 7-Day Odd / Even Calendar</h2>
+          <h2 data-i18n="elig_cal_h"><i data-lucide="calendar" class="icon-lucide"></i> 7-Day Odd / Even Calendar</h2>
           <span class="updated-tag">Based on today's date</span>
         </div>
         <div class="glassmorphic" style="padding:24px;border-radius:16px;">
@@ -665,7 +629,7 @@
 
         <!-- ── WEEKLY INFO ── -->
         <div class="section-header mt-4">
-          <h2>📊 This Week's Info</h2>
+          <h2><i data-lucide="bar-chart-2" class="icon-lucide"></i> This Week's Info</h2>
         </div>
         <div id="weeklyOverview" class="weekly-overview glassmorphic" style="padding:24px;border-radius:16px;"></div>
 
@@ -683,38 +647,38 @@
         <!-- Owner Panel Banner (shown when owner is logged in) -->
         <div id="ownerActiveBanner" style="display:none;" class="owner-banner glassmorphic">
           <div class="ob-info">
-            <span class="ob-badge">✅ VERIFIED OWNER</span>
+            <span class="ob-badge"><i data-lucide="check-circle" class="icon-lucide"></i> VERIFIED OWNER</span>
             <div>
               <strong id="obOwnerName">—</strong>
               <span id="obStationCode" style="color:var(--blue);font-size:0.8rem;margin-left:8px;">—</span>
             </div>
             <span style="font-size:0.78rem;color:var(--text-muted);">Your updates are shown as Verified to all users</span>
           </div>
-          <button class="action-small-btn" onclick="ownerLogout()">🚪 Logout</button>
+          <button class="action-small-btn" onclick="ownerLogout()"><i data-lucide="log-out" class="icon-lucide"></i> Logout</button>
         </div>
 
         <!-- Not logged in notice -->
         <div id="ownerLoginNotice" class="owner-login-notice glassmorphic">
           <div>
-            <h3>🏪 Are you a Station Owner or Gas Dealer?</h3>
-            <p>Log in with your <strong>Station Code and Password</strong> to submit <span class="verified-tag">✅ Verified</span> real-time updates that users trust more.</p>
+            <h3><i data-lucide="store" class="icon-lucide"></i> Are you a Station Owner or Gas Dealer?</h3>
+            <p>Log in with your <strong>Station Code and Password</strong> to submit <span class="verified-tag"><i data-lucide="check-circle" class="icon-lucide"></i> Verified</span> real-time updates that users trust more.</p>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="elig-btn" onclick="openOwnerLogin()" style="padding:10px 20px;">🔑 Owner Login</button>
-            <a href="register.html"><button class="elig-btn" style="padding:10px 20px;background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);">📝 Register Station</button></a>
+            <button class="elig-btn" onclick="openOwnerLogin()" style="padding:10px 20px;"><i data-lucide="key" class="icon-lucide"></i> Owner Login</button>
+            <a href="register.html"><button class="elig-btn" style="padding:10px 20px;background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);"><i data-lucide="file-edit" class="icon-lucide"></i> Register Station</button></a>
           </div>
         </div>
 
         <div class="report-type-toggle">
           <button class="rt-btn active" id="btnReportFuel" onclick="setReportType('fuel')">
-            <span class="rt-icon">⛽</span>
+            <span class="rt-icon"><i data-lucide="fuel" class="icon-lucide"></i></span>
             <div class="rt-text">
               <strong>Fuel Station</strong>
               <span>Report for Petrol / Diesel</span>
             </div>
           </button>
           <button class="rt-btn" id="btnReportGas" onclick="setReportType('gas')">
-            <span class="rt-icon">🔥</span>
+            <span class="rt-icon"><i data-lucide="flame" class="icon-lucide"></i></span>
             <div class="rt-text">
               <strong>Gas Shop</strong>
               <span>Report for LPG Cylinders</span>
@@ -725,7 +689,7 @@
         <div class="report-grid">
           <!-- VERIFIED OWNER REPORT FORM -->
           <div id="ownerReportForm" class="report-card glassmorphic" style="display:none;">
-            <h3>✅ Verified Owner Report</h3>
+            <h3><i data-lucide="check-circle" class="icon-lucide"></i> Verified Owner Report</h3>
             <p>You are logged in as a <strong>Verified Station Owner</strong>. Your updates carry a trust badge visible to all users.</p>
             <form onsubmit="submitVerifiedReport(event)">
               <div class="form-group">
@@ -744,9 +708,9 @@
               <div class="form-group">
                 <label>Current Availability</label>
                 <div class="status-picker">
-                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectVrStatus('available')">✅ Available</button>
-                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectVrStatus('limited')">⚠️ Limited</button>
-                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectVrStatus('out')">❌ Out of Stock</button>
+                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectVrStatus('available')"><i data-lucide="check-circle" class="icon-lucide"></i> Available</button>
+                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectVrStatus('limited')"><i data-lucide="alert-triangle" class="icon-lucide"></i> Limited</button>
+                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectVrStatus('out')"><i data-lucide="x-circle" class="icon-lucide"></i> Out of Stock</button>
                 </div>
               </div>
               <div class="form-group">
@@ -772,13 +736,13 @@
                 <label data-i18n="report_notes">Additional Notes</label>
                 <textarea id="vrNotes" class="form-input form-textarea" rows="2" placeholder="Any additional info for customers…"></textarea>
               </div>
-              <button type="submit" class="elig-btn" style="width:100%;background:linear-gradient(135deg,var(--green),#059669);" data-i18n="report_submit_ver">📡 Publish Verified Update</button>
+              <button type="submit" class="elig-btn" style="width:100%;background:linear-gradient(135deg,var(--green),#059669);" data-i18n="report_submit_ver"><i data-lucide="radio" class="icon-lucide"></i> Publish Verified Update</button>
             </form>
           </div>
 
           <!-- COMMUNITY REPORT FORM (always visible) -->
           <div class="report-card glassmorphic">
-            <h3 data-i18n="report_comm_h">👥 Community Report</h3>
+            <h3 data-i18n="report_comm_h"><i data-lucide="users" class="icon-lucide"></i> Community Report</h3>
             <p data-i18n="report_comm_p">Help others by reporting what you see. Community reports are marked separately from verified owner updates.</p>
             <form id="reportForm" onsubmit="submitReport(event)">
               <div class="form-group">
@@ -808,9 +772,9 @@
               <div class="form-group">
                 <label data-i18n="report_status">Availability Status</label>
                 <div class="status-picker" id="statusPicker">
-                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectStatus('available')">✅ Available</button>
-                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectStatus('limited')">⚠️ Limited</button>
-                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectStatus('out')">❌ Out of Stock</button>
+                  <button type="button" class="sp-btn sp-available active" data-value="available" onclick="selectStatus('available')"><i data-lucide="check-circle" class="icon-lucide"></i> Available</button>
+                  <button type="button" class="sp-btn sp-limited" data-value="limited" onclick="selectStatus('limited')"><i data-lucide="alert-triangle" class="icon-lucide"></i> Limited</button>
+                  <button type="button" class="sp-btn sp-out" data-value="out" onclick="selectStatus('out')"><i data-lucide="x-circle" class="icon-lucide"></i> Out of Stock</button>
                 </div>
               </div>
               <div class="form-group">
@@ -832,8 +796,8 @@
             <h3 data-i18n="recent_reports">🕐 Recent Reports</h3>
             <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
               <button class="mc-btn active" id="filterAllBtn" onclick="filterReportsFeed('all')">All Reports</button>
-              <button class="mc-btn" id="filterVerifiedBtn" onclick="filterReportsFeed('verified')">✅ Verified Only</button>
-              <button class="mc-btn" id="filterCommunityBtn" onclick="filterReportsFeed('community')">👥 Community</button>
+              <button class="mc-btn" id="filterVerifiedBtn" onclick="filterReportsFeed('verified')"><i data-lucide="check-circle" class="icon-lucide"></i> Verified Only</button>
+              <button class="mc-btn" id="filterCommunityBtn" onclick="filterReportsFeed('community')"><i data-lucide="users" class="icon-lucide"></i> Community</button>
             </div>
             <div id="recentReports" class="recent-reports-list"></div>
           </div>
@@ -886,17 +850,17 @@
       </div>
       <div class="footer-links">
         <h4 data-i18n="footer_portal">Portal</h4>
-        <a href="admin.html" data-i18n="nav_admin">⚙️ Admin Panel</a>
-        <a href="register.html" data-i18n="nav_register">📝 Register Station</a>
-        <a onclick="openOwnerLogin()" style="cursor:pointer;" data-i18n="footer_owner_login">🔑 Owner Login</a>
+        <a href="admin.html" data-i18n="nav_admin"><i data-lucide="settings" class="icon-lucide"></i> Admin Panel</a>
+        <a href="register.html" data-i18n="nav_register"><i data-lucide="file-edit" class="icon-lucide"></i> Register Station</a>
+        <a onclick="openOwnerLogin()" style="cursor:pointer;" data-i18n="footer_owner_login"><i data-lucide="key" class="icon-lucide"></i> Owner Login</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 FuelPass SL. Built to help Sri Lankans during fuel challenges. 🇱🇰
+      <p>© 2026 FuelPass SL. Built to help Sri Lankans during fuel challenges. <i data-lucide="shield-check" class="icon-lucide"></i>
         &nbsp;·&nbsp;
-        <a href="admin.html" style="color:var(--text-muted);">⚙️ Admin Panel</a>
+        <a href="admin.html" style="color:var(--text-muted);"><i data-lucide="settings" class="icon-lucide"></i> Admin Panel</a>
         &nbsp;·&nbsp;
-        <a href="register.html" style="color:var(--text-muted);">📝 Register Station</a>
+        <a href="register.html" style="color:var(--text-muted);"><i data-lucide="file-edit" class="icon-lucide"></i> Register Station</a>
       </p>
     </div>
   </footer>
@@ -916,7 +880,7 @@
     <div class="modal-content glassmorphic" style="max-width:420px;">
       <button class="modal-close" onclick="closeOwnerLogin()">✕</button>
       <div style="padding:8px 0;">
-        <h3 style="font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:6px;" data-i18n="owner_login_h">🔑 Station Owner Login</h3>
+        <h3 style="font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:6px;" data-i18n="owner_login_h"><i data-lucide="key" class="icon-lucide"></i> Station Owner Login</h3>
         <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;" data-i18n="owner_login_p">Log in with your Station Code and Password provided by FuelPass SL admin.</p>
         <div class="form-group">
           <label style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);" data-i18n="reg_station_code">Station Code</label>
@@ -988,10 +952,11 @@
       try { renderGasPage(); }        catch(e) {}
       try { renderPricesPage(); }     catch(e) {}
       if (typeof map !== 'undefined' && map) try { renderMapMarkers(); } catch(e) {}
-      console.log('✅ UI fully refreshed with live data');
+      console.log('<i data-lucide="check-circle" class="icon-lucide"></i> UI fully refreshed with live data');
     });
   </script>
 
+  <script>lucide.createIcons();</script>
 </body>
 </html>
 

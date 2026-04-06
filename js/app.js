@@ -188,7 +188,7 @@ function hideSplash() {
 
 // ---- MAIN INIT ----
 window.addEventListener('DOMContentLoaded', async () => {
-  // ⚠️ ALWAYS hide splash first — nothing should block this
+  //  ALWAYS hide splash first — nothing should block this
   hideSplash();
 
   try { initNavbar(); }           catch(e) { console.warn(e); }
@@ -223,7 +223,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (el) el.innerHTML = `
           <div style="height:100%;display:flex;align-items:center;justify-content:center;
                       flex-direction:column;gap:12px;color:#64748B;font-family:Inter,sans-serif;">
-            <span style="font-size:3rem">🗺️</span>
+            <span style="font-size:3rem"></span>
             <p>Map requires an internet connection to load tiles.</p>
           </div>`;
       }
@@ -269,13 +269,13 @@ async function handleFooterContact(e) {
   try {
     const res = await apiSubmitContact({ name, email, message });
     if (res && res.success) {
-      showToast('✅ Thank you! Feedback submitted.');
+      showToast(' Thank you! Feedback submitted.');
       e.target.reset();
     } else {
-      showToast('❌ Submission failed. Please try again.');
+      showToast(' Submission failed. Please try again.');
     }
   } catch(err) {
-    showToast('❌ Network error. Please try again.');
+    showToast(' Network error. Please try again.');
   } finally {
     btn.textContent = originalText;
     btn.disabled = false;
