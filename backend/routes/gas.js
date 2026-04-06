@@ -90,7 +90,7 @@ router.patch('/:id/status', verifyToken, async (req, res) => {
       `, [req.params.id, size, status]);
     });
 
-    if (!isNaN(lat) && !isNaN(lng)) {
+    if (lat !== null && lng !== null && typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
       stockQueries.push(db.query(`UPDATE gas_shops SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
     }
     

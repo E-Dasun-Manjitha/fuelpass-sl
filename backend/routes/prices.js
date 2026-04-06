@@ -48,18 +48,32 @@ router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
 router.put('/bulk', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { updates } = req.body;
+    
+    // Matrix routing frontend categories to all exact DB string variants
+    const MAPPING = {
+      'Petrol 92 Octane': ['Petrol 92 Octane', 'Servo 92 Octane'],
+      'Petrol 95 Octane': ['Petrol 95 Octane', 'Servo 95 Octane', 'XP-95 Premium'],
+      'Auto Diesel': ['Auto Diesel'],
+      'Super Diesel (Euro 4)': ['Super Diesel (Euro4)', 'XP Super Diesel'],
+      'Kerosene': ['Kerosene']
+    };
+
     for (const u of updates) {
-      // Look up and update fuel_prices or gas_prices depending on the request criteria
-      // Our frontend bulk updates pass `type` and `price`.
-      // We can update fuel and gas based on type matching.
-      await db.query(
-        "UPDATE fuel_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE fuel_type = $2",
-        [u.price, u.type]
-      );
-      await db.query(
-        "UPDATE gas_prices SET price = $1, updated_at = NOW() WHERE provider || ' ' || size = $2",
-        [u.price, u.type]
-      );
+      if (MAPPING[u.type]) {
+        // Fuel variant logic
+        for (const dbType of MAPPING[u.type]) {
+          await db.query(
+            "UPDATE fuel_prices SET prev_price = price, price = $1, updated_at = NOW() WHERE fuel_type = $2",
+            [u.price, dbType]
+          );
+        }
+      } else {
+        // Gas variant logic
+        await db.query(
+          "UPDATE gas_prices SET price = $1, updated_at = NOW() WHERE provider || ' ' || size = $2",
+          [u.price, u.type]
+        );
+      }
     }
     res.json({ success: true });
   } catch (err) {

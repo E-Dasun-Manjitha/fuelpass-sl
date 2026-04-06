@@ -100,7 +100,7 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     });
 
     // Update location if valid coordinates provided
-    if (!isNaN(lat) && !isNaN(lng)) {
+    if (lat !== null && lng !== null && typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
       fuelQueries.push(db.query(`UPDATE stations SET lat = $1, lng = $2 WHERE id = $3`, [lat, lng, req.params.id]));
     }
     

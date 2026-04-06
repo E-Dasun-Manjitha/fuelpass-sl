@@ -862,7 +862,7 @@
     const d = res?.data;
     const prices = d ? [ ...(d.fuelPrices?.cpc||[]), ...(d.gasPrices?.litro||[]), ...(d.gasPrices?.laugfs||[]) ] : [];
     const getP = (type) => {
-       const f = prices.find(x => (x.fuel_type || x.size) === type);
+       const f = prices.find(x => (x.fuel_type || (x.provider + ' ' + x.size)) === type);
        return f ? f.price : '';
     };
 
@@ -1071,8 +1071,19 @@
     
     try {
       if (!ALL_ADMIN_STATIONS.length) {
-        const res = await apiGetStations();
-        ALL_ADMIN_STATIONS = res?.data || [];
+        const [stRes, gasRes] = await Promise.all([ apiGetStations(), apiGetGasShops() ]);
+        const slist = stRes?.data || [];
+        const glist = (gasRes?.data || []).map(g => ({
+           id: g.id,
+           name: g.name,
+           company: g.provider,
+           district: g.district,
+           address: g.address,
+           lat: g.lat,
+           lng: g.lng,
+           fuels: g.stock
+        }));
+        ALL_ADMIN_STATIONS = [...slist, ...glist];
       }
       
       const dF = document.getElementById('stDistrictFilter').value;
