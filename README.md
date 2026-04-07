@@ -90,4 +90,4 @@ If you are a first-time user, here is how to get the most out of FuelPass SL:
 ## Live Demo
 You can visit the live website here: [https://fuelpass-sl.vercel.app/](https://fuelpass-sl.vercel.app/)
 
-**"Helping Sri Lanka stay informed."** 
+**"Helping Sri Lanka stay informed."**
