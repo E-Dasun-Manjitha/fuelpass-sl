@@ -23,7 +23,7 @@ const TRANSLATIONS = {
     nav_theme_light: 'Light',
 
     // --- Hero ---
-    hero_badge:      'Sri Lanka Fuel Intelligence',
+    hero_badge:      'Real-Time Fuel & Gas Intelligence for Sri Lanka',
     hero_title:      'Real-Time Fuel &<br/>Gas Tracking',
     hero_subtitle:   'Check fuel availability, verify your National Fuel Pass quota, find nearby stations, and stay informed during shortage situations.',
     hero_search_ph:  'Search stations, cities, or vehicle number…',
@@ -332,7 +332,7 @@ const TRANSLATIONS = {
     nav_theme_light: 'ආලෝක (Light)',
 
     // --- Hero ---
-    hero_badge:      'ශ්‍රී ලංකා ඉන්ධන සේවාව',
+    hero_badge:      'ශ්‍රී ලංකාව සඳහා තත්‍ය කාලීන ඉන්ධන සහ ගෑස් බුද්ධි තොරතුරු',
     hero_title:      'තත්‍ය කාල ඉන්ධන &<br/>ගෑස් ලුහුබෑම',
     hero_subtitle:   'ඉන්ධන ලබාගත හැකි බව පරීක්ෂා කරන්න, ඔබේ ජාතික ඉන්ධන සූදානම් කෝටාව සත්‍යාපනය කරන්න, ළগම නැවතුම් ස්ථාන සොයා ගන්න.',
     hero_search_ph:  'නගරය, දිස්ත්‍රික්කය හෝ වාහන අංකය සොයන්න…',
@@ -599,7 +599,7 @@ const TRANSLATIONS = {
     nav_theme_light: 'ஒளி (Light)',
 
     // --- Hero ---
-    hero_badge:      'இலங்கை எரிபொருள் சேவை',
+    hero_badge:      'இலங்கைக்கான நிகழ்நேர எரிபொருள் மற்றும் எரிவாயு தரவு',
     hero_title:      'நேரடி எரிபொருள் &<br/>கேஸ் கண்காணிப்பு',
     hero_subtitle:   'எரிபொருள் கிடைக்கும் தன்மையை சரிபார்க்கவும், தேசிய எரிபொருள் கோட்டா உறுதிப்படுத்தவும், அருகிலுள்ள நிலையங்களை கண்டறியவும்.',
     hero_search_ph:  'நகரம், மாவட்டம் அல்லது வாகன எண் தேடுங்கள்…',
