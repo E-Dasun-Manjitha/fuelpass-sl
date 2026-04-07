@@ -59,6 +59,27 @@
   border-color: rgba(59,130,246,0.2);
 }
 
+/* --- Expanded Light Mode Overrides (v=22K-STABLE) --- */
+[data-theme="light"] .suggestions-dropdown { background: #ffffff !important; border-color: #cbd5e1 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+[data-theme="light"] .sugg-item { color: #1e293b !important; border-bottom: 1px solid #f1f5f9 !important; }
+[data-theme="light"] .sugg-item:hover { background: #f8fafc !important; }
+[data-theme="light"] .sugg-type { background: #f1f5f9 !important; color: #64748b !important; }
+
+[data-theme="light"] .fuelpass-gov-banner { background: #fffbeb !important; border-color: #fcd34d !important; }
+[data-theme="light"] .fuelpass-gov-banner:hover { background: #fff7ed !important; border-color: #fbbf24 !important; }
+[data-theme="light"] .fpb-text span { color: #92400e !important; }
+
+[data-theme="light"] .rt-btn { background: #ffffff; border-color: #e2e8f0; color: #1e293b; }
+[data-theme="light"] .rt-btn:hover { background: #f8fafc; }
+[data-theme="light"] .rt-icon { background: #f1f5f9; border: 1px solid #e2e8f0; }
+[data-theme="light"] .rt-btn strong { color: #0f172a !important; }
+
+[data-theme="light"] .drawer-link:hover { background: #f1f5f9; }
+[data-theme="light"] .mobile-nav-lang { background: #f8fafc; border-color: #e2e8f0; }
+[data-theme="light"] .lang-switcher { background: #f1f5f9; border-color: #cbd5e1; }
+[data-theme="light"] .lang-btn:hover { background: #e2e8f0; color: #0f172a; }
+[data-theme="light"] .updated-tag { background: #f1f5f9; border-color: #e2e8f0; }
+
 html { 
   scroll-behavior: smooth; 
   height: auto !important; 
