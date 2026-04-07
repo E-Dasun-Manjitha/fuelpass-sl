@@ -1247,10 +1247,18 @@
     document.getElementById('esAddress').value = s.address || '';
     document.getElementById('esDistrict').value = s.district || 'Colombo';
     
-    const fuelTypes = s.fuels ? Object.keys(s.fuels) : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+    let fuelTypes = [];
+    if (s.isGas) {
+      // Standard Gas Sizes
+      fuelTypes = ['12.5kg', '5kg', '37.5kg', '2.3kg'];
+    } else {
+      // Standard Fuel Types
+      fuelTypes = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+    }
+
     const list = document.getElementById('esFuelStatusList');
     list.innerHTML = fuelTypes.map(f => {
-      const current = s.fuels ? s.fuels[f] : 'out';
+      const current = s.fuels ? (s.fuels[f] || 'out') : 'out';
       const label = f.replace('petrol', 'Petrol ').replace('superDiesel', 'Super Diesel').replace('kg', ' kg');
       return `
         <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
@@ -1264,7 +1272,26 @@
       `;
     }).join('');
 
-    const firstQueue = Object.values(s.queues || {})[0] || 'none';
+    // Delivery fields for Gas
+    const deliveryHtml = s.isGas ? `
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <div style="flex:1;">
+          <label style="font-size:0.7rem;color:var(--text-muted);">Last Delivery</label>
+          <input type="text" id="esLastDelivery" class="am-input" value="${s.lastDelivery || ''}" placeholder="e.g. 2 days ago">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.7rem;color:var(--text-muted);">Next Delivery</label>
+          <input type="text" id="esNextDelivery" class="am-input" value="${s.nextDelivery || ''}" placeholder="e.g. Monday">
+        </div>
+      </div>
+    ` : '';
+    
+    // Append or insert delivery fields
+    if (s.isGas) {
+      list.insertAdjacentHTML('afterend', deliveryHtml);
+    }
+
+    const firstQueue = Object.values(s.queues || {})[0] || s.queue || 'none';
     document.getElementById('esQueue').value = firstQueue;
     document.getElementById('esLat').value = s.lat || '';
     document.getElementById('esLng').value = s.lng || '';
@@ -1297,8 +1324,13 @@
 
       // Prepare payload - Gas shops expect 'stock', Stations expect 'fuels'
       const payload = { name, address, district, queue, lat, lng };
-      if (isGas) payload.stock = fuelsData;
-      else payload.fuels = fuelsData;
+      if (isGas) {
+        payload.stock = fuelsData;
+        payload.last_delivery = document.getElementById('esLastDelivery')?.value || '';
+        payload.next_delivery = document.getElementById('esNextDelivery')?.value || '';
+      } else {
+        payload.fuels = fuelsData;
+      }
 
       const res = await apiUpdateStationStatus(id, payload, isGas);
       if (res && res.success) {

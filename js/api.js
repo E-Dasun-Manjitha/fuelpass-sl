@@ -197,18 +197,25 @@ async function loadLiveData() {
         lastUpdated: s.last_updated ? new Date(s.last_updated).toLocaleTimeString() : '--',
       }));
 
-    // Merge: upsert live stations into the static list (by id or name+address match)
+    // Merge: upsert live stations into the static list (robust matching)
+    const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    
     liveStations.forEach(live => {
+      const liveNameNorm = normalize(live.name);
+      const liveAddrNorm = normalize(live.address);
+      
       const idx = DB.stations.findIndex(s => 
         s.id === live.id || 
-        (s.name === live.name && s.address === live.address)
+        (normalize(s.name) === liveNameNorm && normalize(s.address).startsWith(liveAddrNorm.substring(0, 10))) ||
+        (normalize(s.name) === liveNameNorm) // Fallback to just name if unique enough
       );
+      
       if (idx !== -1) {
-        // preserve the static ID if it's our designated "real" format (rXXX)
-        const oldId = DB.stations[idx].id;
-        DB.stations[idx] = { ...live, id: oldId }; 
+        // preserve the static ID and any fields the API might have missed
+        const existing = DB.stations[idx];
+        DB.stations[idx] = { ...existing, ...live, id: existing.id }; 
       } else {
-        DB.stations.push(live);  // add new (admin-created)
+        DB.stations.push(live); 
       }
     });
     console.log(`✅ ${liveStations.length} live DB stations processed → total ${DB.stations.length}`);
@@ -224,15 +231,22 @@ async function loadLiveData() {
       lastDelivery: g.last_delivery || '--',
       nextDelivery: g.next_delivery || '--',
     }));
+
+    const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
     // Merge into static list
     liveGas.forEach(live => {
+      const liveNameNorm = normalize(live.name);
       const idx = DB.gasShops.findIndex(g => 
         g.id === live.id || 
-        (g.name === live.name && g.address === live.address)
+        (normalize(g.name) === liveNameNorm) // Match by name (e.g. "Litro Gas – Galle Karapitiya")
       );
+      
       if (idx !== -1) {
-        const oldId = DB.gasShops[idx].id;
-        DB.gasShops[idx] = { ...live, id: oldId };
+        const existing = DB.gasShops[idx];
+        // MERGE stock objects instead of replacing to keep keys that might be in static but not API
+        const mergedStock = { ...(existing.stock || {}), ...(live.stock || {}) };
+        DB.gasShops[idx] = { ...existing, ...live, stock: mergedStock, id: existing.id };
       } else {
         DB.gasShops.push(live);
       }
