@@ -11,28 +11,44 @@ FuelPass SL is a web-based dashboard developed to help Sri Lankans track fuel an
 
 After several rounds of testing, I’ve implemented some important fixes to make the website production-ready:
 
+### 🎨 Modern Human-Centric UI (v=50K)
+The entire frontend has been modernized with a professional, human-centric aesthetic. We've moved away from AI-generated artifacts toward a clean "Inter" font design with high-contrast visibility. page titles and search suggestions are now fully accessible in both **Light and Dark themes**.
+
+### ⚡ Optimized Dashboard & Quick Navigation
+The main home page has been streamlined for high performance. We've removed redundant station lists to reduce scrolling and added two prominent **Quick Navigation** buttons:
+- **Fuel Stations**: Jump directly to the specialized fuel tracking interface.
+- **Gas Dealers**: Navigate straight to the LPG gas availability grid.
+The **Find Nearest Station (GPS)** feature remains at the top for instant location-based lookups.
+
 ### 📱 Full Mobile & Orientation Support
-I noticed that the navigation menu and some dashboard buttons were getting cut off when rotating the phone to landscape (horizontal) mode. I have fixed this by updating the side-drawer’s CSS to be scrollable and properly adjusted for landscape views. Now, the dashboard fits perfectly on any screen size.
+The dashboard now fits perfectly on any screen size. I have updated the side-drawer’s CSS to be scrollable and properly adjusted for landscape views.
 
 ### 🌐 Trilingual Navigation Switcher
-To make the site more accessible, I added a quick language switcher directly into the mobile navbar. You can now toggle between **English, සිංහල (Sinhala), and தமிழ் (Tamil)** with just one tap from any page.
+To make the site more accessible, I added a quick language switcher directly into the mobile navbar. You can now toggle between **English, සිංහල (Sinhala), and தமிழ் (Tamil)** with just one tap.
 
 ### 🗺️ Improved Map View
-The map was previously zooming in too far, cutting off the coastal areas. I’ve updated the map calculation logic to guarantee that the entire island of Sri Lanka is visible with enough "breathing room" around the borders, making it much easier to find stations in any district.
+The map calculation logic now guarantees that the entire island of Sri Lanka is visible with enough "breathing room" around the borders.
 
-### 🛡️ Security Hardening
-I’ve added two new layers of security to the backend to protect the system from basic attacks:
-- **Helmet.js**: This adds security headers to prevent common web vulnerabilities like clickjacking and cross-site scripting.
-- **Rate-Limiting**: I’ve added a shield to the login and report forms so that automated bots cannot spam or try to guess passwords multiple times.
+---
 
-### ⛽ Universal Station Discovery (v=48K)
-I have overhauled the "Discovery Protocol" to ensure all fuel stations—including those with custom IDs like **USG Filling & Service Station**—are visible in our national statistics and map markers. This fixes a legacy issue where only standard `r00x` type IDs were appearing, making the dashboard 100% authoritative for all districts including Galle, Mannar, and Mullaitivu.
+## 📖 How to Use
 
-### 💰 Price Sync Recovery (v=49K)
-The Admin Dashboard now has high-precision control over national fuel and gas prices. I have updated the backend CORS policy and semantic string mapping to resolve "Failed to fetch" errors and ensure Super Diesel (Euro 4) and other products are synchronized with zero data loss across the National Grid.
+If you are a first-time user, here is how to get the most out of FuelPass SL:
 
-### 🚀 Zero-Cache Architecture
-Implemented a global versioning signature for all CSS and JS assets. This forces all user browsers to automatically invalidate their cache and load the latest universal discovery logic instantly without requiring manual refreshes.
+1. **Find Instant Availability (GPS)**: 
+   - On the **Dashboard**, tap **"Find Nearest Fuel Station"**. 
+   - Allow location access to see the closest stations sorted by distance with one-tap Google Maps directions.
+
+2. **Explore the National Grid**:
+   - Use the **"Fuel Stations"** or **"Gas Dealers"** buttons to see full lists across all districts.
+   - You can filter by **District**, **Fuel Type**, or **Company (CPC/IOC)** to find exactly what you need.
+
+3. **Check Prices & Quotas**:
+   - Visit the **Prices** page to see the latest official rates set by the government.
+   - Use the **Eligibility** tab to check your vehicle's weekly fuel quota and odd/even day rules.
+
+4. **Help the Community**:
+   - If you are at a station, use the **Report** page to share real-time queue status and stock levels with other citizens.
 
 ---
 
