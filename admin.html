@@ -1213,12 +1213,18 @@
         <thead><tr><th>Station</th><th>Dist</th><th>Fuel Status</th><th>Queue</th><th>Actions</th></tr></thead>
         <tbody>` +
         filtered.map(s => {
+          const normalizeKey = k => (k || '').toLowerCase().replace(/\s+/g, '');
           const isGas = !!s.isGas;
           const types = isGas ? ['12.5kg', '5kg', '37.5kg', '2.3kg'] : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+          
           const fuels = types.map(type => {
-             const status = (s.fuels && s.fuels[type]) || 'out';
+             // Find status by matching normalized key
+             let status = 'out';
+             if (s.fuels) {
+               const foundKey = Object.keys(s.fuels).find(k => normalizeKey(k) === normalizeKey(type));
+               if (foundKey) status = s.fuels[foundKey];
+             }
              const dot = status === 'available' ? '🟢' : status === 'limited' ? '🟠' : '🔴';
-             const label = type.replace('petrol', 'P').replace('superDiesel', 'SD').replace('diesel', 'D').replace('kg', 'kg');
              return `<span title="${type}: ${status}">${dot}</span>`;
           }).join(' ');
           
@@ -1270,8 +1276,13 @@
     }
 
     const list = document.getElementById('esFuelStatusList');
+    const normalizeKey = k => (k || '').toLowerCase().replace(/\s+/g, '');
     list.innerHTML = fuelTypes.map(f => {
-      const current = s.fuels ? (s.fuels[f] || 'out') : 'out';
+      let current = 'out';
+      if (s.fuels) {
+        const foundKey = Object.keys(s.fuels).find(k => normalizeKey(k) === normalizeKey(f));
+        if (foundKey) current = s.fuels[foundKey];
+      }
       const label = f.replace('petrol', 'Petrol ').replace('superDiesel', 'Super Diesel').replace('kg', ' kg');
       return `
         <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">

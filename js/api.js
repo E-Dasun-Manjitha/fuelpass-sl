@@ -244,8 +244,14 @@ async function loadLiveData() {
       
       if (idx !== -1) {
         const existing = DB.gasShops[idx];
-        // MERGE stock objects instead of replacing to keep keys that might be in static but not API
-        const mergedStock = { ...(existing.stock || {}), ...(live.stock || {}) };
+        // MERGE stock objects with key normalization (no spaces allowed internally)
+        const mergedStock = { ...(existing.stock || {}) };
+        if (live.stock) {
+          Object.entries(live.stock).forEach(([k, v]) => {
+            const cleanKey = k.toLowerCase().replace(/\s+/g, '');
+            mergedStock[cleanKey] = v;
+          });
+        }
         DB.gasShops[idx] = { ...existing, ...live, stock: mergedStock, id: existing.id };
       } else {
         DB.gasShops.push(live);
