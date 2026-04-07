@@ -197,17 +197,21 @@ async function loadLiveData() {
         lastUpdated: s.last_updated ? new Date(s.last_updated).toLocaleTimeString() : '--',
       }));
 
-    // Merge: upsert live stations into the static list (by id)
-    const existingIds = new Set(DB.stations.map(s => s.id));
+    // Merge: upsert live stations into the static list (by id or name+address match)
     liveStations.forEach(live => {
-      const idx = DB.stations.findIndex(s => s.id === live.id);
+      const idx = DB.stations.findIndex(s => 
+        s.id === live.id || 
+        (s.name === live.name && s.address === live.address)
+      );
       if (idx !== -1) {
-        DB.stations[idx] = live; // update existing
+        // preserve the static ID if it's our designated "real" format (rXXX)
+        const oldId = DB.stations[idx].id;
+        DB.stations[idx] = { ...live, id: oldId }; 
       } else {
         DB.stations.push(live);  // add new (admin-created)
       }
     });
-    console.log(`✅ ${liveStations.length} live DB stations merged → total ${DB.stations.length} stations`);
+    console.log(`✅ ${liveStations.length} live DB stations processed → total ${DB.stations.length}`);
   } else {
     console.warn('⚠️ API returned no stations — showing static data only');
   }
@@ -222,13 +226,18 @@ async function loadLiveData() {
     }));
     // Merge into static list
     liveGas.forEach(live => {
-      const idx = DB.gasShops.findIndex(g => g.id === live.id);
+      const idx = DB.gasShops.findIndex(g => 
+        g.id === live.id || 
+        (g.name === live.name && g.address === live.address)
+      );
       if (idx !== -1) {
-        DB.gasShops[idx] = live;
+        const oldId = DB.gasShops[idx].id;
+        DB.gasShops[idx] = { ...live, id: oldId };
       } else {
         DB.gasShops.push(live);
       }
     });
+    console.log(`✅ ${liveGas.length} live gas shops processed → total ${DB.gasShops.length}`);
     console.log(`✅ ${liveGas.length} live DB gas shops merged → total ${DB.gasShops.length}`);
   }
 
@@ -257,20 +266,22 @@ async function loadLiveData() {
   }
 
   // ---- DYNAMIC STATISTICAL SYNC (v=47K-USG-DISCOVER) ----
-  // Expanding discovery for custom IDs like 'USG' (cpcgal)
+  // Counting all stations (fuel/gas) but excluding community "new" requests not yet verified
+  // If id is numeric (live) or starts with 'r' (static real), it's a valid station
+  const isReal = s => typeof s.id === 'number' || s.id.startsWith('r');
   
-  const fuelCount = DB.stations.filter(s => !s.id.startsWith('rg')).length;
-  const gasCount  = DB.gasShops.filter(g => g.id.startsWith('rg')).length;
+  const fuelCount = DB.stations.filter(s => isReal(s)).length;
+  const gasCount  = DB.gasShops.filter(g => isReal(g)).length;
   
   DB.stats.totalStations = fuelCount; 
   DB.stats.totalGasShops = gasCount;
   
-  const availFuel = DB.stations.filter(s => !s.id.startsWith('rg') && Object.values(s.fuels || {}).some(v => v === 'available')).length;
-  const availGas  = DB.gasShops.filter(g => g.id.startsWith('rg') && Object.values(g.stock || {}).some(v => v === 'available')).length;
+  const availFuel = DB.stations.filter(s => isReal(s) && Object.values(s.fuels || {}).some(v => v === 'available')).length;
+  const availGas  = DB.gasShops.filter(g => isReal(g) && Object.values(g.stock || {}).some(v => v === 'available')).length;
   
   DB.stats.availableStations = availFuel + availGas;
   DB.stats.lastUpdated = 'Just now';
-  console.log(`📡 National Stats Updated: ${DB.stats.totalStations} Fuel | ${DB.stats.totalGasShops} Gas`);
+  console.log(`📡 National Stats Updated: ${DB.stats.availableStations} / ${DB.stats.totalStations + DB.stats.totalGasShops} Available`);
 }
 
 

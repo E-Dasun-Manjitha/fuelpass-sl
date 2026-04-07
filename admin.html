@@ -507,6 +507,8 @@
 <!-- ── STATION EDIT MODAL ── -->
 <div id="stationEditModal" style="display:none;" class="modal-overlay">
   <div class="approve-modal" style="max-width:500px;">
+    <input type="hidden" id="esStationId">
+    <input type="hidden" id="esIsGas">
     <div class="am-row">
       <label>Station Name</label>
       <input type="text" id="esName" class="am-input" placeholder="Station Name">
@@ -1145,7 +1147,7 @@
     try {
       if (!ALL_ADMIN_STATIONS.length) {
         const [stRes, gasRes] = await Promise.all([ apiGetStations(), apiGetGasShops() ]);
-        const slist = stRes?.data || [];
+        const slist = (stRes?.data || []).map(s => ({ ...s, isGas: false }));
         const glist = (gasRes?.data || []).map(g => ({
            id: g.id,
            name: g.name,
@@ -1154,7 +1156,8 @@
            address: g.address,
            lat: g.lat,
            lng: g.lng,
-           fuels: g.stock
+           fuels: g.stock,
+           isGas: true
         }));
         ALL_ADMIN_STATIONS = [...slist, ...glist];
       }
@@ -1239,6 +1242,7 @@
     const s = ALL_ADMIN_STATIONS.find(x => x.id === id);
     if (!s) return;
     document.getElementById('esStationId').value = id;
+    document.getElementById('esIsGas').value = s.isGas ? 'true' : 'false';
     document.getElementById('esName').value = s.name || '';
     document.getElementById('esAddress').value = s.address || '';
     document.getElementById('esDistrict').value = s.district || 'Colombo';
@@ -1278,20 +1282,25 @@
 
     try {
       const id = document.getElementById('esStationId').value;
+      const isGas = document.getElementById('esIsGas').value === 'true';
       const name = document.getElementById('esName').value.trim();
       const address = document.getElementById('esAddress').value.trim();
       const district = document.getElementById('esDistrict').value;
       
-      const fuels = {};
+      const fuelsData = {};
       document.querySelectorAll('.fuel-select-field').forEach(el => {
-        fuels[el.dataset.fkey] = el.value;
+        fuelsData[el.dataset.fkey] = el.value;
       });
       const queue = document.getElementById('esQueue').value;
       const lat = parseFloat(document.getElementById('esLat').value) || null;
       const lng = parseFloat(document.getElementById('esLng').value) || null;
 
-      const isGas = id.startsWith('rg');
-      const res = await apiUpdateStationStatus(id, { name, address, district, fuels, queue, lat, lng }, isGas);
+      // Prepare payload - Gas shops expect 'stock', Stations expect 'fuels'
+      const payload = { name, address, district, queue, lat, lng };
+      if (isGas) payload.stock = fuelsData;
+      else payload.fuels = fuelsData;
+
+      const res = await apiUpdateStationStatus(id, payload, isGas);
       if (res && res.success) {
         showAdminToast('✅ Data saved successfully!');
         closeStationEdit();

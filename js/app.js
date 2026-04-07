@@ -137,49 +137,55 @@ function initNavbar() {
 // ---- REAL-TIME SIMULATION ----
 const statusCycle = ['available', 'limited', 'out'];
 function simulateRealTimeUpdates() {
-  setInterval(() => {
+  setInterval(async () => {
     try {
-      // Randomly update 1–2 stations
-      const count = Math.floor(Math.random() * 2) + 1;
-      for (let i = 0; i < count; i++) {
-        const idx = Math.floor(Math.random() * DB.stations.length);
-        const station = DB.stations[idx];
-        const fuelKeys = Object.keys(station.fuels);
-        const fuelKey  = fuelKeys[Math.floor(Math.random() * fuelKeys.length)];
-        const newStatus = statusCycle[Math.floor(Math.random() * statusCycle.length)];
-        station.fuels[fuelKey] = newStatus;
-        station.lastUpdated    = 'Just now';
+      if (typeof is_live !== 'undefined' && is_live) {
+        // If live, we don't randomize! We just periodically refresh from the actual DB
+        await loadLiveData();
+      } else {
+        // Only if offline/static: Randomly update 1–2 stations for demo
+        const count = Math.floor(Math.random() * 2) + 1;
+        for (let i = 0; i < count; i++) {
+          const idx = Math.floor(Math.random() * DB.stations.length);
+          if (idx < 0) continue;
+          const station = DB.stations[idx];
+          if (!station || !station.fuels) continue;
+          const fuelKeys = Object.keys(station.fuels);
+          if (!fuelKeys.length) continue;
+          const fuelKey  = fuelKeys[Math.floor(Math.random() * fuelKeys.length)];
+          const newStatus = statusCycle[Math.floor(Math.random() * statusCycle.length)];
+          station.fuels[fuelKey] = newStatus;
+          station.lastUpdated    = 'Just now';
+        }
       }
 
-      // Update stats (Surgically aligned with 501-location national network)
-      const availFuel = DB.stations.filter(s => s.id.startsWith('r') && !s.id.startsWith('rg') && Object.values(s.fuels || {}).some(v => v === 'available')).length;
-      const availGas  = DB.gasShops.filter(g => g.id.startsWith('rg') && Object.values(g.stock || {}).some(v => v === 'available')).length;
-      
-      DB.stats.totalStations     = 201;
-      DB.stats.totalGasShops     = 300;
-      DB.stats.availableStations = availFuel + availGas;
-      
-      DB.stats.lastUpdated = 'Just now';
-      // CORRECTED IDs: statStations and statGas (matching index.html)
+      // Sync stats UI
       document.getElementById('statStations').textContent = DB.stats.totalStations;
       document.getElementById('statGas').textContent      = DB.stats.totalGasShops;
       document.getElementById('statAvail').textContent    = DB.stats.availableStations;
       document.getElementById('statUpdated').textContent  = 'Just now';
 
-
-
-      // Refresh visible lists
-      const activePage = document.querySelector('.page.active')?.id;
-      if (activePage === 'page-dashboard') try { filterStations(); }  catch(e) {}
-      if (activePage === 'page-stations')  try { searchStations(); }  catch(e) {}
-
-      // Refresh map markers
+      // Refresh visible lists & map
+      refreshUIPages();
       if (map) try { renderMapMarkers(); } catch(e) {}
 
-      // Update last updated display
-      document.getElementById('overviewUpdated').textContent = 'Updated just now';
-    } catch(e) { console.warn('Realtime update error:', e); }
+      // Update footer indicator
+      const ou = document.getElementById('overviewUpdated');
+      if (ou) ou.textContent = 'Updated just now';
+
+    } catch(e) { console.warn('Realtime update/sync error:', e); }
   }, 30000); // every 30s
+}
+
+/**
+ * Global helper to refresh UI elements on current page
+ */
+function refreshUIPages() {
+  const activePage = document.querySelector('.page.active')?.id;
+  if (activePage === 'page-dashboard') try { filterStations(); }  catch(e) {}
+  if (activePage === 'page-stations')  try { searchStations(); }  catch(e) {}
+  if (activePage === 'page-gas')       try { filterGasShops(); renderGasPage(); } catch(e) {}
+  if (activePage === 'page-report')    try { renderRecentReports(); } catch(e) {}
 }
 
 // ---- SPLASH ----
