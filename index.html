@@ -274,7 +274,7 @@
 
         <!-- Stations List -->
         <div class="section-header mt-4">
-          <h2>All Stations</h2>
+          <h2 data-i18n="all_stations">All Stations</h2>
           <div class="filter-row">
             <select id="districtFilter" class="filter-select" onchange="filterStations()">
               <option value="">All Districts</option>
@@ -317,6 +317,16 @@
               <option value="IOC">Lanka IOC</option>
             </select>
           </div>
+        </div>
+
+        <!-- Quick navigation buttons to dedicated interfaces -->
+        <div class="dashboard-direct-nav" style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+           <button class="elig-btn" style="padding:10px 24px; border-radius:99px; font-size:0.9rem; display:flex; align-items:center; gap:8px;" onclick="navigateTo('stations')">
+              <i data-lucide="fuel" class="icon-lucide" style="width:18px;height:18px;"></i> <span data-i18n="stat_stations">Fuel Stations</span>
+           </button>
+           <button class="elig-btn" style="background:linear-gradient(135deg,#7C3AED,#5B21B6); padding:10px 24px; border-radius:99px; font-size:0.9rem; display:flex; align-items:center; gap:8px;" onclick="navigateTo('gas')">
+              <i data-lucide="flame" class="icon-lucide" style="width:18px;height:18px;"></i> <span data-i18n="stat_gas_shops">Gas Dealers</span>
+           </button>
         </div>
         <div id="stationsList" class="stations-list"></div>
       </div>
