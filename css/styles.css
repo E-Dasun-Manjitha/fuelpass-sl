@@ -80,6 +80,18 @@
 [data-theme="light"] .lang-btn:hover { background: #e2e8f0; color: #0f172a; }
 [data-theme="light"] .updated-tag { background: #f1f5f9; border-color: #e2e8f0; }
 
+[data-theme="light"] .elig-btn-outline { 
+  background: #f1f5f9 !important; 
+  border-color: #cbd5e1 !important; 
+  color: #1e293b !important; 
+}
+[data-theme="light"] .elig-btn-outline:hover { 
+  background: #e2e8f0 !important; 
+}
+
+[data-theme="light"] .owner-login-btn { background: #ede9fe; color: #7c3aed; border-color: #ddd6fe; }
+[data-theme="light"] .admin-nav-btn { background: #fff7ed; color: #d97706; border-color: #fed7aa; }
+
 html { 
   scroll-behavior: smooth; 
   height: auto !important; 
@@ -1226,6 +1238,26 @@ select option { background: var(--bg-surface); color: var(--text-primary); }
   opacity: 0.9;
   transform: translateY(-2px);
   box-shadow: 0 6px 24px var(--blue-glow);
+}
+
+.elig-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: var(--transition);
+  cursor: pointer;
+}
+.elig-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
 }
 .elig-result {
   border-radius: var(--radius-sm);

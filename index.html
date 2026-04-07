@@ -265,7 +265,7 @@
             <button id="nearestGasBtn" class="elig-btn" style="padding:10px 22px;background:linear-gradient(135deg,#7C3AED,#5B21B6);display:flex;align-items:center;gap:8px;" onclick="findNearestStations('gas')">
               <i data-lucide="flame" class="icon-lucide"></i> Find Nearest Gas Shop
             </button>
-            <button id="clearNearestBtn" class="elig-btn" style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);display:none;" onclick="clearNearestResults()">
+            <button id="clearNearestBtn" class="elig-btn-outline" style="display:none;" onclick="clearNearestResults()">
               <i data-lucide="arrow-left" class="icon-lucide"></i> Clear Results
             </button>
           </div>
@@ -628,8 +628,8 @@
             <p>Log in with your <strong>Station Code and Password</strong> to submit <span class="verified-tag"><i data-lucide="check-circle" class="icon-lucide"></i> Verified</span> real-time updates that users trust more.</p>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="elig-btn" onclick="openOwnerLogin()" style="padding:10px 20px;"><i data-lucide="key" class="icon-lucide"></i> Owner Login</button>
-            <a href="register.html"><button class="elig-btn" style="padding:10px 20px;background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);"><i data-lucide="file-edit" class="icon-lucide"></i> Register Station</button></a>
+            <button class="elig-btn" onclick="openOwnerLogin()" data-i18n="owner_login_btn" style="padding:10px 20px;"><i data-lucide="key" class="icon-lucide"></i> Owner Login</button>
+            <a href="register.html"><button class="elig-btn-outline" data-i18n="owner_reg_btn" style="padding:10px 20px;"><i data-lucide="file-edit" class="icon-lucide"></i> Register Station</button></a>
           </div>
         </div>
 

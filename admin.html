@@ -176,6 +176,7 @@
       <div class="sb-section-label" data-i18n="admin_data_management">Data Management</div>
       <a onclick="showPanel('prices')">💰 <span data-i18n="admin_prices">Update Fuel Prices</span></a>
       <a onclick="showPanel('reports')">📋 <span data-i18n="admin_reports">Verified Reports</span></a>
+      <a onclick="showPanel('community-reports')">👥 <span data-i18n="admin_community_reports">Community Reports</span></a>
       <a onclick="showPanel('feedback')">💬 <span data-i18n="admin_feedback">User Feedback</span></a>
       <a onclick="showPanel('managestations')">🚉 <span data-i18n="admin_stations">Manage Stations</span></a>
       <div class="sb-section-label" data-i18n="site_section">Site</div>
@@ -208,8 +209,9 @@
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
           <button class="action-btn btn-approve" onclick="showPanel('addowner')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_add">➕ Add New Station Owner</button>
           <button class="action-btn btn-view" onclick="showPanel('approved')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_view">🏪 View All Owners</button>
-          <button class="action-btn btn-approve" onclick="showPanel('prices')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_prices">💰 Update Fuel Prices</button>
+          <button class="action-btn btn-view" onclick="showPanel('prices')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_prices">💰 Update Fuel Prices</button>
           <button class="action-btn btn-view" onclick="showPanel('reports')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_reports">📋 Verified Reports</button>
+          <button class="action-btn btn-reject" onclick="showPanel('community-reports')" style="padding:10px 20px;font-size:0.85rem;" data-i18n="admin_btn_community">👥 Community Reports</button>
         </div>
       </div>
     </div>
@@ -459,6 +461,19 @@
         <div id="verifiedReportsList"></div>
       </div>
     </div>
+
+    <!-- ── COMMUNITY REPORTS ── -->
+    <div id="panel-community-reports" class="admin-panel animate-fade-in">
+      <div class="admin-topbar">
+        <h1 data-i18n="admin_community_reports">👥 Community Reports</h1>
+        <div style="display:flex;gap:12px;align-items:center;">
+           <button class="action-btn btn-view" onclick="renderCommunityReports()">🔄 Refresh Grid</button>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div id="communityReportsList"></div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -600,7 +615,7 @@
     document.querySelectorAll('.sb-nav a').forEach(a => a.classList.remove('active'));
     const panel = document.getElementById('panel-' + name);
     if (panel) panel.classList.add('active');
-    const map = { dashboard:0, pending:1, addowner:2, approved:3, prices:4, reports:5, feedback:6, managestations:7 };
+    const map = { dashboard:0, pending:1, addowner:2, approved:3, prices:4, reports:5, 'community-reports':6, feedback:7, managestations:8 };
     const links = document.querySelectorAll('.sb-nav a');
     if (links[map[name]] !== undefined) links[map[name]].classList.add('active');
 
@@ -608,6 +623,7 @@
     if (name === 'approved') renderApproved();
     if (name === 'prices')   renderPrices();
     if (name === 'reports')  renderVerifiedReports();
+    if (name === 'community-reports') renderCommunityReports();
     if (name === 'feedback') renderFeedback();
     if (name === 'managestations') { renderManageStations(); syncCompanyFilter(); }
     if (name === 'addowner') { 
@@ -1068,18 +1084,55 @@
     }
   }
 
-  window.deleteReport = async function(id) {
-    if (!confirm('Permanently remove this verified report?')) return;
+  window.deleteReport = async function(id, isVerified = true) {
+    if (!confirm(`Permanently remove this ${isVerified ? 'verified' : 'community'} report?`)) return;
     try {
       const res = await apiFetch(`/api/reports/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': 'Bearer ' + Auth.getToken() }
       });
       if (res && res.success) {
-        document.getElementById(`report-row-${id}`).remove();
+        const row = document.getElementById(`report-row-${id}`) || document.getElementById(`comm-report-row-${id}`);
+        if(row) row.remove();
         showAdminToast('🗑️ Report removed from grid.');
       }
     } catch(err) { showAdminToast('❌ Failed to delete.', 'error'); }
+  }
+
+  // ── COMMUNITY REPORTS ──────────────────────────────────────
+  window.renderCommunityReports = async function() {
+    const el = document.getElementById('communityReportsList');
+    el.innerHTML = '<div style="padding:24px;text-align:center;">⌛ Syncing community reports...</div>';
+    try {
+      const res = await apiGetReports(false); // false = unverified (community)
+      const reports = res?.data || [];
+      
+      if (!reports.length) {
+        el.innerHTML = '<div class="empty-state"><span>👥</span><p>No unverified community reports found.</p></div>';
+        return;
+      }
+
+      el.innerHTML = `<table class="admin-table">
+        <thead><tr><th>Station</th><th>Product</th><th>Status</th><th>Time</th><th>Actions</th></tr></thead>
+        <tbody>` +
+        reports.map(r => `
+          <tr id="comm-report-row-${r.id}">
+            <td>
+              <strong style="color:var(--text-primary);">${r.station_name}</strong><br/>
+              <span style="font-size:0.75rem;color:var(--amber);">${r.reporter || 'Anonymous User'}</span>
+            </td>
+            <td><span class="tag-pending" style="text-transform:capitalize;">${r.product || 'Fuel'}</span></td>
+            <td><span class="tag-approved" style="background:${r.status==='available'?'rgba(16,185,129,0.1)':'rgba(239,68,68,0.1)'}; color:${r.status==='available'?'var(--green)':'var(--red)'};">${r.status}</span></td>
+            <td style="font-size:0.72rem;">${new Date(r.created_at).toLocaleString()}</td>
+            <td>
+              <button class="action-btn btn-reject" onclick="deleteReport('${r.id}', false)">🗑️ Remove</button>
+            </td>
+          </tr>
+        `).join('') +
+        '</tbody></table>';
+    } catch(err) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--red);">❌ Fail to sync with community reports.</div>';
+    }
   }
   // ── MANAGE STATIONS ──────────────────────────────────────
   let ALL_ADMIN_STATIONS = [];
