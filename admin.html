@@ -1213,9 +1213,13 @@
         <thead><tr><th>Station</th><th>Dist</th><th>Fuel Status</th><th>Queue</th><th>Actions</th></tr></thead>
         <tbody>` +
         filtered.map(s => {
-          const fuels = Object.entries(s.fuels || {}).map(([type, status]) => {
+          const isGas = !!s.isGas;
+          const types = isGas ? ['12.5kg', '5kg', '37.5kg', '2.3kg'] : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+          const fuels = types.map(type => {
+             const status = (s.fuels && s.fuels[type]) || 'out';
              const dot = status === 'available' ? '🟢' : status === 'limited' ? '🟠' : '🔴';
-             return `<span title="${type}">${dot}</span>`;
+             const label = type.replace('petrol', 'P').replace('superDiesel', 'SD').replace('diesel', 'D').replace('kg', 'kg');
+             return `<span title="${type}: ${status}">${dot}</span>`;
           }).join(' ');
           
           const firstQueue = Object.values(s.queues || {})[0] || '—';
