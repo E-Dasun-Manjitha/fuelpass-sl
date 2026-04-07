@@ -272,63 +272,20 @@
           <div id="nearestResults"></div>
         </div>
 
-        <!-- Stations List -->
+        <!-- Stations List Header -->
         <div class="section-header mt-4">
           <h2 data-i18n="all_stations">All Stations</h2>
-          <div class="filter-row">
-            <select id="districtFilter" class="filter-select" onchange="filterStations()">
-              <option value="">All Districts</option>
-              <option value="Colombo">Colombo</option>
-              <option value="Gampaha">Gampaha</option>
-              <option value="Kalutara">Kalutara</option>
-              <option value="Kandy">Kandy</option>
-              <option value="Matale">Matale</option>
-              <option value="Nuwara Eliya">Nuwara Eliya</option>
-              <option value="Galle">Galle</option>
-              <option value="Matara">Matara</option>
-              <option value="Hambantota">Hambantota</option>
-              <option value="Jaffna">Jaffna</option>
-              <option value="Kilinochchi">Kilinochchi</option>
-              <option value="Mannar">Mannar</option>
-              <option value="Vavuniya">Vavuniya</option>
-              <option value="Mullaitivu">Mullaitivu</option>
-              <option value="Trincomalee">Trincomalee</option>
-              <option value="Batticaloa">Batticaloa</option>
-              <option value="Ampara">Ampara</option>
-              <option value="Kurunegala">Kurunegala</option>
-              <option value="Puttalam">Puttalam</option>
-              <option value="Anuradhapura">Anuradhapura</option>
-              <option value="Polonnaruwa">Polonnaruwa</option>
-              <option value="Badulla">Badulla</option>
-              <option value="Monaragala">Monaragala</option>
-              <option value="Ratnapura">Ratnapura</option>
-              <option value="Kegalle">Kegalle</option>
-            </select>
-            <select id="fuelFilter" class="filter-select" onchange="filterStations()">
-              <option value="">All Fuel Types</option>
-              <option value="petrol92">Petrol 92</option>
-              <option value="petrol95">Petrol 95</option>
-              <option value="diesel">Auto Diesel</option>
-              <option value="superDiesel">Super Diesel</option>
-            </select>
-            <select id="companyFilter" class="filter-select" onchange="filterStations()">
-              <option value="">All Companies</option>
-              <option value="CPC">CPC</option>
-              <option value="IOC">Lanka IOC</option>
-            </select>
-          </div>
         </div>
 
         <!-- Quick navigation buttons to dedicated interfaces -->
-        <div class="dashboard-direct-nav" style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
-           <button class="elig-btn" style="padding:10px 24px; border-radius:99px; font-size:0.9rem; display:flex; align-items:center; gap:8px;" onclick="navigateTo('stations')">
-              <i data-lucide="fuel" class="icon-lucide" style="width:18px;height:18px;"></i> <span data-i18n="stat_stations">Fuel Stations</span>
+        <div class="dashboard-direct-nav" style="display:flex; gap:12px; margin-bottom:40px; flex-wrap:wrap;">
+           <button class="elig-btn" style="padding:10px 24px; border-radius:12px; font-size:0.9rem; display:flex; align-items:center; gap:8px; flex: 1; min-width: 160px; justify-content: center;" onclick="navigateTo('stations')">
+              <i data-lucide="fuel" class="icon-lucide" style="width:20px;height:20px;"></i> <span data-i18n="stat_stations">Fuel Stations</span>
            </button>
-           <button class="elig-btn" style="background:linear-gradient(135deg,#7C3AED,#5B21B6); padding:10px 24px; border-radius:99px; font-size:0.9rem; display:flex; align-items:center; gap:8px;" onclick="navigateTo('gas')">
-              <i data-lucide="flame" class="icon-lucide" style="width:18px;height:18px;"></i> <span data-i18n="stat_gas_shops">Gas Dealers</span>
+           <button class="elig-btn" style="background:linear-gradient(135deg,#7C3AED,#5B21B6); padding:10px 24px; border-radius:12px; font-size:0.9rem; display:flex; align-items:center; gap:8px; flex: 1; min-width: 160px; justify-content: center;" onclick="navigateTo('gas')">
+              <i data-lucide="flame" class="icon-lucide" style="width:20px;height:20px;"></i> <span data-i18n="stat_gas_shops">Gas Dealers</span>
            </button>
         </div>
-        <div id="stationsList" class="stations-list"></div>
       </div>
     </section>
 

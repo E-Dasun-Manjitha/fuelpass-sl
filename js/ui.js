@@ -241,6 +241,9 @@ function filterStations() {
   const fuel     = document.getElementById('fuelFilter')?.value || '';
   const company  = document.getElementById('companyFilter')?.value || '';
 
+  const container = document.getElementById('stationsList');
+  if (!container) return; // Exit if element is not present (e.g. removed from dashboard)
+
   filteredStations = DB.stations.filter(s => {
     const dOk = !district || s.district === district;
     const cOk = !company  || s.company  === company;
@@ -248,7 +251,7 @@ function filterStations() {
     return dOk && cOk && fOk;
   });
 
-  document.getElementById('stationsList').innerHTML =
+  container.innerHTML =
     filteredStations.map(s => renderStationCard(s)).join('') ||
     `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">${t('no_stations_found')}</p>`;
 }
