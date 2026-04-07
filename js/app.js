@@ -21,6 +21,11 @@ function navigateTo(page) {
   // Close mobile menu
   document.getElementById('navLinks')?.classList.remove('open');
 
+  // Push to history if navigation is called directly (not via hashchange)
+  if (window.location.hash.replace('#', '') !== page) {
+    history.pushState({ page }, '', page === 'dashboard' ? '#' : `#${page}`);
+  }
+
   // Page-specific init
   if (page === 'dashboard') setTimeout(() => { if (map) map.invalidateSize(); }, 100);
   if (page === 'stations')   try { searchStations(); }         catch(e) {}
@@ -242,11 +247,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   } catch(e) {}
 });
 
-// Handle browser back/forward
+// Handle browser back/forward buttons smoothly
 window.addEventListener('hashchange', () => {
   try {
-    const page = window.location.hash.replace('#', '');
-    if (page && document.getElementById(`page-${page}`)) {
+    const page = window.location.hash.replace('#', '') || 'dashboard';
+    const target = document.getElementById(`page-${page}`);
+    if (target && !target.classList.contains('active')) {
       navigateTo(page);
     }
   } catch(e) {}
