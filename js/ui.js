@@ -153,9 +153,12 @@ function renderGasShopCard(shop) {
   const normalizeKey = k => (k || '').toLowerCase().replace(/\s+/g, '');
   const stockHtml = sizes.map(size => {
     let v = 'out';
-    if (shop.stock) {
-      const foundKey = Object.keys(shop.stock).find(k => normalizeKey(k) === normalizeKey(size));
-      if (foundKey) v = shop.stock[foundKey];
+    const data = shop.stock || shop.fuels || {};
+    const stockObj = typeof data === 'string' ? JSON.parse(data) : data;
+    
+    if (stockObj) {
+      const foundKey = Object.keys(stockObj).find(k => normalizeKey(k) === normalizeKey(size));
+      if (foundKey) v = stockObj[foundKey];
     }
     const chipClass = v === 'available' ? 'chip-available' : v === 'limited' ? 'chip-limited' : 'chip-out';
     return `<div class="fuel-chip ${chipClass}"><span class="chip-dot"></span>${size}</div>`;
@@ -200,9 +203,12 @@ window.openGasShopModal = function(shop) {
   const normalizeKey = k => (k || '').toLowerCase().replace(/\s+/g, '');
   const stockItems = sizes.map(size => {
     let v = 'out';
-    if (shop.stock) {
-      const foundKey = Object.keys(shop.stock).find(k => normalizeKey(k) === normalizeKey(size));
-      if (foundKey) v = shop.stock[foundKey];
+    const data = shop.stock || shop.fuels || {};
+    const stockObj = typeof data === 'string' ? JSON.parse(data) : data;
+
+    if (stockObj) {
+      const foundKey = Object.keys(stockObj).find(k => normalizeKey(k) === normalizeKey(size));
+      if (foundKey) v = stockObj[foundKey];
     }
     const chipC   = v==='available'?'chip-available':v==='limited'?'chip-limited':'chip-out';
     const stLabel = t('status_' + v);

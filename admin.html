@@ -1218,11 +1218,14 @@
           const types = isGas ? ['12.5kg', '5kg', '37.5kg', '2.3kg'] : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
           
           const fuels = types.map(type => {
-             // Find status by matching normalized key
+             // Robust status extraction
              let status = 'out';
-             if (s.fuels) {
-               const foundKey = Object.keys(s.fuels).find(k => normalizeKey(k) === normalizeKey(type));
-               if (foundKey) status = s.fuels[foundKey];
+             const data = s.fuels || s.stock || {};
+             const stockObj = typeof data === 'string' ? JSON.parse(data) : data;
+             
+             if (stockObj) {
+               const foundKey = Object.keys(stockObj).find(k => normalizeKey(k) === normalizeKey(type));
+               if (foundKey) status = stockObj[foundKey];
              }
              const dot = status === 'available' ? '🟢' : status === 'limited' ? '🟠' : '🔴';
              return `<span title="${type}: ${status}">${dot}</span>`;
@@ -1279,9 +1282,12 @@
     const normalizeKey = k => (k || '').toLowerCase().replace(/\s+/g, '');
     list.innerHTML = fuelTypes.map(f => {
       let current = 'out';
-      if (s.fuels) {
-        const foundKey = Object.keys(s.fuels).find(k => normalizeKey(k) === normalizeKey(f));
-        if (foundKey) current = s.fuels[foundKey];
+      const data = s.fuels || s.stock || {};
+      const stockObj = typeof data === 'string' ? JSON.parse(data) : data;
+
+      if (stockObj) {
+        const foundKey = Object.keys(stockObj).find(k => normalizeKey(k) === normalizeKey(f));
+        if (foundKey) current = stockObj[foundKey];
       }
       const label = f.replace('petrol', 'Petrol ').replace('superDiesel', 'Super Diesel').replace('kg', ' kg');
       return `
@@ -1346,14 +1352,14 @@
       const lat = parseFloat(document.getElementById('esLat').value) || null;
       const lng = parseFloat(document.getElementById('esLng').value) || null;
 
-      // Prepare payload - Gas shops expect 'stock', Stations expect 'fuels'
+      // Prepare payload - Send both 'stock' and 'fuels' for max compatibility
       const payload = { name, address, district, queue, lat, lng };
+      payload.fuels = fuelsData;
+      payload.stock = fuelsData;
+      
       if (isGas) {
-        payload.stock = fuelsData;
         payload.last_delivery = document.getElementById('esLastDelivery')?.value || '';
         payload.next_delivery = document.getElementById('esNextDelivery')?.value || '';
-      } else {
-        payload.fuels = fuelsData;
       }
 
       const res = await apiUpdateStationStatus(id, payload, isGas);
