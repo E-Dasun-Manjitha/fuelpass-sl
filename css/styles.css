@@ -48,6 +48,17 @@
   color-scheme: light;
 }
 
+[data-theme="light"] .mini-hero h1 {
+  background: none !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .hero-badge {
+  background: rgba(59,130,246,0.08);
+  border-color: rgba(59,130,246,0.2);
+}
+
 html { 
   scroll-behavior: smooth; 
   height: auto !important; 
