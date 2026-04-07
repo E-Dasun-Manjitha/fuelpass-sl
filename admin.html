@@ -1147,7 +1147,7 @@
     try {
       if (!ALL_ADMIN_STATIONS.length) {
         const [stRes, gasRes] = await Promise.all([ apiGetStations(), apiGetGasShops() ]);
-        const slist = (stRes?.data || []).map(s => ({ ...s, isGas: false }));
+        const slist = (stRes?.data || []).map(s => ({ ...s, isGas: !!s.is_gas || !!s.stock }));
         const glist = (gasRes?.data || []).map(g => ({
            id: g.id,
            name: g.name,
@@ -1157,6 +1157,8 @@
            lat: g.lat,
            lng: g.lng,
            fuels: g.stock,
+           lastDelivery: g.last_delivery || g.lastDelivery,
+           nextDelivery: g.next_delivery || g.nextDelivery,
            isGas: true
         }));
         ALL_ADMIN_STATIONS = [...slist, ...glist];
@@ -1177,8 +1179,7 @@
         
         let matchesType = (tF === 'all');
         if (!matchesType) {
-           const isGas = (s.id || '').startsWith('rg');
-           matchesType = (tF === 'gas' && isGas) || (tF === 'fuel' && !isGas);
+           matchesType = (tF === 'gas' && s.isGas) || (tF === 'fuel' && !s.isGas);
         }
 
         let matchesStat = (sF === 'all');
