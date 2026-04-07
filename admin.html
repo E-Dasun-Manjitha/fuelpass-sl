@@ -1147,7 +1147,15 @@
     try {
       if (!ALL_ADMIN_STATIONS.length) {
         const [stRes, gasRes] = await Promise.all([ apiGetStations(), apiGetGasShops() ]);
-        const slist = (stRes?.data || []).map(s => ({ ...s, isGas: !!s.is_gas || !!s.stock }));
+        const slist = (stRes?.data || []).map(s => {
+          // Robust Detection for Gas items that might be in the station table
+          const name = (s.name || '').toLowerCase();
+          const hasGasKeyword = name.includes('gas') || name.includes('lpg') || name.includes('cylinder');
+          const isGasComp = s.company === 'Litro' || (s.company === 'LAUGFS' && hasGasKeyword);
+          const hasStockKeys = s.fuels && Object.keys(s.fuels).some(k => k.includes('kg'));
+          
+          return { ...s, isGas: !!s.is_gas || !!s.stock || isGasComp || hasStockKeys };
+        });
         const glist = (gasRes?.data || []).map(g => ({
            id: g.id,
            name: g.name,
