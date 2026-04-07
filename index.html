@@ -7,7 +7,7 @@
   <meta name="description" content="Track real-time fuel availability, prices, and LPG cylinder stock across Sri Lanka. Check your National Fuel Pass quota, odd/even eligibility, and nearby stations." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet" />
   <title data-i18n="app_title">FuelPass SL – National Fuel & Gas Tracker</title>
   <link rel="stylesheet" href="css/styles.css?v=46K-PR-RESOLVE" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -15,17 +15,16 @@
     /* ============ SPLASH LOADER LOGIC ============ */
     #splash-loader {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0b0f1a; display: flex; align-items: center; justify-content: center;
-      z-index: 999999; transition: opacity 0.8s ease, visibility 0.8s;
-      color: #fff; text-align: center; font-family: 'Space Grotesk', sans-serif;
+      background: #0f1629; display: flex; align-items: center; justify-content: center;
+      z-index: 999999; transition: opacity 0.4s ease, visibility 0.4s;
+      color: #fff; text-align: center; font-family: 'Inter', sans-serif;
     }
     #splash-loader.hidden { opacity: 0; visibility: hidden; }
-    .splash-inner h2 { margin-top: 15px; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; }
+    .splash-inner h2 { margin-top: 15px; font-size: 1.8rem; font-weight: 800; }
     .splash-bar { width: 180px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 15px auto; overflow: hidden; }
-    .splash-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3B82F6, #7C3AED); animation: splashBarProgress 2s ease-out forwards; }
-    .splash-inner p { font-size: 0.85rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+    .splash-bar-fill { height: 100%; width: 0%; background: #3B82F6; animation: splashBarProgress 2s ease-out forwards; }
+    .splash-inner p { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
 
-    @keyframes splashLogoPulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
     @keyframes splashBarProgress { from { width: 0%; } to { width: 100%; } }
   </style>
   <link rel="icon" type="image/png" href="logo.png" />
@@ -39,11 +38,9 @@
     <div class="splash-inner">
       <div class="splash-logo">
         <img src="logo.png" alt="FuelPass SL"
-          style="width:110px;height:110px;object-fit:contain;
-                 filter:drop-shadow(0 0 24px rgba(59,130,246,0.6)) drop-shadow(0 0 8px rgba(245,158,11,0.5));
-                 animation:splashLogoPulse 2s ease-in-out infinite;" />
+          style="width:110px;height:110px;object-fit:contain;" />
       </div>
-      <h2>FuelPass <span style="background:linear-gradient(135deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">SL</span></h2>
+      <h2>FuelPass <span style="color:#3B82F6;">SL</span></h2>
       <div class="splash-bar"><div class="splash-bar-fill"></div></div>
       <p>Loading real-time data…</p>
     </div>
@@ -102,7 +99,7 @@
   <div class="mobile-drawer" id="mobileDrawer">
     <div class="drawer-header">
       <img src="logo.png" alt="Logo" class="drawer-logo" style="width:50px;height:50px;object-fit:contain;" />
-      <h3 style="font-family:'Space Grotesk',sans-serif;font-weight:700;">FuelPass <em style="font-style:normal;color:var(--blue);">SL</em></h3>
+      <h3 style="font-weight:700;">FuelPass <em style="font-style:normal;color:var(--blue);">SL</em></h3>
     </div>
     <div class="drawer-links">
       <a href="#dashboard" onclick="toggleDrawer()" class="drawer-link"><span class="drawer-icon"><i data-lucide="bar-chart-2" class="icon-lucide"></i></span> <span data-i18n="nav_dashboard">Dashboard</span></a>
@@ -153,7 +150,7 @@
         <div class="hero-content">
           <!-- LEFT: text content -->
           <div class="hero-left">
-            <div class="hero-badge"><span><i data-lucide="shield-check" class="icon-lucide"></i></span> <span data-i18n="hero_badge">Sri Lanka Fuel Intelligence</span></div>
+            <div class="hero-badge"><span><i data-lucide="shield-check" class="icon-lucide"></i></span> <span data-i18n="hero_badge">Sri Lanka Fuel Monitoring</span></div>
             <h1 data-i18n="hero_title" data-i18n-html>Real-Time Fuel &<br/>Gas Tracking</h1>
             <p data-i18n="hero_subtitle">Check fuel availability, verify your National Fuel Pass quota, find nearby stations, and stay informed during shortage situations.</p>
             <div class="hero-search" style="position:relative;">
