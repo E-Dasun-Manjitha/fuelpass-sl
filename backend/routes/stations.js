@@ -104,15 +104,17 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
       queries.push(db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams));
     }
 
-    // 2. Update fuel availability
-    if (fuels) {
+    // 2. Update fuel/gas availability
+    if (fuels && typeof fuels === 'object') {
       Object.entries(fuels).forEach(([type, status]) => {
+        // Normalize: '12.5 kg' -> '12.5kg', 'Petrol 95' -> 'petrol95'
+        const normalizedType = type.toLowerCase().replace(/\s+/g, '');
         queries.push(db.query(`
           INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
           VALUES ($1, $2, $3, $4, NOW(), 'admin')
           ON CONFLICT (station_id, fuel_type)
           DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'admin'
-        `, [req.params.id, type, status, queue || 'none']));
+        `, [req.params.id, normalizedType, status, queue || 'none']));
       });
     }
 
