@@ -1248,8 +1248,8 @@
             <td><span style="font-size:0.8rem;text-transform:capitalize;">${firstQueue}</span></td>
             <td>
               <div style="display:flex;gap:6px;">
-                <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit(${JSON.stringify(s.id)})">⚙️ Edit</button>
-                <button class="action-btn btn-reject" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteStation(${JSON.stringify(s.id)})">🗑️</button>
+                <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
+                <button class="action-btn btn-reject" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteStation('${s.id}')">🗑️</button>
               </div>
             </td>
           </tr>`;
