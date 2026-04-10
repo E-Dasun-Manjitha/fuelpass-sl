@@ -107,8 +107,17 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     // 2. Update fuel/gas availability
     if (fuels && typeof fuels === 'object') {
       Object.entries(fuels).forEach(([type, status]) => {
-        // Normalize: '12.5 kg' -> '12.5kg', 'Petrol 95' -> 'petrol95'
+        // Normalize: 'Petrol 95' -> 'petrol95'
         const normalizedType = type.toLowerCase().replace(/\s+/g, '');
+        
+        // --- WHITELIST CHECK ---
+        // Only allow fuel types defined in the station_fuel_status table constraint
+        const allowedFuels = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+        if (!allowedFuels.includes(normalizedType)) {
+          console.warn(`⚠️ Skipping unsupported fuel type for station: ${normalizedType}`);
+          return;
+        }
+
         queries.push(db.query(`
           INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
           VALUES ($1, $2, $3, $4, NOW(), 'admin')
@@ -122,7 +131,7 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     res.json({ success: true, message: 'Station details and status updated' });
   } catch (err) {
     console.error('❌ Station Status Update Error:', err);
-    res.status(500).json({ success: false, error: 'Database update failed' });
+    res.status(500).json({ success: false, error: err.message || 'Database update failed' });
   }
 });
 

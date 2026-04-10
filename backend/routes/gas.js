@@ -80,7 +80,7 @@ router.post('/:id/stock', verifyToken, async (req, res) => {
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
     // Accept both 'fuels' and 'stock' field names from the frontend
-    const { lat, lng, name, address, district } = req.body;
+    const { lat, lng, name, address, district, last_delivery, next_delivery } = req.body;
     const fuels = req.body.fuels || req.body.stock;
     const queries = [];
 
@@ -92,6 +92,8 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     if (district) { updateFields.push(`district = $${updateParams.length + 1}`); updateParams.push(district); }
     if (lat !== null && typeof lat === 'number') { updateFields.push(`lat = $${updateParams.length + 1}`); updateParams.push(lat); }
     if (lng !== null && typeof lng === 'number') { updateFields.push(`lng = $${updateParams.length + 1}`); updateParams.push(lng); }
+    if (last_delivery !== undefined) { updateFields.push(`last_delivery = $${updateParams.length + 1}`); updateParams.push(last_delivery); }
+    if (next_delivery !== undefined) { updateFields.push(`next_delivery = $${updateParams.length + 1}`); updateParams.push(next_delivery); }
 
     if (updateFields.length > 0) {
       updateParams.push(req.params.id);
