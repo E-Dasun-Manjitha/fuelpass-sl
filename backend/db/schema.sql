@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS gas_shops (
 
 CREATE TABLE IF NOT EXISTS gas_shop_stock (
   shop_id        VARCHAR(20) REFERENCES gas_shops(id) ON DELETE CASCADE,
-  cylinder_size  VARCHAR(10) NOT NULL CHECK (cylinder_size IN ('5kg','12.5kg','37.5kg')),
+  cylinder_size  VARCHAR(10) NOT NULL CHECK (cylinder_size IN ('5kg','12.5kg','37.5kg','2.3kg')),
   status         VARCHAR(10) NOT NULL DEFAULT 'available' CHECK (status IN ('available','limited','out')),
   last_updated   TIMESTAMP DEFAULT NOW(),
   PRIMARY KEY (shop_id, cylinder_size)
@@ -139,9 +139,11 @@ INSERT INTO gas_prices (provider, size, price, status) VALUES
   ('Litro',  '12.5 kg', 4040, 'available'),
   ('Litro',  '5 kg',    1620, 'limited'),
   ('Litro',  '37.5 kg', 9970, 'available'),
+  ('Litro',  '2.3 kg',  890,  'available'),
   ('LAUGFS', '12.5 kg', 4040, 'available'),
   ('LAUGFS', '5 kg',    1620, 'out'),
-  ('LAUGFS', '37.5 kg', 9970, 'limited')
+  ('LAUGFS', '37.5 kg', 9970, 'limited'),
+  ('LAUGFS', '2.3 kg',  912,  'available')
 ON CONFLICT DO NOTHING;
 
 -- Sample stations (Colombo)

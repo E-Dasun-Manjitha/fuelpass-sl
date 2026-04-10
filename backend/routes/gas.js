@@ -104,7 +104,7 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
         // Normalize: '12.5 kg' -> '12.5kg', '5 KG' -> '5kg'
         const normalizedSize = size.toLowerCase().replace(/\s+/g, '');
         
-        const allowedSizes = ['5kg', '12.5kg', '37.5kg'];
+        const allowedSizes = ['5kg', '12.5kg', '37.5kg', '2.3kg'];
         if (!allowedSizes.includes(normalizedSize)) {
           console.warn(`⚠️ Skipping unsupported cylinder size: ${normalizedSize}`);
           return;
