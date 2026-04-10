@@ -1248,8 +1248,8 @@
             <td><span style="font-size:0.8rem;text-transform:capitalize;">${firstQueue}</span></td>
             <td>
               <div style="display:flex;gap:6px;">
-                <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
-                <button class="action-btn btn-reject" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteStation('${s.id}')">🗑️</button>
+                <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit(${JSON.stringify(s.id)})">⚙️ Edit</button>
+                <button class="action-btn btn-reject" style="padding:6px 10px;font-size:0.75rem;" onclick="deleteStation(${JSON.stringify(s.id)})">🗑️</button>
               </div>
             </td>
           </tr>`;
@@ -1261,8 +1261,9 @@
   }
 
   window.openStationEdit = function(id) {
-    const s = ALL_ADMIN_STATIONS.find(x => x.id === id);
-    if (!s) return;
+    // Use loose equality to handle both numeric and string IDs
+    const s = ALL_ADMIN_STATIONS.find(x => x.id == id);
+    if (!s) { console.error('Station not found for id:', id, typeof id); return; }
     document.getElementById('esStationId').value = id;
     document.getElementById('esIsGas').value = s.isGas ? 'true' : 'false';
     document.getElementById('esName').value = s.name || '';
@@ -1352,27 +1353,37 @@
       const lat = parseFloat(document.getElementById('esLat').value) || null;
       const lng = parseFloat(document.getElementById('esLng').value) || null;
 
-      // Prepare payload - Send both 'stock' and 'fuels' for max compatibility
+      // Build payload correctly for each type
       const payload = { name, address, district, queue, lat, lng };
-      payload.fuels = fuelsData;
-      payload.stock = fuelsData;
       
       if (isGas) {
+        // Gas shops: backend reads 'fuels' key to update gas_shop_stock
+        payload.fuels = fuelsData;
         payload.last_delivery = document.getElementById('esLastDelivery')?.value || '';
         payload.next_delivery = document.getElementById('esNextDelivery')?.value || '';
+      } else {
+        // Fuel stations: backend reads 'fuels' key to update station_fuel_status
+        payload.fuels = fuelsData;
       }
 
+      console.log(`Saving ${isGas ? 'Gas Shop' : 'Fuel Station'} id=${id}`, payload);
+      
       const res = await apiUpdateStationStatus(id, payload, isGas);
+      console.log('Save response:', res);
+      
       if (res && res.success) {
-        showAdminToast('✅ Data saved successfully!');
+        showAdminToast('\u2705 Data saved successfully!');
         closeStationEdit();
         ALL_ADMIN_STATIONS = []; // Force refresh
         await renderManageStations();
       } else {
-        showAdminToast('❌ Failed to save data.', 'error');
+        const errMsg = res?.error || 'Unknown error';
+        console.error('Save failed:', errMsg);
+        showAdminToast('\u274C Failed to save: ' + errMsg, 'error');
       }
     } catch(err) { 
-       showAdminToast('❌ Update failed. Check connection.', 'error'); 
+       console.error('Save exception:', err);
+       showAdminToast('\u274C Update failed: ' + err.message, 'error'); 
     } finally {
        btn.innerHTML = oldText;
        btn.disabled = false;

@@ -79,7 +79,9 @@ router.post('/:id/stock', verifyToken, async (req, res) => {
 // PATCH /api/gas-shops/:id/status – Bulk admin update (status + details + coordinates)
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { fuels, lat, lng, name, address, district } = req.body;
+    // Accept both 'fuels' and 'stock' field names from the frontend
+    const { lat, lng, name, address, district } = req.body;
+    const fuels = req.body.fuels || req.body.stock;
     const queries = [];
 
     // 1. Update shop details
@@ -96,15 +98,17 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
       queries.push(db.query(`UPDATE gas_shops SET ${updateFields.join(', ')} WHERE id = $${updateParams.length}`, updateParams));
     }
 
-    // 2. Update stock
-    if (fuels) {
+    // 2. Update stock – normalize cylinder size keys (remove spaces, lowercase)
+    if (fuels && typeof fuels === 'object') {
       Object.entries(fuels).forEach(([size, status]) => {
+        // Normalize: '12.5 kg' -> '12.5kg', '5 KG' -> '5kg'
+        const normalizedSize = size.toLowerCase().replace(/\s+/g, '');
         queries.push(db.query(`
           INSERT INTO gas_shop_stock (shop_id, cylinder_size, status, last_updated)
           VALUES ($1, $2, $3, NOW())
           ON CONFLICT (shop_id, cylinder_size)
           DO UPDATE SET status = $3, last_updated = NOW()
-        `, [req.params.id, size, status]));
+        `, [req.params.id, normalizedSize, status]));
       });
     }
 
@@ -112,7 +116,7 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     res.json({ success: true, message: 'Gas shop details and stock updated' });
   } catch (err) {
     console.error('❌ Gas Shop Update Error:', err);
-    res.status(500).json({ success: false, error: 'Database update failed' });
+    res.status(500).json({ success: false, error: err.message || 'Database update failed' });
   }
 });
 
