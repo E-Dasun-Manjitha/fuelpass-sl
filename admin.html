@@ -509,6 +509,7 @@
   <div class="approve-modal" style="max-width:500px;">
     <input type="hidden" id="esStationId">
     <input type="hidden" id="esIsGas">
+    <input type="hidden" id="esOriginTable">
     <div class="am-row">
       <label>Station Name</label>
       <input type="text" id="esName" class="am-input" placeholder="Station Name">
@@ -1161,7 +1162,11 @@
           const isGasComp = s.company === 'Litro' || (s.company === 'LAUGFS' && hasGasKeyword);
           const hasStockKeys = s.fuels && Object.keys(s.fuels).some(k => k.includes('kg'));
           
-          return { ...s, isGas: !!s.is_gas || !!s.stock || isGasComp || hasStockKeys };
+          return { 
+            ...s, 
+            isGas: !!s.is_gas || !!s.stock || isGasComp || hasStockKeys,
+            originTable: 'stations' 
+          };
         });
         const glist = (gasRes?.data || []).map(g => ({
            id: g.id,
@@ -1174,7 +1179,8 @@
            fuels: g.stock,
            lastDelivery: g.last_delivery || g.lastDelivery,
            nextDelivery: g.next_delivery || g.nextDelivery,
-           isGas: true
+           isGas: true,
+           originTable: 'gas'
         }));
         ALL_ADMIN_STATIONS = [...slist, ...glist];
       }
@@ -1273,6 +1279,7 @@
     if (!s) { console.error('Station not found for id:', id, typeof id); return; }
     document.getElementById('esStationId').value = id;
     document.getElementById('esIsGas').value = s.isGas ? 'true' : 'false';
+    document.getElementById('esOriginTable').value = s.originTable || 'stations';
     document.getElementById('esName').value = s.name || '';
     document.getElementById('esAddress').value = s.address || '';
     document.getElementById('esDistrict').value = s.district || 'Colombo';
@@ -1342,6 +1349,7 @@
     try {
       const id = document.getElementById('esStationId').value;
       const isGas = document.getElementById('esIsGas').value === 'true';
+      const originTable = document.getElementById('esOriginTable').value;
       const name = document.getElementById('esName').value.trim();
       const address = document.getElementById('esAddress').value.trim();
       const district = document.getElementById('esDistrict').value;
@@ -1367,9 +1375,9 @@
         payload.fuels = fuelsData;
       }
 
-      console.log(`Saving ${isGas ? 'Gas Shop' : 'Fuel Station'} id=${id}`, payload);
+      console.log(`Saving ${isGas ? 'Gas Shop' : 'Fuel Station'} id=${id} (Table: ${originTable})`, payload);
       
-      const res = await apiUpdateStationStatus(id, payload, isGas);
+      const res = await apiUpdateStationStatus(id, payload, originTable === 'gas');
       console.log('Save response:', res);
       
       if (res && res.success) {
