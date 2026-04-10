@@ -103,6 +103,13 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
       Object.entries(fuels).forEach(([size, status]) => {
         // Normalize: '12.5 kg' -> '12.5kg', '5 KG' -> '5kg'
         const normalizedSize = size.toLowerCase().replace(/\s+/g, '');
+        
+        const allowedSizes = ['5kg', '12.5kg', '37.5kg'];
+        if (!allowedSizes.includes(normalizedSize)) {
+          console.warn(`⚠️ Skipping unsupported cylinder size: ${normalizedSize}`);
+          return;
+        }
+
         queries.push(db.query(`
           INSERT INTO gas_shop_stock (shop_id, cylinder_size, status, last_updated)
           VALUES ($1, $2, $3, NOW())

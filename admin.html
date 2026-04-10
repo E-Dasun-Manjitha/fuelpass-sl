@@ -1284,10 +1284,9 @@
     document.getElementById('esAddress').value = s.address || '';
     document.getElementById('esDistrict').value = s.district || 'Colombo';
     
-    let fuelTypes = [];
     if (s.isGas) {
       // Standard Gas Sizes
-      fuelTypes = ['12.5kg', '5kg', '37.5kg', '2.3kg'];
+      fuelTypes = ['12.5kg', '5kg', '37.5kg'];
     } else {
       // Standard Fuel Types
       fuelTypes = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
