@@ -538,6 +538,13 @@
         <!-- Dynamically filled -->
       </div>
     </div>
+    <!-- Gas-only delivery fields (permanent, shown/hidden by JS, never duplicated) -->
+    <div id="esDeliveryFields" style="display:none;margin-top:10px;">
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;"><label style="font-size:0.7rem;color:var(--text-muted);">Last Delivery</label><input type="text" id="esLastDelivery" class="am-input" placeholder="e.g. 2 days ago"></div>
+        <div style="flex:1;"><label style="font-size:0.7rem;color:var(--text-muted);">Next Delivery</label><input type="text" id="esNextDelivery" class="am-input" placeholder="e.g. Monday"></div>
+      </div>
+    </div>
 
     <div class="am-row" style="margin-top:20px;">
       <label>🔄 Queue Status</label>
@@ -1303,23 +1310,14 @@
       `;
     }).join('');
 
-    // Delivery fields for Gas
-    const deliveryHtml = s.isGas ? `
-      <div style="display:flex;gap:10px;margin-top:10px;">
-        <div style="flex:1;">
-          <label style="font-size:0.7rem;color:var(--text-muted);">Last Delivery</label>
-          <input type="text" id="esLastDelivery" class="am-input" value="${s.lastDelivery || ''}" placeholder="e.g. 2 days ago">
-        </div>
-        <div style="flex:1;">
-          <label style="font-size:0.7rem;color:var(--text-muted);">Next Delivery</label>
-          <input type="text" id="esNextDelivery" class="am-input" value="${s.nextDelivery || ''}" placeholder="e.g. Monday">
-        </div>
-      </div>
-    ` : '';
-    
-    // Append or insert delivery fields
+    // Delivery fields (permanent container in HTML)
+    const delContainer = document.getElementById('esDeliveryFields');
     if (s.isGas) {
-      list.insertAdjacentHTML('afterend', deliveryHtml);
+      delContainer.style.display = 'block';
+      document.getElementById('esLastDelivery').value = s.lastDelivery || '';
+      document.getElementById('esNextDelivery').value = s.nextDelivery || '';
+    } else {
+      delContainer.style.display = 'none';
     }
 
     const firstQueue = Object.values(s.queues || {})[0] || s.queue || 'none';
@@ -1330,7 +1328,10 @@
     document.getElementById('stationEditModal').style.display = 'flex';
   }
 
-  window.closeStationEdit = () => { document.getElementById('stationEditModal').style.display = 'none'; };
+  window.closeStationEdit = () => { 
+    document.getElementById('stationEditModal').style.display = 'none';
+    document.getElementById('esDeliveryFields').style.display = 'none';
+  };
 
   window.saveStationEdit = async function(btn) {
     if (!btn) return;
