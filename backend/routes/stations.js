@@ -89,12 +89,11 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { fuels, queue, lat, lng, name, address, district } = req.body;
     const queries = [];
-    
     // 1. Upsert station details (supports persisting static stations for the first time)
     const company = req.body.company;
     if (name && district && address && company) {
        // All required fields present, we can safely UPSERT
-       queries.push(db.query(`
+       await db.query(`
          INSERT INTO stations (id, name, company, district, address, lat, lng)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (id) 
@@ -105,9 +104,9 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
             address = EXCLUDED.address, 
             lat = EXCLUDED.lat, 
             lng = EXCLUDED.lng
-       `, [req.params.id, name, company, district, address, lat || 0, lng || 0]));
+       `, [req.params.id, name, company, district, address, lat || 0, lng || 0]);
     } else {
-      // Fallback to simple update if some mandatory fields are somehow missing
+      // Fallback to simple update
       const updateStationsFields = [];
       const updateStationsParams = [];
       if (name) { updateStationsFields.push(`name = $${updateStationsParams.length + 1}`); updateStationsParams.push(name); }
@@ -118,34 +117,27 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
       
       if (updateStationsFields.length > 0) {
         updateStationsParams.push(req.params.id);
-        queries.push(db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams));
+        await db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams);
       }
     }
 
     // 2. Update fuel/gas availability
     if (fuels && typeof fuels === 'object') {
+      const fuelQueries = [];
       Object.entries(fuels).forEach(([type, status]) => {
-        // Normalize: 'Petrol 95' -> 'petrol95'
         const normalizedType = type.toLowerCase().replace(/\s+/g, '');
-        
-        // --- WHITELIST CHECK ---
-        // Only allow fuel types defined in the station_fuel_status table constraint
         const allowedFuels = ['petrol92', 'petrol95', 'diesel', 'superDiesel', '5kg', '12.5kg', '37.5kg', '2.3kg'];
-        if (!allowedFuels.includes(normalizedType)) {
-          console.warn(`⚠️ Skipping unsupported fuel type for station: ${normalizedType}`);
-          return;
-        }
+        if (!allowedFuels.includes(normalizedType)) return;
 
-        queries.push(db.query(`
+        fuelQueries.push(db.query(`
           INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
           VALUES ($1, $2, $3, $4, NOW(), 'admin')
           ON CONFLICT (station_id, fuel_type)
           DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'admin'
         `, [req.params.id, normalizedType, status, queue || 'none']));
       });
+      await Promise.all(fuelQueries);
     }
-
-    await Promise.all(queries);
     res.json({ success: true, message: 'Station details and status updated' });
   } catch (err) {
     console.error('❌ Station Status Update Error:', err);
