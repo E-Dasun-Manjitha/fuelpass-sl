@@ -1154,35 +1154,49 @@
     
     try {
       if (!ALL_ADMIN_STATIONS.length) {
-        const [stRes, gasRes] = await Promise.all([ apiGetStations(), apiGetGasShops() ]);
-        const slist = (stRes?.data || []).map(s => {
-          // Robust Detection for Gas items that might be in the station table
+        const [stRes, gasRes] = await Promise.all([ 
+          apiGetStations().catch(() => ({ data: [] })), 
+          apiGetGasShops().catch(() => ({ data: [] })) 
+        ]);
+        
+        const stationMap = new Map();
+
+        // 1. Process stations and identify gas shops within that table
+        (stRes?.data || []).forEach(s => {
           const name = (s.name || '').toLowerCase();
           const hasGasKeyword = name.includes('gas') || name.includes('lpg') || name.includes('cylinder');
           const isGasComp = s.company === 'Litro' || (s.company === 'LAUGFS' && hasGasKeyword);
           const hasStockKeys = s.fuels && Object.keys(s.fuels).some(k => k.includes('kg'));
+          const isGas = !!s.is_gas || !!s.stock || isGasComp || hasStockKeys;
           
-          return { 
+          stationMap.set(s.id, { 
             ...s, 
-            isGas: !!s.is_gas || !!s.stock || isGasComp || hasStockKeys,
-            originTable: 'stations' 
-          };
+            isGas,
+            originTable: isGas ? 'gas' : 'stations' 
+          });
         });
-        const glist = (gasRes?.data || []).map(g => ({
-           id: g.id,
-           name: g.name,
-           company: g.provider,
-           district: g.district,
-           address: g.address,
-           lat: g.lat,
-           lng: g.lng,
-           fuels: g.stock,
-           lastDelivery: g.last_delivery || g.lastDelivery,
-           nextDelivery: g.next_delivery || g.nextDelivery,
-           isGas: true,
-           originTable: 'gas'
-        }));
-        ALL_ADMIN_STATIONS = [...slist, ...glist];
+
+        // 2. Merge gas shops from the dedicated gas endpoint (these take precedence for gas stock)
+        (gasRes?.data || []).forEach(g => {
+          const existing = stationMap.get(g.id);
+          const merged = {
+             id: g.id,
+             name: g.name || existing?.name,
+             company: g.provider || g.company || existing?.company || 'LAUGFS',
+             district: g.district || existing?.district,
+             address: g.address || existing?.address,
+             lat: g.lat || existing?.lat,
+             lng: g.lng || existing?.lng,
+             fuels: g.stock || g.fuels || existing?.fuels,
+             lastDelivery: g.last_delivery || g.lastDelivery || existing?.lastDelivery,
+             nextDelivery: g.next_delivery || g.nextDelivery || existing?.nextDelivery,
+             isGas: true,
+             originTable: 'gas'
+          };
+          stationMap.set(g.id, merged);
+        });
+
+        ALL_ADMIN_STATIONS = Array.from(stationMap.values());
       }
       
       const dF = document.getElementById('stDistrictFilter').value;
