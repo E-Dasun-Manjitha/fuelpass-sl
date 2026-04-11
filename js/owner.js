@@ -321,13 +321,7 @@ window.renderRecentReports = function() {
 };
 
 // ── HELPERS ───────────────────────────────────────────────
-function timeAgo(date) {
-  const secs = Math.floor((new Date() - date) / 1000);
-  if (secs < 60)    return 'Just now';
-  if (secs < 3600)  return Math.floor(secs / 60) + 'm ago';
-  if (secs < 86400) return Math.floor(secs / 3600) + 'h ago';
-  return date.toLocaleDateString();
-}
+// timeAgo removed - using centralized version in api.js
 
 // ── INIT ─────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
