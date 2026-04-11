@@ -130,7 +130,7 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
         
         // --- WHITELIST CHECK ---
         // Only allow fuel types defined in the station_fuel_status table constraint
-        const allowedFuels = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+        const allowedFuels = ['petrol92', 'petrol95', 'diesel', 'superDiesel', '5kg', '12.5kg', '37.5kg', '2.3kg'];
         if (!allowedFuels.includes(normalizedType)) {
           console.warn(`⚠️ Skipping unsupported fuel type for station: ${normalizedType}`);
           return;
