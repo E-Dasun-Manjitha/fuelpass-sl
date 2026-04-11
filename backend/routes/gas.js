@@ -82,13 +82,12 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     // Accept both 'fuels' and 'stock' field names from the frontend
     const { lat, lng, name, address, district, last_delivery, next_delivery } = req.body;
     const fuels = req.body.fuels || req.body.stock;
-    const queries = [];
 
     // 1. Upsert shop details (supports persisting static stations for the first time)
     const company = req.body.company;
     if (name && district && address && company) {
        // All required fields present, we can safely UPSERT
-       queries.push(db.query(`
+       await db.query(`
          INSERT INTO gas_shops (id, name, provider, district, address, lat, lng, last_delivery, next_delivery)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          ON CONFLICT (id) 
@@ -101,7 +100,7 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
             lng = EXCLUDED.lng, 
             last_delivery = EXCLUDED.last_delivery, 
             next_delivery = EXCLUDED.next_delivery
-       `, [req.params.id, name, company, district, address, lat || 0, lng || 0, last_delivery || '', next_delivery || '']));
+       `, [req.params.id, name, company, district, address, lat || 0, lng || 0, last_delivery || '', next_delivery || '']);
     } else {
       // Fallback to simple update if some mandatory fields are somehow missing (legacy)
       const updateFields = [];
@@ -116,32 +115,27 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
 
       if (updateFields.length > 0) {
         updateParams.push(req.params.id);
-        queries.push(db.query(`UPDATE gas_shops SET ${updateFields.join(', ')} WHERE id = $${updateParams.length}`, updateParams));
+        await db.query(`UPDATE gas_shops SET ${updateFields.join(', ')} WHERE id = $${updateParams.length}`, updateParams);
       }
     }
 
-    // 2. Update stock – normalize cylinder size keys (remove spaces, lowercase)
+    // 2. Update stock
     if (fuels && typeof fuels === 'object') {
+      const stockQueries = [];
       Object.entries(fuels).forEach(([size, status]) => {
-        // Normalize: '12.5 kg' -> '12.5kg', '5 KG' -> '5kg'
         const normalizedSize = size.toLowerCase().replace(/\s+/g, '');
-        
         const allowedSizes = ['5kg', '12.5kg', '37.5kg', '2.3kg'];
-        if (!allowedSizes.includes(normalizedSize)) {
-          console.warn(`⚠️ Skipping unsupported cylinder size: ${normalizedSize}`);
-          return;
-        }
+        if (!allowedSizes.includes(normalizedSize)) return;
 
-        queries.push(db.query(`
+        stockQueries.push(db.query(`
           INSERT INTO gas_shop_stock (shop_id, cylinder_size, status, last_updated)
           VALUES ($1, $2, $3, NOW())
           ON CONFLICT (shop_id, cylinder_size)
           DO UPDATE SET status = $3, last_updated = NOW()
         `, [req.params.id, normalizedSize, status]));
       });
+      await Promise.all(stockQueries);
     }
-
-    await Promise.all(queries);
     res.json({ success: true, message: 'Gas shop details and stock updated' });
   } catch (err) {
     console.error('❌ Gas Shop Update Error:', err);
