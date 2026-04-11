@@ -191,84 +191,69 @@ async function loadLiveData() {
   try { loadRealStationData(); } catch(e) {}
 
   if (stationsResp?.data?.length) {
-    // Normalise API response to match existing DB shape
-    // FILTER: Only merge real fuel stations into DB.stations (id starts with r, not rg)
-    const liveStations = stationsResp.data
-      .filter(s => !(s.id || '').startsWith('rg')) // allow 'r' and custom company IDs like 'cpcgal'
-      .map(s => ({
-        ...s,
-        fuels: s.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
-        queue: Object.values(s.queues || {})[0] || 'none',
-        lastUpdated: s.last_updated ? new Date(s.last_updated).toLocaleTimeString() : '--',
-      }));
-
-    // Merge: upsert live stations into the static list (robust matching)
     const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     
-    liveStations.forEach(live => {
+    stationsResp.data.forEach(live => {
+      const isGas = (live.id || '').startsWith('rg');
       const liveNameNorm = normalize(live.name);
-      const liveAddrNorm = normalize(live.address);
       
-      const idx = DB.stations.findIndex(s => 
-        s.id === live.id || 
-        (normalize(s.name) === liveNameNorm && normalize(s.address).startsWith(liveAddrNorm.substring(0, 10))) ||
-        (normalize(s.name) === liveNameNorm) // Fallback to just name if unique enough
-      );
-      
-      if (idx !== -1) {
-        // preserve the static ID and any fields the API might have missed
-        const existing = DB.stations[idx];
-        DB.stations[idx] = { ...existing, ...live, id: existing.id }; 
+      if (isGas) {
+        // Handle Gas Shop merge from stations endpoint
+        const idx = DB.gasShops.findIndex(g => g.id === live.id || normalize(g.name) === liveNameNorm);
+        if (idx !== -1) {
+          const existing = DB.gasShops[idx];
+          // Map backend 'fuels' to frontend 'stock' if fuels exists (happens when editing gas as a station)
+          const liveStock = live.stock || live.fuels || {};
+          DB.gasShops[idx] = { 
+            ...existing, 
+            ...live, 
+            stock: { ...(existing.stock || {}), ...liveStock },
+            id: existing.id || live.id,
+            lastUpdated: 'Live updated'
+          };
+        }
       } else {
-        DB.stations.push(live); 
+        // Handle Fuel Station merge
+        const mapped = {
+          ...live,
+          fuels: live.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
+          queue: Object.values(live.queues || {})[0] || 'none',
+          lastUpdated: live.last_updated ? new Date(live.last_updated).toLocaleTimeString() : '--',
+        };
+        const liveAddrNorm = normalize(live.address);
+        const idx = DB.stations.findIndex(s => 
+          s.id === live.id || 
+          (normalize(s.name) === liveNameNorm && normalize(s.address).startsWith(liveAddrNorm.substring(0, 10))) ||
+          (normalize(s.name) === liveNameNorm)
+        );
+        if (idx !== -1) {
+          const existing = DB.stations[idx];
+          DB.stations[idx] = { ...existing, ...mapped, id: existing.id }; 
+        } else {
+          DB.stations.push(mapped); 
+        }
       }
     });
-    console.log(`✅ ${liveStations.length} live DB stations processed → total ${DB.stations.length}`);
-  } else {
-    console.warn('⚠️ API returned no stations — showing static data only');
+    console.log(`✅ Live data merged: Total ${DB.stations.length} stations, ${DB.gasShops.length} gas shops.`);
   }
 
-
   if (gasResp?.data?.length) {
-    const liveGas = gasResp.data.map(g => ({
-      ...g,
-      stock: g.stock || {},
-      lastDelivery: g.last_delivery || '--',
-      nextDelivery: g.next_delivery || '--',
-    }));
-
     const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-
-    // Merge into static list
-    liveGas.forEach(live => {
+    gasResp.data.forEach(live => {
       const liveNameNorm = normalize(live.name);
-      const idx = DB.gasShops.findIndex(g => 
-        g.id === live.id || 
-        (normalize(g.name) === liveNameNorm) 
-      );
-      
+      const idx = DB.gasShops.findIndex(g => g.id === live.id || normalize(g.name) === liveNameNorm);
       if (idx !== -1) {
         const existing = DB.gasShops[idx];
-        const mergedStock = { ...(existing.stock || {}) };
-        if (live.stock) {
-          Object.entries(live.stock).forEach(([k, v]) => {
-            const cleanKey = k.toLowerCase().replace(/\s+/g, '');
-            mergedStock[cleanKey] = v;
-          });
-        }
-        // Force the merge into the global DB object
         DB.gasShops[idx] = { 
           ...existing, 
           ...live, 
-          stock: mergedStock, 
-          id: existing.id || live.id, // Prefer static ID if matching was name-based
+          stock: { ...(existing.stock || {}), ...(live.stock || {}) },
           lastUpdated: 'Live updated'
         };
       } else {
-        DB.gasShops.push(live);
+        DB.gasShops.push({ ...live, stock: live.stock || {} });
       }
     });
-    console.log(`✅ ${liveGas.length} live gas shops merged → total ${DB.gasShops.length}`);
   }
 
   if (pricesResp?.data) {
