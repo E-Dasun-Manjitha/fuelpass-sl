@@ -84,20 +84,40 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     const fuels = req.body.fuels || req.body.stock;
     const queries = [];
 
-    // 1. Update shop details
-    const updateFields = [];
-    const updateParams = [];
-    if (name) { updateFields.push(`name = $${updateParams.length + 1}`); updateParams.push(name); }
-    if (address) { updateFields.push(`address = $${updateParams.length + 1}`); updateParams.push(address); }
-    if (district) { updateFields.push(`district = $${updateParams.length + 1}`); updateParams.push(district); }
-    if (lat !== null && typeof lat === 'number') { updateFields.push(`lat = $${updateParams.length + 1}`); updateParams.push(lat); }
-    if (lng !== null && typeof lng === 'number') { updateFields.push(`lng = $${updateParams.length + 1}`); updateParams.push(lng); }
-    if (last_delivery !== undefined) { updateFields.push(`last_delivery = $${updateParams.length + 1}`); updateParams.push(last_delivery); }
-    if (next_delivery !== undefined) { updateFields.push(`next_delivery = $${updateParams.length + 1}`); updateParams.push(next_delivery); }
+    // 1. Upsert shop details (supports persisting static stations for the first time)
+    const company = req.body.company;
+    if (name && district && address && company) {
+       // All required fields present, we can safely UPSERT
+       queries.push(db.query(`
+         INSERT INTO gas_shops (id, name, provider, district, address, lat, lng, last_delivery, next_delivery)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         ON CONFLICT (id) 
+         DO UPDATE SET 
+            name = EXCLUDED.name, 
+            provider = EXCLUDED.provider, 
+            district = EXCLUDED.district, 
+            address = EXCLUDED.address, 
+            lat = EXCLUDED.lat, 
+            lng = EXCLUDED.lng, 
+            last_delivery = EXCLUDED.last_delivery, 
+            next_delivery = EXCLUDED.next_delivery
+       `, [req.params.id, name, company, district, address, lat || 0, lng || 0, last_delivery || '', next_delivery || '']));
+    } else {
+      // Fallback to simple update if some mandatory fields are somehow missing (legacy)
+      const updateFields = [];
+      const updateParams = [];
+      if (name) { updateFields.push(`name = $${updateParams.length + 1}`); updateParams.push(name); }
+      if (address) { updateFields.push(`address = $${updateParams.length + 1}`); updateParams.push(address); }
+      if (district) { updateFields.push(`district = $${updateParams.length + 1}`); updateParams.push(district); }
+      if (lat !== null && typeof lat === 'number') { updateFields.push(`lat = $${updateParams.length + 1}`); updateParams.push(lat); }
+      if (lng !== null && typeof lng === 'number') { updateFields.push(`lng = $${updateParams.length + 1}`); updateParams.push(lng); }
+      if (last_delivery !== undefined) { updateFields.push(`last_delivery = $${updateParams.length + 1}`); updateParams.push(last_delivery); }
+      if (next_delivery !== undefined) { updateFields.push(`next_delivery = $${updateParams.length + 1}`); updateParams.push(next_delivery); }
 
-    if (updateFields.length > 0) {
-      updateParams.push(req.params.id);
-      queries.push(db.query(`UPDATE gas_shops SET ${updateFields.join(', ')} WHERE id = $${updateParams.length}`, updateParams));
+      if (updateFields.length > 0) {
+        updateParams.push(req.params.id);
+        queries.push(db.query(`UPDATE gas_shops SET ${updateFields.join(', ')} WHERE id = $${updateParams.length}`, updateParams));
+      }
     }
 
     // 2. Update stock – normalize cylinder size keys (remove spaces, lowercase)

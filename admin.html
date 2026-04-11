@@ -1362,7 +1362,17 @@
       const lng = parseFloat(document.getElementById('esLng').value) || null;
 
       // Build payload correctly for each type
-      const payload = { name, address, district, queue, lat, lng };
+      // We pass 'company' so the backend can UPSERT the shop/station if it only existed in static files
+      const sourceStation = ALL_ADMIN_STATIONS.find(x => x.id == id) || {};
+      const payload = { 
+        name, 
+        address, 
+        district, 
+        queue, 
+        lat, 
+        lng, 
+        company: sourceStation.company 
+      };
       
       if (isGas) {
         // Gas shops: backend reads 'fuels' key to update gas_shop_stock

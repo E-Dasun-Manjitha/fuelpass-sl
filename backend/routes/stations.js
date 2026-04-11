@@ -90,18 +90,36 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     const { fuels, queue, lat, lng, name, address, district } = req.body;
     const queries = [];
     
-    // 1. Update station details (Name, Address, District, Location)
-    const updateStationsFields = [];
-    const updateStationsParams = [];
-    if (name) { updateStationsFields.push(`name = $${updateStationsParams.length + 1}`); updateStationsParams.push(name); }
-    if (address) { updateStationsFields.push(`address = $${updateStationsParams.length + 1}`); updateStationsParams.push(address); }
-    if (district) { updateStationsFields.push(`district = $${updateStationsParams.length + 1}`); updateStationsParams.push(district); }
-    if (lat !== null && typeof lat === 'number') { updateStationsFields.push(`lat = $${updateStationsParams.length + 1}`); updateStationsParams.push(lat); }
-    if (lng !== null && typeof lng === 'number') { updateStationsFields.push(`lng = $${updateStationsParams.length + 1}`); updateStationsParams.push(lng); }
-    
-    if (updateStationsFields.length > 0) {
-      updateStationsParams.push(req.params.id);
-      queries.push(db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams));
+    // 1. Upsert station details (supports persisting static stations for the first time)
+    const company = req.body.company;
+    if (name && district && address && company) {
+       // All required fields present, we can safely UPSERT
+       queries.push(db.query(`
+         INSERT INTO stations (id, name, company, district, address, lat, lng)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (id) 
+         DO UPDATE SET 
+            name = EXCLUDED.name, 
+            company = EXCLUDED.company, 
+            district = EXCLUDED.district, 
+            address = EXCLUDED.address, 
+            lat = EXCLUDED.lat, 
+            lng = EXCLUDED.lng
+       `, [req.params.id, name, company, district, address, lat || 0, lng || 0]));
+    } else {
+      // Fallback to simple update if some mandatory fields are somehow missing
+      const updateStationsFields = [];
+      const updateStationsParams = [];
+      if (name) { updateStationsFields.push(`name = $${updateStationsParams.length + 1}`); updateStationsParams.push(name); }
+      if (address) { updateStationsFields.push(`address = $${updateStationsParams.length + 1}`); updateStationsParams.push(address); }
+      if (district) { updateStationsFields.push(`district = $${updateStationsParams.length + 1}`); updateStationsParams.push(district); }
+      if (lat !== null && typeof lat === 'number') { updateStationsFields.push(`lat = $${updateStationsParams.length + 1}`); updateStationsParams.push(lat); }
+      if (lng !== null && typeof lng === 'number') { updateStationsFields.push(`lng = $${updateStationsParams.length + 1}`); updateStationsParams.push(lng); }
+      
+      if (updateStationsFields.length > 0) {
+        updateStationsParams.push(req.params.id);
+        queries.push(db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams));
+      }
     }
 
     // 2. Update fuel/gas availability

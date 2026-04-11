@@ -18,10 +18,16 @@ const Auth = {
   }),
 };
 
-// ---- Core fetch wrapper ----
+// ---- Core fetch wrapper with Cache-Busting ----
 async function apiFetch(path, options = {}) {
   try {
-    const res = await fetch(`${API_BASE}${path}`, {
+    const url = new URL(`${API_BASE}${path}`);
+    // Append timestamp to GET requests to bypass CDN/Browser cache
+    if (!options.method || options.method === 'GET') {
+      url.searchParams.set('_t', Date.now());
+    }
+
+    const res = await fetch(url.toString(), {
       headers: Auth.getHeaders(),
       cache: 'no-store',
       ...options,
@@ -31,10 +37,9 @@ async function apiFetch(path, options = {}) {
     if (res.status === 401 || res.status === 403) {
       console.warn('⚠️ Session expired or invalid. Redirecting to login...');
       Auth.clearToken();
-      // Handle Admin-Panel vs Dashboard Login Portal
       if (window.location.pathname.includes('admin.html')) {
         window.location.href = 'admin.html#login-refresh';
-        location.reload(); // Force refresh to trigger login state
+        location.reload();
       }
     }
 
@@ -239,12 +244,11 @@ async function loadLiveData() {
       const liveNameNorm = normalize(live.name);
       const idx = DB.gasShops.findIndex(g => 
         g.id === live.id || 
-        (normalize(g.name) === liveNameNorm) // Match by name (e.g. "Litro Gas – Galle Karapitiya")
+        (normalize(g.name) === liveNameNorm) 
       );
       
       if (idx !== -1) {
         const existing = DB.gasShops[idx];
-        // MERGE stock objects with key normalization (no spaces allowed internally)
         const mergedStock = { ...(existing.stock || {}) };
         if (live.stock) {
           Object.entries(live.stock).forEach(([k, v]) => {
@@ -252,13 +256,19 @@ async function loadLiveData() {
             mergedStock[cleanKey] = v;
           });
         }
-        DB.gasShops[idx] = { ...existing, ...live, stock: mergedStock, id: existing.id };
+        // Force the merge into the global DB object
+        DB.gasShops[idx] = { 
+          ...existing, 
+          ...live, 
+          stock: mergedStock, 
+          id: existing.id || live.id, // Prefer static ID if matching was name-based
+          lastUpdated: 'Live updated'
+        };
       } else {
         DB.gasShops.push(live);
       }
     });
-    console.log(`✅ ${liveGas.length} live gas shops processed → total ${DB.gasShops.length}`);
-    console.log(`✅ ${liveGas.length} live DB gas shops merged → total ${DB.gasShops.length}`);
+    console.log(`✅ ${liveGas.length} live gas shops merged → total ${DB.gasShops.length}`);
   }
 
   if (pricesResp?.data) {
