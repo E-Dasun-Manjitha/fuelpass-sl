@@ -141,11 +141,9 @@ async function submitVerifiedReport(e) {
     if (!reportResp || !reportResp.success) throw new Error(reportResp?.error || 'API error');
 
     // 2. Also update the station's live fuel status in database
-    //    Find the station by station code
-    const station = DB.stations.find(s =>
-      s.id === session.stationCode ||
-      s.name?.toLowerCase().includes((session.stationName || '').toLowerCase())
-    );
+    //    Find the station/shop by code or name in both databases
+    const station = DB.stations.find(s => s.id === session.stationCode || s.name?.toLowerCase().includes((session.stationName || '').toLowerCase())) ||
+                    DB.gasShops.find(g => g.id === session.stationCode || g.name?.toLowerCase().includes((session.stationName || '').toLowerCase()));
 
     if (station) {
       // Map product name → fuel_type key
