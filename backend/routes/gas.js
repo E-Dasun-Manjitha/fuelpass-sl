@@ -117,8 +117,14 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     ]);
 
     // 2. Update status records in 'gas_shop_stock'
-    if (fuels && typeof fuels === 'object') {
-      const stockQueries = Object.entries(fuels).map(([size, status]) => {
+    // Support both bulk 'fuels/stock' object (admin) AND single 'cylinder_size/status' (owner)
+    let stockData = fuels;
+    if (!stockData && req.body.cylinder_size) {
+      stockData = { [req.body.cylinder_size]: req.body.status };
+    }
+
+    if (stockData && typeof stockData === 'object') {
+      const stockQueries = Object.entries(stockData).map(([size, status]) => {
         const normalizedSize = size.toLowerCase().replace(/\s+/g, '');
         const allowedSizes = ['5kg','12.5kg','37.5kg','2.3kg'];
         if (!allowedSizes.includes(normalizedSize)) return Promise.resolve();

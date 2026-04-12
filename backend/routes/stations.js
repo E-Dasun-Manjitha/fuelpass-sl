@@ -111,17 +111,23 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     ]);
 
     // 2. Update fuel availability
-    if (fuels && typeof fuels === 'object') {
-      const fuelQueries = Object.entries(fuels).map(([type, status]) => {
+    // Support both bulk 'fuels' object (admin) AND single 'fuel_type/status' (owner)
+    let fuelData = fuels;
+    if (!fuelData && req.body.fuel_type) {
+      fuelData = { [req.body.fuel_type]: req.body.status };
+    }
+
+    if (fuelData && typeof fuelData === 'object') {
+      const fuelQueries = Object.entries(fuelData).map(([type, status]) => {
         const normalizedType = type.toLowerCase().replace(/\s+/g, '');
         const allowedFuels = ['petrol92', 'petrol95', 'diesel', 'superDiesel', '5kg', '12.5kg', '37.5kg', '2.3kg'];
         if (!allowedFuels.includes(normalizedType)) return Promise.resolve();
 
         return db.query(`
           INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
-          VALUES ($1, $2, $3, $4, NOW(), 'admin')
+          VALUES ($1, $2, $3, $4, NOW(), 'verified')
           ON CONFLICT (station_id, fuel_type)
-          DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'admin'
+          DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'verified'
         `, [id, normalizedType, status, queue || 'none']);
       });
       await Promise.all(fuelQueries);
