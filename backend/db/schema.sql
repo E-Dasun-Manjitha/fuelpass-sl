@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS stations (
 
 CREATE TABLE IF NOT EXISTS station_fuel_status (
   station_id    VARCHAR(20) REFERENCES stations(id) ON DELETE CASCADE,
-  fuel_type     VARCHAR(20) NOT NULL CHECK (fuel_type IN ('petrol92','petrol95','diesel','superDiesel')),
+  fuel_type     VARCHAR(20) NOT NULL,
   status        VARCHAR(10) NOT NULL DEFAULT 'available' CHECK (status IN ('available','limited','out')),
   queue         VARCHAR(10) NOT NULL DEFAULT 'none'      CHECK (queue  IN ('none','short','medium','long')),
   last_updated  TIMESTAMP DEFAULT NOW(),

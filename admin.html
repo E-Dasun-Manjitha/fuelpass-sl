@@ -1148,48 +1148,37 @@
   // ── MANAGE STATIONS ──────────────────────────────────────
   let ALL_ADMIN_STATIONS = [];
   window.renderManageStations = async function(search = '') {
-    const el = document.getElementById('manageStationsList');
-    if (!search && !ALL_ADMIN_STATIONS.length) {
-      el.innerHTML = '<div style="padding:20px;text-align:center;">Loading stations...</div>';
-    }
-    
-    try {
-      if (!ALL_ADMIN_STATIONS.length) {
-        const [stRes, gasRes] = await Promise.all([ 
-          apiGetStations().catch(() => ({ data: [] })), 
-          apiGetGasShops().catch(() => ({ data: [] })) 
-        ]);
-        
-        const stationMap = new Map();
+    const el = document.getElementById('manageStationsTable');
+    if (!el) return;
 
-        // 0. Seed with legacy data so all stations/shops appear even before first DB update
+    if (ALL_ADMIN_STATIONS.length === 0) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;">↻ Syncing with database...</div>';
+      try {
+        const [stRes, gasRes] = await Promise.all([
+           apiGetStations(),
+           apiGetGasShops()
+        ]);
+
+        const stationMap = new Map();
+        const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        // 1. Seed with static data
         if (typeof REAL_STATIONS !== 'undefined') {
-          REAL_STATIONS.forEach(s => stationMap.set(s.id, { 
+          REAL_STATIONS.forEach(s => stationMap.set(String(s.id), { 
             ...s, 
             isGas: false, 
             originTable: 'stations' 
           }));
         }
         if (typeof REAL_GAS_SHOPS !== 'undefined') {
-          REAL_GAS_SHOPS.forEach(g => stationMap.set(g.id, { 
+          REAL_GAS_SHOPS.forEach(g => stationMap.set(String(g.id), { 
             ...g, 
             isGas: true, 
-            company: g.company || g.provider || 'Litro',
             originTable: 'gas' 
           }));
         }
 
         // 1. Process stations and identify gas shops within that table
-        (stRes?.data || []).forEach(s => {
-          const name = (s.name || '').toLowerCase();
-          const hasGasKeyword = name.includes('gas') || name.includes('lpg') || name.includes('cylinder');
-          const isGasComp = s.company === 'Litro' || (s.company === 'LAUGFS' && hasGasKeyword);
-          const hasStockKeys = s.fuels && Object.keys(s.fuels).some(k => k.includes('kg'));
-          const isGas = !!s.is_gas || !!s.stock || isGasComp || hasStockKeys || (s.id && s.id.startsWith('rg'));
-          
-          const existing = stationMap.get(s.id);
-          stationMap.set(s.id, { 
-            ...existing,
             ...s, 
             isGas,
             originTable: isGas ? 'gas' : 'stations' 
