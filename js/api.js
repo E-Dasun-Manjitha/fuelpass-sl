@@ -196,11 +196,14 @@ async function loadLiveData() {
     const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     
     stationsResp.data.forEach(live => {
-      const isGas = (live.id || '').startsWith('rg') || (live.is_gas);
+      const liveId = String(live.id);
+      const isGas = liveId.startsWith('rg') || live.is_gas;
       const liveNameNorm = normalize(live.name);
       
       if (isGas) {
-        const idx = DB.gasShops.findIndex(g => g.id === live.id || normalize(g.name) === liveNameNorm);
+        let idx = DB.gasShops.findIndex(g => String(g.id) === liveId);
+        if (idx === -1) idx = DB.gasShops.findIndex(g => normalize(g.name) === liveNameNorm);
+        
         const liveStock = live.stock || live.fuels || {};
         if (idx !== -1) {
           DB.gasShops[idx] = { 
@@ -219,7 +222,9 @@ async function loadLiveData() {
           queue: Object.values(live.queues || {})[0] || 'none',
           lastUpdated: live.last_updated ? new Date(live.last_updated).toLocaleTimeString() : 'Just now',
         };
-        const idx = DB.stations.findIndex(s => s.id === live.id || normalize(s.name) === liveNameNorm);
+        let idx = DB.stations.findIndex(s => String(s.id) === liveId);
+        if (idx === -1) idx = DB.stations.findIndex(s => normalize(s.name) === liveNameNorm);
+
         if (idx !== -1) {
           DB.stations[idx] = { ...DB.stations[idx], ...mapped }; 
         } else {
