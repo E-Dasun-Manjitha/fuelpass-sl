@@ -89,57 +89,45 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { fuels, queue, lat, lng, name, address, district } = req.body;
     const id = req.params.id;
-    // 1. Primary Upsert for the station itself (ensures ID exists in parent table)
-    const company = req.body.company;
-    if (name && district && address && company) {
-       console.log(`[STATIONS] Performing primary UPSERT for station: ${id} (${name})`);
-       await db.query(`
-         INSERT INTO stations (id, name, company, district, address, lat, lng)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
-         ON CONFLICT (id) 
-         DO UPDATE SET 
-            name = EXCLUDED.name, 
-            company = EXCLUDED.company, 
-            district = EXCLUDED.district, 
-            address = EXCLUDED.address, 
-            lat = EXCLUDED.lat, 
-            lng = EXCLUDED.lng
-       `, [id, name, company, district, address, lat || 0, lng || 0]);
-    } else {
-      // Fallback to simple update if some metadata is missing but ID exists
-      const updateStationsFields = [];
-      const updateStationsParams = [];
-      if (name) { updateStationsFields.push(`name = $${updateStationsParams.length + 1}`); updateStationsParams.push(name); }
-      if (address) { updateStationsFields.push(`address = $${updateStationsParams.length + 1}`); updateStationsParams.push(address); }
-      if (district) { updateStationsFields.push(`district = $${updateStationsParams.length + 1}`); updateStationsParams.push(district); }
-      if (lat !== null && typeof lat === 'number') { updateStationsFields.push(`lat = $${updateStationsParams.length + 1}`); updateStationsParams.push(lat); }
-      if (lng !== null && typeof lng === 'number') { updateStationsFields.push(`lng = $${updateStationsParams.length + 1}`); updateStationsParams.push(lng); }
-      
-      if (updateStationsFields.length > 0) {
-        updateStationsParams.push(id);
-        console.log(`[STATIONS] Performing partial UPDATE for station: ${id}`);
-        await db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams);
-      }
-    }
+    const company = req.body.company || 'CPC';
 
-    // 2. Update fuel/gas availability
+    console.log(`[STATION-UPDATE] Request for ID: ${id}, Name: ${name}`);
+
+    // 1. Mandatory Primary Upsert: Ensure the station exists
+    await db.query(`
+      INSERT INTO stations (id, name, company, district, address, lat, lng)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      ON CONFLICT (id) 
+      DO UPDATE SET 
+        name = EXCLUDED.name, 
+        company = EXCLUDED.company, 
+        district = EXCLUDED.district, 
+        address = EXCLUDED.address, 
+        lat = EXCLUDED.lat, 
+        lng = EXCLUDED.lng
+    `, [
+      id, name || 'Unknown', company, district || 'Unknown', address || 'No Address', 
+      lat || 0, lng || 0
+    ]);
+
+    // 2. Update fuel availability
     if (fuels && typeof fuels === 'object') {
-      console.log(`[STATIONS] Updating fuel status for ${id}:`, fuels);
-      const fuelQueries = [];
-      Object.entries(fuels).forEach(([type, status]) => {
+      const fuelQueries = Object.entries(fuels).map(([type, status]) => {
         const normalizedType = type.toLowerCase().replace(/\s+/g, '');
         const allowedFuels = ['petrol92', 'petrol95', 'diesel', 'superDiesel', '5kg', '12.5kg', '37.5kg', '2.3kg'];
-        if (!allowedFuels.includes(normalizedType)) return;
+        if (!allowedFuels.includes(normalizedType)) return Promise.resolve();
 
-        fuelQueries.push(db.query(`
+        return db.query(`
           INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
           VALUES ($1, $2, $3, $4, NOW(), 'admin')
           ON CONFLICT (station_id, fuel_type)
           DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'admin'
-        `, [id, normalizedType, status, queue || 'none']));
+        `, [id, normalizedType, status, queue || 'none']);
       });
       await Promise.all(fuelQueries);
     }
+
+    console.log(`[STATION-UPDATE] Successfully updated station: ${id}`);
     res.json({ success: true, message: 'Station details and status updated' });
   } catch (err) {
     console.error('❌ Station Status Update Error:', err);
