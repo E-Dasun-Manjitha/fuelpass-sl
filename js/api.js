@@ -196,41 +196,32 @@ async function loadLiveData() {
     const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     
     stationsResp.data.forEach(live => {
-      const isGas = (live.id || '').startsWith('rg');
+      const isGas = (live.id || '').startsWith('rg') || (live.is_gas);
       const liveNameNorm = normalize(live.name);
       
       if (isGas) {
-        // Handle Gas Shop merge from stations endpoint
         const idx = DB.gasShops.findIndex(g => g.id === live.id || normalize(g.name) === liveNameNorm);
+        const liveStock = live.stock || live.fuels || {};
         if (idx !== -1) {
-          const existing = DB.gasShops[idx];
-          // Map backend 'fuels' to frontend 'stock' if fuels exists (happens when editing gas as a station)
-          const liveStock = live.stock || live.fuels || {};
           DB.gasShops[idx] = { 
-            ...existing, 
+            ...DB.gasShops[idx], 
             ...live, 
-            stock: { ...(existing.stock || {}), ...liveStock },
-            id: existing.id || live.id,
+            stock: { ...(DB.gasShops[idx].stock || {}), ...liveStock },
             lastUpdated: 'Live updated'
           };
+        } else {
+          DB.gasShops.push({ ...live, stock: liveStock, lastUpdated: 'Live updated' });
         }
       } else {
-        // Handle Fuel Station merge
         const mapped = {
           ...live,
           fuels: live.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
           queue: Object.values(live.queues || {})[0] || 'none',
-          lastUpdated: live.last_updated ? new Date(live.last_updated).toLocaleTimeString() : '--',
+          lastUpdated: live.last_updated ? new Date(live.last_updated).toLocaleTimeString() : 'Just now',
         };
-        const liveAddrNorm = normalize(live.address);
-        const idx = DB.stations.findIndex(s => 
-          s.id === live.id || 
-          (normalize(s.name) === liveNameNorm && normalize(s.address).startsWith(liveAddrNorm.substring(0, 10))) ||
-          (normalize(s.name) === liveNameNorm)
-        );
+        const idx = DB.stations.findIndex(s => s.id === live.id || normalize(s.name) === liveNameNorm);
         if (idx !== -1) {
-          const existing = DB.stations[idx];
-          DB.stations[idx] = { ...existing, ...mapped, id: existing.id }; 
+          DB.stations[idx] = { ...DB.stations[idx], ...mapped }; 
         } else {
           DB.stations.push(mapped); 
         }

@@ -8,13 +8,16 @@ const { verifyToken, requireAdmin } = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const { district, provider, cylinder } = req.query;
-    let query = `
-      SELECT g.*,
-        json_object_agg(gss.cylinder_size, gss.status) AS stock,
-        MAX(gss.last_updated) AS stock_updated
+    const result = await db.query(`
+      SELECT
+        g.*,
+        json_object_agg(gas_shop_stock.tank_size, gas_shop_stock.status) FILTER (WHERE gas_shop_stock.tank_size IS NOT NULL) AS stock,
+        MAX(gas_shop_stock.last_updated) AS last_updated
       FROM gas_shops g
-      LEFT JOIN gas_shop_stock gss ON gss.shop_id = g.id
-    `;
+      LEFT JOIN gas_shop_stock ON gas_shop_stock.shop_id = g.id
+      GROUP BY g.id
+      ORDER BY g.district, g.name
+    `);
     const conditions = [];
     const params = [];
     if (district) { params.push(district); conditions.push(`g.district = $${params.length}`); }
@@ -22,10 +25,6 @@ router.get('/', async (req, res) => {
       params.push(provider);
       conditions.push(`(g.provider = $${params.length} OR g.provider = 'Both')`);
     }
-    if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
-    query += ' GROUP BY g.id ORDER BY g.district, g.name';
-
-    const result = await db.query(query, params);
     let shops = result.rows;
     if (cylinder) {
       shops = shops.filter(s => s.stock && s.stock[cylinder] !== undefined);
@@ -82,57 +81,57 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     // Accept both 'fuels' and 'stock' field names from the frontend
     const { lat, lng, name, address, district, last_delivery, next_delivery } = req.body;
     const fuels = req.body.fuels || req.body.stock;
-
-    // 1. Upsert shop details (supports persisting static stations for the first time)
-    const company = req.body.company;
-    if (name && district && address && company) {
-       // All required fields present, we can safely UPSERT
+    const id = req.params.id;
+    // 1. Primary Upsert for the gas shop itself
+    const provider = req.body.provider || req.body.company;
+    if (name && district && address && provider) {
+       console.log(`[GAS] Performing primary UPSERT for gas shop: ${id} (${name})`);
        await db.query(`
-         INSERT INTO gas_shops (id, name, provider, district, address, lat, lng, last_delivery, next_delivery)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-         ON CONFLICT (id) 
-         DO UPDATE SET 
-            name = EXCLUDED.name, 
-            provider = EXCLUDED.provider, 
-            district = EXCLUDED.district, 
-            address = EXCLUDED.address, 
-            lat = EXCLUDED.lat, 
-            lng = EXCLUDED.lng, 
-            last_delivery = EXCLUDED.last_delivery, 
-            next_delivery = EXCLUDED.next_delivery
-       `, [req.params.id, name, company, district, address, lat || 0, lng || 0, last_delivery || '', next_delivery || '']);
+          INSERT INTO gas_shops (id, name, provider, district, address, lat, lng)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          ON CONFLICT (id) 
+          DO UPDATE SET 
+             name = EXCLUDED.name, 
+             provider = EXCLUDED.provider, 
+             district = EXCLUDED.district, 
+             address = EXCLUDED.address, 
+             lat = EXCLUDED.lat, 
+             lng = EXCLUDED.lng
+       `, [id, name, provider, district, address, lat || 0, lng || 0]);
     } else {
-      // Fallback to simple update if some mandatory fields are somehow missing (legacy)
+      // Fallback update
       const updateFields = [];
       const updateParams = [];
-      if (name) { updateFields.push(`name = $${updateParams.length + 1}`); updateParams.push(name); }
-      if (address) { updateFields.push(`address = $${updateParams.length + 1}`); updateParams.push(address); }
-      if (district) { updateFields.push(`district = $${updateParams.length + 1}`); updateParams.push(district); }
-      if (lat !== null && typeof lat === 'number') { updateFields.push(`lat = $${updateParams.length + 1}`); updateParams.push(lat); }
-      if (lng !== null && typeof lng === 'number') { updateFields.push(`lng = $${updateParams.length + 1}`); updateParams.push(lng); }
-      if (last_delivery !== undefined) { updateFields.push(`last_delivery = $${updateParams.length + 1}`); updateParams.push(last_delivery); }
-      if (next_delivery !== undefined) { updateFields.push(`next_delivery = $${updateParams.length + 1}`); updateParams.push(next_delivery); }
+      if (name) { updateFields.push(`name = $${updateParams.length+1}`); updateParams.push(name); }
+      if (provider) { updateFields.push(`provider = $${updateParams.length+1}`); updateParams.push(provider); }
+      if (address) { updateFields.push(`address = $${updateParams.length+1}`); updateParams.push(address); }
+      if (district) { updateFields.push(`district = $${updateParams.length+1}`); updateParams.push(district); }
+      if (lat) { updateFields.push(`lat = $${updateParams.length+1}`); updateParams.push(lat); }
+      if (lng) { updateFields.push(`lng = $${updateParams.length+1}`); updateParams.push(lng); }
 
       if (updateFields.length > 0) {
-        updateParams.push(req.params.id);
+        updateParams.push(id);
+        console.log(`[GAS] Performing partial UPDATE for gas shop: ${id}`);
         await db.query(`UPDATE gas_shops SET ${updateFields.join(', ')} WHERE id = $${updateParams.length}`, updateParams);
       }
     }
 
-    // 2. Update stock
+    // 2. Update stock availability
     if (fuels && typeof fuels === 'object') {
+      console.log(`[GAS] Updating stock for ${id}:`, fuels);
       const stockQueries = [];
       Object.entries(fuels).forEach(([size, status]) => {
+        // Validation: sizes must be in the format '12.5kg' etc.
         const normalizedSize = size.toLowerCase().replace(/\s+/g, '');
-        const allowedSizes = ['5kg', '12.5kg', '37.5kg', '2.3kg'];
+        const allowedSizes = ['2.3kg', '5kg', '12.5kg', '37.5kg'];
         if (!allowedSizes.includes(normalizedSize)) return;
 
         stockQueries.push(db.query(`
-          INSERT INTO gas_shop_stock (shop_id, cylinder_size, status, last_updated)
+          INSERT INTO gas_shop_stock (shop_id, tank_size, status, last_updated)
           VALUES ($1, $2, $3, NOW())
-          ON CONFLICT (shop_id, cylinder_size)
+          ON CONFLICT (shop_id, tank_size)
           DO UPDATE SET status = $3, last_updated = NOW()
-        `, [req.params.id, normalizedSize, status]));
+        `, [id, normalizedSize, status]));
       });
       await Promise.all(stockQueries);
     }

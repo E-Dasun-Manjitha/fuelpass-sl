@@ -11,9 +11,9 @@ router.get('/', async (req, res) => {
     let query = `
       SELECT
         s.*,
-        json_object_agg(sfs.fuel_type, sfs.status)  AS fuels,
-        json_object_agg(sfs.fuel_type, sfs.queue)   AS queues,
-        MAX(sfs.last_updated)                        AS last_updated
+        json_object_agg(sfs.fuel_type, sfs.status) FILTER (WHERE sfs.fuel_type IS NOT NULL) AS fuels,
+        json_object_agg(sfs.fuel_type, sfs.queue)  FILTER (WHERE sfs.fuel_type IS NOT NULL) AS queues,
+        MAX(sfs.last_updated) AS last_updated
       FROM stations s
       LEFT JOIN station_fuel_status sfs ON sfs.station_id = s.id
     `;
@@ -88,11 +88,11 @@ router.post('/:id/status', verifyToken, async (req, res) => {
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { fuels, queue, lat, lng, name, address, district } = req.body;
-    const queries = [];
-    // 1. Upsert station details (supports persisting static stations for the first time)
+    const id = req.params.id;
+    // 1. Primary Upsert for the station itself (ensures ID exists in parent table)
     const company = req.body.company;
     if (name && district && address && company) {
-       // All required fields present, we can safely UPSERT
+       console.log(`[STATIONS] Performing primary UPSERT for station: ${id} (${name})`);
        await db.query(`
          INSERT INTO stations (id, name, company, district, address, lat, lng)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -104,9 +104,9 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
             address = EXCLUDED.address, 
             lat = EXCLUDED.lat, 
             lng = EXCLUDED.lng
-       `, [req.params.id, name, company, district, address, lat || 0, lng || 0]);
+       `, [id, name, company, district, address, lat || 0, lng || 0]);
     } else {
-      // Fallback to simple update
+      // Fallback to simple update if some metadata is missing but ID exists
       const updateStationsFields = [];
       const updateStationsParams = [];
       if (name) { updateStationsFields.push(`name = $${updateStationsParams.length + 1}`); updateStationsParams.push(name); }
@@ -116,13 +116,15 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
       if (lng !== null && typeof lng === 'number') { updateStationsFields.push(`lng = $${updateStationsParams.length + 1}`); updateStationsParams.push(lng); }
       
       if (updateStationsFields.length > 0) {
-        updateStationsParams.push(req.params.id);
+        updateStationsParams.push(id);
+        console.log(`[STATIONS] Performing partial UPDATE for station: ${id}`);
         await db.query(`UPDATE stations SET ${updateStationsFields.join(', ')} WHERE id = $${updateStationsParams.length}`, updateStationsParams);
       }
     }
 
     // 2. Update fuel/gas availability
     if (fuels && typeof fuels === 'object') {
+      console.log(`[STATIONS] Updating fuel status for ${id}:`, fuels);
       const fuelQueries = [];
       Object.entries(fuels).forEach(([type, status]) => {
         const normalizedType = type.toLowerCase().replace(/\s+/g, '');
@@ -134,7 +136,7 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
           VALUES ($1, $2, $3, $4, NOW(), 'admin')
           ON CONFLICT (station_id, fuel_type)
           DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'admin'
-        `, [req.params.id, normalizedType, status, queue || 'none']));
+        `, [id, normalizedType, status, queue || 'none']));
       });
       await Promise.all(fuelQueries);
     }

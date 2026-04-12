@@ -1185,7 +1185,7 @@
           const hasGasKeyword = name.includes('gas') || name.includes('lpg') || name.includes('cylinder');
           const isGasComp = s.company === 'Litro' || (s.company === 'LAUGFS' && hasGasKeyword);
           const hasStockKeys = s.fuels && Object.keys(s.fuels).some(k => k.includes('kg'));
-          const isGas = !!s.is_gas || !!s.stock || isGasComp || hasStockKeys;
+          const isGas = !!s.is_gas || !!s.stock || isGasComp || hasStockKeys || (s.id && s.id.startsWith('rg'));
           
           const existing = stationMap.get(s.id);
           stationMap.set(s.id, { 
@@ -1406,8 +1406,9 @@
         queue, 
         lat, 
         lng, 
-        company: sourceStation.company 
+        company: sourceStation.company || sourceStation.provider 
       };
+      if (originTable === 'gas') payload.provider = sourceStation.provider || sourceStation.company;
       
       if (isGas) {
         // Gas shops: backend reads 'fuels' key to update gas_shop_stock
