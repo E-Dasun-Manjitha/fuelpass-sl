@@ -118,17 +118,35 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     }
 
     if (fuelData && typeof fuelData === 'object') {
+      // Normalize map: lowercase key → canonical DB key
+      const fuelKeyMap = {
+        'petrol92': 'petrol92',
+        'petrol95': 'petrol95',
+        'diesel': 'diesel',
+        'autodiesel': 'diesel',
+        'superdiesel': 'superDiesel',
+        'superdiesel(euro4)': 'superDiesel',
+        'superdiesel euro4': 'superDiesel',
+        '5kg': '5kg',
+        '12.5kg': '12.5kg',
+        '37.5kg': '37.5kg',
+        '2.3kg': '2.3kg',
+      };
+
       const fuelQueries = Object.entries(fuelData).map(([type, status]) => {
-        const normalizedType = type.toLowerCase().replace(/\s+/g, '');
-        const allowedFuels = ['petrol92', 'petrol95', 'diesel', 'superDiesel', '5kg', '12.5kg', '37.5kg', '2.3kg'];
-        if (!allowedFuels.includes(normalizedType)) return Promise.resolve();
+        const lookupKey = type.toLowerCase().replace(/\s+/g, '');
+        const canonicalType = fuelKeyMap[lookupKey];
+        if (!canonicalType) {
+          console.warn(`[STATION-UPDATE] Skipping unknown fuel type: "${type}" (normalized: "${lookupKey}")`);
+          return Promise.resolve();
+        }
 
         return db.query(`
           INSERT INTO station_fuel_status (station_id, fuel_type, status, queue, last_updated, updated_by)
           VALUES ($1, $2, $3, $4, NOW(), 'verified')
           ON CONFLICT (station_id, fuel_type)
           DO UPDATE SET status = $3, queue = $4, last_updated = NOW(), updated_by = 'verified'
-        `, [id, normalizedType, status, queue || 'none']);
+        `, [id, canonicalType, status, queue || 'none']);
       });
       await Promise.all(fuelQueries);
     }
