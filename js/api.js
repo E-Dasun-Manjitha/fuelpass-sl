@@ -262,16 +262,25 @@ async function loadLiveData() {
     gasResp.data.forEach(live => {
       const liveNameNorm = normalize(live.name);
       const idx = DB.gasShops.findIndex(g => g.id === live.id || normalize(g.name) === liveNameNorm);
+      // Normalize snake_case API keys → camelCase for consistency
+      const mergedLive = {
+        ...live,
+        stock: live.stock || {},
+        fuels: live.stock || {},  // alias so renderManageStations finds it
+        lastDelivery: live.last_delivery || live.lastDelivery || '',
+        nextDelivery: live.next_delivery || live.nextDelivery || '',
+        lastUpdated: 'Live updated',
+      };
       if (idx !== -1) {
         const existing = DB.gasShops[idx];
         DB.gasShops[idx] = { 
           ...existing, 
-          ...live, 
+          ...mergedLive,
           stock: { ...(existing.stock || {}), ...(live.stock || {}) },
-          lastUpdated: 'Live updated'
+          fuels: { ...(existing.stock || {}), ...(live.stock || {}) },
         };
       } else {
-        DB.gasShops.push({ ...live, stock: live.stock || {} });
+        DB.gasShops.push(mergedLive);
       }
     });
   }

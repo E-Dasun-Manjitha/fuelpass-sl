@@ -1224,7 +1224,7 @@
              let status = 'out';
              const data = s.fuels || s.stock || {};
              const stockObj = typeof data === 'string' ? JSON.parse(data) : data;
-             if (stockObj) {
+             if (stockObj && Object.keys(stockObj).length > 0) {
                const foundKey = Object.keys(stockObj).find(k => normalizeKey(k) === normalizeKey(type));
                if (foundKey) status = stockObj[foundKey];
              }
@@ -1241,7 +1241,7 @@
             <td><strong style="color:var(--text-primary);">${s.name}</strong><br/><span style="font-size:0.75rem;color:${compColor};">${s.company} · ${s.address}</span></td>
             <td>${s.district}</td>
             <td><div style="display:flex;gap:4px;">${fuels}</div></td>
-            <td><span style="font-size:0.8rem;text-transform:capitalize;">${firstQueue}</span></td>
+            <td><span style="font-size:0.8rem;text-transform:capitalize;">${isGas ? '—' : firstQueue}</span></td>
             <td>
               <div style="display:flex;gap:6px;">
                 <button class="action-btn btn-approve" style="padding:6px 12px;font-size:0.75rem;" onclick="openStationEdit('${s.id}')">⚙️ Edit</button>
@@ -1266,29 +1266,38 @@
     document.getElementById('esAddress').value = s.address || '';
     document.getElementById('esDistrict').value = s.district || 'Colombo';
     
+    let fuelTypesLocal;
     if (s.isGas) {
-      // Standard Gas Sizes
-      fuelTypes = ['12.5kg', '5kg', '37.5kg', '2.3kg'];
+      fuelTypesLocal = ['12.5kg', '5kg', '37.5kg', '2.3kg'];
     } else {
-      // Standard Fuel Types
-      fuelTypes = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
+      fuelTypesLocal = ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
     }
 
     const list = document.getElementById('esFuelStatusList');
-    const normalizeKey = k => (k || '').toLowerCase().replace(/\s+/g, '');
-    list.innerHTML = fuelTypes.map(f => {
+    const normalizeKey = k => (k || '').toLowerCase().replace(/[\s-_]/g, '');
+    list.innerHTML = fuelTypesLocal.map(f => {
       let current = 'out';
+      // Read from both fuels (fuel station) and stock (gas shop) fields
       const data = s.fuels || s.stock || {};
       const stockObj = typeof data === 'string' ? JSON.parse(data) : data;
 
-      if (stockObj) {
+      if (stockObj && Object.keys(stockObj).length > 0) {
         const foundKey = Object.keys(stockObj).find(k => normalizeKey(k) === normalizeKey(f));
         if (foundKey) current = stockObj[foundKey];
       }
-      const label = f.replace('petrol', 'Petrol ').replace('superDiesel', 'Super Diesel').replace('kg', ' kg');
+      // Human-readable labels
+      let label = f;
+      if (f === 'petrol92') label = 'Petrol 92';
+      else if (f === 'petrol95') label = 'Petrol 95';
+      else if (f === 'diesel') label = 'Diesel';
+      else if (f === 'superDiesel') label = 'Super Diesel';
+      else if (f === '12.5kg') label = 'LPG 12.5 kg';
+      else if (f === '5kg') label = 'LPG 5 kg';
+      else if (f === '37.5kg') label = 'LPG 37.5 kg';
+      else if (f === '2.3kg') label = 'LPG 2.3 kg';
       return `
         <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
-          <strong style="text-transform:capitalize;font-size:0.85rem;">${label}</strong>
+          <strong style="font-size:0.85rem;">${label}</strong>
           <select class="fuel-select-field" data-fkey="${f}" style="background:#0f172a;color:white;border:1px solid #334155;padding:4px 8px;border-radius:4px;font-size:0.82rem;">
             <option value="available" ${current==='available'?'selected':''}>🟢 Available</option>
             <option value="limited" ${current==='limited'?'selected':''}>🟠 Limited</option>
@@ -1302,14 +1311,23 @@
     const delContainer = document.getElementById('esDeliveryFields');
     if (s.isGas) {
       delContainer.style.display = 'block';
-      document.getElementById('esLastDelivery').value = s.lastDelivery || '';
-      document.getElementById('esNextDelivery').value = s.nextDelivery || '';
+      document.getElementById('esLastDelivery').value = s.last_delivery || s.lastDelivery || '';
+      document.getElementById('esNextDelivery').value = s.next_delivery || s.nextDelivery || '';
     } else {
       delContainer.style.display = 'none';
     }
 
-    const firstQueue = Object.values(s.queues || {})[0] || s.queue || 'none';
-    document.getElementById('esQueue').value = firstQueue;
+    // Queue: fuel stations use queue, gas stations don't
+    const queueRow = document.getElementById('esQueue')?.closest('div[style]') || document.getElementById('esQueue')?.parentElement;
+    if (s.isGas) {
+      if (queueRow) queueRow.style.display = 'none';
+      if (document.getElementById('esQueue')) document.getElementById('esQueue').value = 'none';
+    } else {
+      if (queueRow) queueRow.style.display = '';
+      const firstQueue = Object.values(s.queues || {})[0] || s.queue || 'none';
+      if (document.getElementById('esQueue')) document.getElementById('esQueue').value = firstQueue;
+    }
+    
     document.getElementById('esLat').value = s.lat || '';
     document.getElementById('esLng').value = s.lng || '';
     
@@ -1378,6 +1396,8 @@
         // Optimistically update the local cache so indicators update immediately
         const cacheIdx = ALL_ADMIN_STATIONS.findIndex(x => x.id == id);
         if (cacheIdx !== -1) {
+          const lastDel = document.getElementById('esLastDelivery')?.value || '';
+          const nextDel = document.getElementById('esNextDelivery')?.value || '';
           ALL_ADMIN_STATIONS[cacheIdx] = {
             ...ALL_ADMIN_STATIONS[cacheIdx],
             name, address, district,
@@ -1385,6 +1405,10 @@
             lat, lng,
             fuels: fuelsData,
             stock: fuelsData,
+            last_delivery: lastDel,
+            lastDelivery: lastDel,
+            next_delivery: nextDel,
+            nextDelivery: nextDel,
           };
         }
         
