@@ -1148,7 +1148,7 @@
   // ── MANAGE STATIONS ──────────────────────────────────────
   let ALL_ADMIN_STATIONS = [];
   window.renderManageStations = async function(search = '') {
-    const el = document.getElementById('manageStationsTable');
+    const el = document.getElementById('manageStationsList');
     if (!el) return;
 
     if (ALL_ADMIN_STATIONS.length === 0) {
@@ -1160,7 +1160,6 @@
         ]);
 
         const stationMap = new Map();
-        const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
         // 1. Seed with static data
         if (typeof REAL_STATIONS !== 'undefined') {
@@ -1178,36 +1177,36 @@
           }));
         }
 
-        // 1. Process stations and identify gas shops within that table
-            ...s, 
+        // 2. Merge live fuel stations
+        (stRes?.data || []).forEach(s => {
+          const isGas = s.category === 'gas' || String(s.id).startsWith('GAS-');
+          const existing = stationMap.get(String(s.id)) || {};
+          stationMap.set(String(s.id), {
+            ...existing,
+            ...s,
+            id: s.id,
             isGas,
-            originTable: isGas ? 'gas' : 'stations' 
+            originTable: isGas ? 'gas' : 'stations'
           });
         });
 
-        // 2. Merge gas shops from the dedicated gas endpoint (these take precedence for gas stock)
+        // 3. Merge live gas shops
         (gasRes?.data || []).forEach(g => {
-          const existing = stationMap.get(g.id);
-          const merged = {
-             ...existing,
-             id: g.id,
-             name: g.name || existing?.name,
-             company: g.provider || g.company || existing?.company || 'LAUGFS',
-             district: g.district || existing?.district,
-             address: g.address || existing?.address,
-             lat: g.lat || existing?.lat,
-             lng: g.lng || existing?.lng,
-             fuels: g.stock || g.fuels || existing?.fuels,
-             lastDelivery: g.last_delivery || g.lastDelivery || existing?.lastDelivery,
-             nextDelivery: g.next_delivery || g.nextDelivery || existing?.nextDelivery,
-             isGas: true,
-             originTable: 'gas'
-          };
-          stationMap.set(g.id, merged);
+          const existing = stationMap.get(String(g.id)) || {};
+          stationMap.set(String(g.id), {
+            ...existing,
+            ...g,
+            id: g.id,
+            isGas: true,
+            originTable: 'gas'
+          });
         });
 
         ALL_ADMIN_STATIONS = Array.from(stationMap.values());
+      } catch(err) {
+        console.error("Sync error:", err);
       }
+    }
       
       const dF = document.getElementById('stDistrictFilter').value;
       const sF = document.getElementById('stStatusFilter').value;
