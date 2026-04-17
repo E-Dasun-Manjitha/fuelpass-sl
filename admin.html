@@ -1171,7 +1171,7 @@
 
         // 2. Merge live fuel stations
         (stRes?.data || []).forEach(s => {
-          const isGas = s.category === 'gas' || String(s.id).startsWith('GAS-');
+          const isGas = s.category === 'gas' || String(s.id).startsWith('GAS-') || String(s.id).startsWith('rg');
           const existing = stationMap.get(String(s.id)) || {};
           stationMap.set(String(s.id), { ...existing, ...s, id: s.id, isGas, originTable: isGas ? 'gas' : 'stations' });
         });
@@ -1364,7 +1364,7 @@
       const district = document.getElementById('esDistrict').value;
       
       const fuelsData = {};
-      document.querySelectorAll('.fuel-select-field').forEach(el => {
+      document.querySelectorAll('#esFuelStatusList .fuel-select-field').forEach(el => {
         fuelsData[el.dataset.fkey] = el.value;
       });
       const queue = document.getElementById('esQueue').value;
@@ -1423,8 +1423,9 @@
         }
         
         closeStationEdit();
-        // Re-render UI with optimistic updates immediately
-        await renderManageStations();
+        // Re-render UI with optimistic updates immediately, keeping search memory
+        const currentSearch = document.getElementById('stationSearchInput')?.value || '';
+        await renderManageStations(currentSearch);
       } else {
         const errMsg = res?.error || 'Unknown error';
         console.error('Save failed:', errMsg);
