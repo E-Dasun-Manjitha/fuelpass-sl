@@ -1148,62 +1148,38 @@
   // ── MANAGE STATIONS ──────────────────────────────────────
   let ALL_ADMIN_STATIONS = [];
   window.renderManageStations = async function(search = '') {
-    const el = document.getElementById('manageStationsTable');
+    const el = document.getElementById('manageStationsList');
     if (!el) return;
 
-    if (ALL_ADMIN_STATIONS.length === 0) {
-      el.innerHTML = '<div style="padding:20px;text-align:center;">↻ Syncing with database...</div>';
-      try {
+    try {
+      if (ALL_ADMIN_STATIONS.length === 0) {
+        el.innerHTML = '<div style="padding:20px;text-align:center;">↻ Syncing with database...</div>';
         const [stRes, gasRes] = await Promise.all([
            apiGetStations(),
            apiGetGasShops()
         ]);
 
         const stationMap = new Map();
-        const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
         // 1. Seed with static data
         if (typeof REAL_STATIONS !== 'undefined') {
-          REAL_STATIONS.forEach(s => stationMap.set(String(s.id), { 
-            ...s, 
-            isGas: false, 
-            originTable: 'stations' 
-          }));
+          REAL_STATIONS.forEach(s => stationMap.set(String(s.id), { ...s, isGas: false, originTable: 'stations' }));
         }
         if (typeof REAL_GAS_SHOPS !== 'undefined') {
-          REAL_GAS_SHOPS.forEach(g => stationMap.set(String(g.id), { 
-            ...g, 
-            isGas: true, 
-            originTable: 'gas' 
-          }));
+          REAL_GAS_SHOPS.forEach(g => stationMap.set(String(g.id), { ...g, isGas: true, originTable: 'gas' }));
         }
 
-        // 1. Process stations and identify gas shops within that table
-            ...s, 
-            isGas,
-            originTable: isGas ? 'gas' : 'stations' 
-          });
+        // 2. Merge live fuel stations
+        (stRes?.data || []).forEach(s => {
+          const isGas = s.category === 'gas' || String(s.id).startsWith('GAS-');
+          const existing = stationMap.get(String(s.id)) || {};
+          stationMap.set(String(s.id), { ...existing, ...s, id: s.id, isGas, originTable: isGas ? 'gas' : 'stations' });
         });
 
-        // 2. Merge gas shops from the dedicated gas endpoint (these take precedence for gas stock)
+        // 3. Merge live gas shops
         (gasRes?.data || []).forEach(g => {
-          const existing = stationMap.get(g.id);
-          const merged = {
-             ...existing,
-             id: g.id,
-             name: g.name || existing?.name,
-             company: g.provider || g.company || existing?.company || 'LAUGFS',
-             district: g.district || existing?.district,
-             address: g.address || existing?.address,
-             lat: g.lat || existing?.lat,
-             lng: g.lng || existing?.lng,
-             fuels: g.stock || g.fuels || existing?.fuels,
-             lastDelivery: g.last_delivery || g.lastDelivery || existing?.lastDelivery,
-             nextDelivery: g.next_delivery || g.nextDelivery || existing?.nextDelivery,
-             isGas: true,
-             originTable: 'gas'
-          };
-          stationMap.set(g.id, merged);
+          const existing = stationMap.get(String(g.id)) || {};
+          stationMap.set(String(g.id), { ...existing, ...g, id: g.id, isGas: true, originTable: 'gas' });
         });
 
         ALL_ADMIN_STATIONS = Array.from(stationMap.values());
@@ -1218,32 +1194,22 @@
         const matchesSearch = (s.name || '').toLowerCase().includes(search.toLowerCase()) || 
                              (s.address || '').toLowerCase().includes(search.toLowerCase()) ||
                              (s.id || '').toLowerCase().includes(search.toLowerCase());
-        
         const matchesDist = (dF === 'all') || (s.district === dF);
         const matchesComp = (cF === 'all') || (s.company === cF);
-        
         let matchesType = (tF === 'all');
-        if (!matchesType) {
-           matchesType = (tF === 'gas' && s.isGas) || (tF === 'fuel' && !s.isGas);
-        }
-
+        if (!matchesType) matchesType = (tF === 'gas' && s.isGas) || (tF === 'fuel' && !s.isGas);
         let matchesStat = (sF === 'all');
-        if (!matchesStat && s.fuels) {
-           matchesStat = Object.values(s.fuels).some(v => v === sF);
-        }
-        
+        if (!matchesStat && s.fuels) matchesStat = Object.values(s.fuels).some(v => v === sF);
         return matchesSearch && matchesDist && matchesComp && matchesStat && matchesType;
       });
 
       if (!filtered.length) {
-        document.getElementById('stCountDisplay').textContent = '0 stations found';
+        if (document.getElementById('stCountDisplay')) document.getElementById('stCountDisplay').textContent = '0 stations found';
         el.innerHTML = '<div class="empty-state"><span>🚉</span><p>No stations found.</p></div>';
         return;
       }
 
-      document.getElementById('stCountDisplay').textContent = `${filtered.length} locations found`;
-      
-      // SURGICAL FILTER LOCK: Always ensure company filter is synced before rendering
+      if (document.getElementById('stCountDisplay')) document.getElementById('stCountDisplay').textContent = `${filtered.length} locations found`;
       syncCompanyFilter();
 
       el.innerHTML = `<table class="admin-table">
@@ -1255,11 +1221,9 @@
           const types = isGas ? ['12.5kg', '5kg', '37.5kg', '2.3kg'] : ['petrol92', 'petrol95', 'diesel', 'superDiesel'];
           
           const fuels = types.map(type => {
-             // Robust status extraction
              let status = 'out';
              const data = s.fuels || s.stock || {};
              const stockObj = typeof data === 'string' ? JSON.parse(data) : data;
-             
              if (stockObj) {
                const foundKey = Object.keys(stockObj).find(k => normalizeKey(k) === normalizeKey(type));
                if (foundKey) status = stockObj[foundKey];
@@ -1268,20 +1232,15 @@
              return `<span title="${type}: ${status}">${dot}</span>`;
           }).join(' ');
           
-          const firstQueue = Object.values(s.queues || {})[0] || '—';
-          
-          // HIGHLIGHT LOGIC: Apply emphasis if company matches exactly the selected filter
+          const firstQueue = s.queue || '—';
           const isHighlighted = (cF !== 'all' && s.company === cF);
           const trStyle = isHighlighted ? 'background:rgba(59,130,246,0.1); border-left:4px solid var(--blue);' : '';
           const compColor = isHighlighted ? 'var(--blue)' : 'var(--text-muted)';
           
           return `<tr id="manage-row-${s.id}" style="${trStyle}">
-            <td>
-              <strong style="color:var(--text-primary);">${s.name}</strong><br/>
-              <span style="font-size:0.75rem;color:${compColor};">${s.company} · ${s.address}</span>
-            </td>
+            <td><strong style="color:var(--text-primary);">${s.name}</strong><br/><span style="font-size:0.75rem;color:${compColor};">${s.company} · ${s.address}</span></td>
             <td>${s.district}</td>
-            <td><div style="display:flex;gap:4px;">${fuels || '<span style="color:var(--text-muted);font-size:0.7rem;">No data</span>'}</div></td>
+            <td><div style="display:flex;gap:4px;">${fuels}</div></td>
             <td><span style="font-size:0.8rem;text-transform:capitalize;">${firstQueue}</span></td>
             <td>
               <div style="display:flex;gap:6px;">
@@ -1290,10 +1249,9 @@
               </div>
             </td>
           </tr>`;
-        }).join('') +
-        '</tbody></table>';
+        }).join('') + '</tbody></table>';
     } catch(err) {
-      el.innerHTML = '<div style="padding:20px;color:red;text-align:center;">Error loading stations.</div>';
+      console.error("Render error:", err);
     }
   }
 
