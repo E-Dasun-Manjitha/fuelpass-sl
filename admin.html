@@ -1179,7 +1179,15 @@
         // 3. Merge live gas shops
         (gasRes?.data || []).forEach(g => {
           const existing = stationMap.get(String(g.id)) || {};
-          stationMap.set(String(g.id), { ...existing, ...g, id: g.id, isGas: true, originTable: 'gas' });
+          const isGas = true;
+          stationMap.set(String(g.id), { 
+            ...existing, 
+            ...g, 
+            id: g.id, 
+            isGas, 
+            originTable: 'gas',
+            fuels: g.stock || g.fuels || existing.stock || {} // Provide alias for UI filtering
+          });
         });
 
         ALL_ADMIN_STATIONS = Array.from(stationMap.values());
@@ -1199,6 +1207,8 @@
         let matchesType = (tF === 'all');
         if (!matchesType) matchesType = (tF === 'gas' && s.isGas) || (tF === 'fuel' && !s.isGas);
         let matchesStat = (sF === 'all');
+        const searchData = s.fuels || s.stock || {};
+        if (!matchesStat && searchData) Object.values(searchData).some(v => v === sF) ? matchesStat = true : null;
         if (!matchesStat && s.fuels) matchesStat = Object.values(s.fuels).some(v => v === sF);
         return matchesSearch && matchesDist && matchesComp && matchesStat && matchesType;
       });
@@ -1413,8 +1423,7 @@
         }
         
         closeStationEdit();
-        // Force full re-fetch to sync with DB
-        ALL_ADMIN_STATIONS = [];
+        // Re-render UI with optimistic updates immediately
         await renderManageStations();
       } else {
         const errMsg = res?.error || 'Unknown error';
