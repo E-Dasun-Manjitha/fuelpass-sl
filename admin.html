@@ -1374,8 +1374,23 @@
       
       if (res && res.success) {
         showAdminToast('\u2705 Data saved successfully!');
+        
+        // Optimistically update the local cache so indicators update immediately
+        const cacheIdx = ALL_ADMIN_STATIONS.findIndex(x => x.id == id);
+        if (cacheIdx !== -1) {
+          ALL_ADMIN_STATIONS[cacheIdx] = {
+            ...ALL_ADMIN_STATIONS[cacheIdx],
+            name, address, district,
+            queue,
+            lat, lng,
+            fuels: fuelsData,
+            stock: fuelsData,
+          };
+        }
+        
         closeStationEdit();
-        ALL_ADMIN_STATIONS = []; // Force refresh
+        // Force full re-fetch to sync with DB
+        ALL_ADMIN_STATIONS = [];
         await renderManageStations();
       } else {
         const errMsg = res?.error || 'Unknown error';

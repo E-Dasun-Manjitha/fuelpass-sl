@@ -192,6 +192,24 @@ async function loadLiveData() {
   // Always start with the full static list (69 real Sri Lanka stations)
   try { loadRealStationData(); } catch(e) {}
 
+  // Normalize DB fuel keys → camelCase keys the UI expects
+  const fuelKeyNorm = {
+    'petrol92': 'petrol92', 'petrol 92': 'petrol92',
+    'petrol95': 'petrol95', 'petrol 95': 'petrol95',
+    'diesel': 'diesel', 'auto diesel': 'diesel', 'autodiesel': 'diesel',
+    'superdiesel': 'superDiesel', 'super diesel': 'superDiesel',
+    'superdiesel(euro4)': 'superDiesel', 'super diesel (euro 4)': 'superDiesel',
+  };
+  const normalizeFuels = (fuelsObj) => {
+    if (!fuelsObj) return {};
+    const result = {};
+    Object.entries(fuelsObj).forEach(([k, v]) => {
+      const canonical = fuelKeyNorm[k.toLowerCase()] || fuelKeyNorm[k.toLowerCase().replace(/\s+/g, '')] || k;
+      result[canonical] = v;
+    });
+    return result;
+  };
+
   if (stationsResp?.data?.length) {
     const normalize = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     
@@ -216,9 +234,12 @@ async function loadLiveData() {
           DB.gasShops.push({ ...live, stock: liveStock, lastUpdated: 'Live updated' });
         }
       } else {
+        const normalizedFuels = normalizeFuels(live.fuels);
         const mapped = {
           ...live,
-          fuels: live.fuels || { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
+          fuels: Object.keys(normalizedFuels).length > 0
+            ? normalizedFuels
+            : { petrol92:'available', petrol95:'available', diesel:'available', superDiesel:'available' },
           queue: Object.values(live.queues || {})[0] || 'none',
           lastUpdated: live.last_updated ? new Date(live.last_updated).toLocaleTimeString() : 'Just now',
         };
@@ -233,6 +254,7 @@ async function loadLiveData() {
       }
     });
     console.log(`✅ Live data merged: Total ${DB.stations.length} stations, ${DB.gasShops.length} gas shops.`);
+
   }
 
   if (gasResp?.data?.length) {
