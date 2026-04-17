@@ -326,10 +326,27 @@ function getStationOverallStatus(station) {
   return 'out';
 }
 
-// Helper to get gas shop overall status
 function getGasShopOverallStatus(shop) {
-  const vals = Object.values(shop.stock);
-  if (vals.some(v => v === 'available')) return 'available';
-  if (vals.some(v => v === 'limited')) return 'limited';
+  const stockObj = typeof shop.stock === 'string' ? JSON.parse(shop.stock) : (shop.stock || {});
+  
+  // Prioritize 12.5kg status as it is the primary consumer cylinder
+  const normalizeKey = k => (k || '').toLowerCase().replace(/[\s-_]/g, '');
+  const findKey = target => Object.keys(stockObj).find(k => normalizeKey(k) === target);
+  
+  const main12kgKey = findKey('12.5kg');
+  if (main12kgKey && stockObj[main12kgKey]) {
+    return stockObj[main12kgKey];
+  }
+
+  // Fallback to evaluating other cylinders if 12.5kg is completely unlisted
+  let availCount = 0; let limitCount = 0; let totalCyl = 0;
+  Object.entries(stockObj).forEach(([size, status]) => {
+     totalCyl++;
+     if(status === 'available') availCount++;
+     if(status === 'limited') limitCount++;
+  });
+
+  if (availCount > 0) return 'available';
+  else if (limitCount > 0) return 'limited';
   return 'out';
 }

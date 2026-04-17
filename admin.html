@@ -1171,7 +1171,7 @@
 
         // 2. Merge live fuel stations
         (stRes?.data || []).forEach(s => {
-          const isGas = s.category === 'gas' || String(s.id).startsWith('GAS-');
+          const isGas = s.category === 'gas' || String(s.id).startsWith('GAS-') || String(s.id).startsWith('rg');
           const existing = stationMap.get(String(s.id)) || {};
           stationMap.set(String(s.id), { ...existing, ...s, id: s.id, isGas, originTable: isGas ? 'gas' : 'stations' });
         });
@@ -1179,7 +1179,15 @@
         // 3. Merge live gas shops
         (gasRes?.data || []).forEach(g => {
           const existing = stationMap.get(String(g.id)) || {};
-          stationMap.set(String(g.id), { ...existing, ...g, id: g.id, isGas: true, originTable: 'gas' });
+          const isGas = true;
+          stationMap.set(String(g.id), { 
+            ...existing, 
+            ...g, 
+            id: g.id, 
+            isGas, 
+            originTable: 'gas',
+            fuels: g.stock || g.fuels || existing.stock || {} // Provide alias for UI filtering
+          });
         });
 
         ALL_ADMIN_STATIONS = Array.from(stationMap.values());
@@ -1199,6 +1207,8 @@
         let matchesType = (tF === 'all');
         if (!matchesType) matchesType = (tF === 'gas' && s.isGas) || (tF === 'fuel' && !s.isGas);
         let matchesStat = (sF === 'all');
+        const searchData = s.fuels || s.stock || {};
+        if (!matchesStat && searchData) Object.values(searchData).some(v => v === sF) ? matchesStat = true : null;
         if (!matchesStat && s.fuels) matchesStat = Object.values(s.fuels).some(v => v === sF);
         return matchesSearch && matchesDist && matchesComp && matchesStat && matchesType;
       });
@@ -1354,7 +1364,7 @@
       const district = document.getElementById('esDistrict').value;
       
       const fuelsData = {};
-      document.querySelectorAll('.fuel-select-field').forEach(el => {
+      document.querySelectorAll('#esFuelStatusList .fuel-select-field').forEach(el => {
         fuelsData[el.dataset.fkey] = el.value;
       });
       const queue = document.getElementById('esQueue').value;
@@ -1413,9 +1423,9 @@
         }
         
         closeStationEdit();
-        // Force full re-fetch to sync with DB
-        ALL_ADMIN_STATIONS = [];
-        await renderManageStations();
+        // Re-render UI with optimistic updates immediately, keeping search memory
+        const currentSearch = document.getElementById('stationSearchInput')?.value || '';
+        await renderManageStations(currentSearch);
       } else {
         const errMsg = res?.error || 'Unknown error';
         console.error('Save failed:', errMsg);
