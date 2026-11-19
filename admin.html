@@ -948,6 +948,11 @@
       }
     });
 
+    const btn = document.querySelector('.save-price-btn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Saving...';
+
     try {
       const res = await apiFetch('/api/prices/bulk', {
         method: 'PUT',
@@ -962,6 +967,9 @@
       }
     } catch(err) {
       showAdminToast('❌ Network error.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
     }
   }
   // ── USER FEEDBACK ────────────────────────────────────────

@@ -27,10 +27,10 @@ function initMap() {
     attributionControl: false
   });
 
-  // CartoDB Voyager – readable dark navy style with city labels
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  // OpenStreetMap – free, no API key required
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '© OpenStreetMap © CARTO'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
 
   // Fit to Sri Lanka on load

@@ -18,8 +18,9 @@ const Auth = {
   }),
 };
 
-// ---- Core fetch wrapper with Cache-Busting ----
-async function apiFetch(path, options = {}) {
+// ---- Core fetch wrapper with Cache-Busting & Auto-Retry ----
+async function apiFetch(path, options = {}, _retryCount = 0) {
+  const MAX_RETRIES = 2;
   try {
     const url = new URL(`${API_BASE}${path}`);
     // Append timestamp to GET requests to bypass CDN/Browser cache
@@ -43,10 +44,25 @@ async function apiFetch(path, options = {}) {
       }
     }
 
+    // Auto-retry on 500/502/503/504 (Render cold-start / wake-up)
+    if (res.status >= 500 && _retryCount < MAX_RETRIES) {
+      const delay = (_retryCount + 1) * 3000; // 3s, 6s
+      console.warn(`⏳ Server returned ${res.status}, retrying in ${delay / 1000}s... (attempt ${_retryCount + 1}/${MAX_RETRIES})`);
+      await new Promise(r => setTimeout(r, delay));
+      return apiFetch(path, options, _retryCount + 1);
+    }
+
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'API error');
     return data;
   } catch (err) {
+    // Retry on network errors (fetch failures, timeouts) from cold-start
+    if (_retryCount < MAX_RETRIES && (err.name === 'TypeError' || err.message === 'Failed to fetch')) {
+      const delay = (_retryCount + 1) * 3000;
+      console.warn(`⏳ Network error, server may be waking up. Retrying in ${delay / 1000}s... (attempt ${_retryCount + 1}/${MAX_RETRIES})`);
+      await new Promise(r => setTimeout(r, delay));
+      return apiFetch(path, options, _retryCount + 1);
+    }
     console.warn(`API call failed [${path}]:`, err.message);
     return { success: false, error: err.message };
   }
